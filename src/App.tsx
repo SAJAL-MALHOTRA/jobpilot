@@ -13,6 +13,8 @@ import { AutopilotTracker } from './components/AutopilotTracker';
 import { PortfolioStudio } from './components/PortfolioStudio';
 import { RadarGlobe3D } from './components/RadarGlobe3D';
 import { TiltCard3D } from './components/TiltCard3D';
+import { PreFooterCTA } from './components/PreFooterCTA';
+import { Footer } from './components/Footer';
 import confetti from 'canvas-confetti';
 
 export function App() {
@@ -207,17 +209,27 @@ export function App() {
           </TiltCard3D>
         </section>
 
-        {/* 4. Feature Bento Grid & Engineering Stories */}
+        {/* 4. Feature Bento Grid, Customer Stories & Supersonic Mission Control */}
         <section>
           <JobPilotFeatures
             onOpenOutreachModal={() => setActiveModal('OUTREACH')}
             onOpenPortfolioModal={() => setActiveModal('PORTFOLIO')}
             onOpenApplicationsTab={() => setActiveModal('APPLICATIONS')}
+            onExploreCluster={() => scrollToDashboard()}
+          />
+        </section>
+
+        {/* 5. Pre-Footer High-Impact Launchpad CTA */}
+        <section>
+          <PreFooterCTA
+            onLaunchRadar={scrollToDashboard}
+            onOpenOutreach={() => setActiveModal('OUTREACH')}
+            onOpenPortfolio={() => setActiveModal('PORTFOLIO')}
           />
         </section>
       </main>
 
-      {/* 5. Modals */}
+      {/* 6. Modals */}
       {/* Cold Email to Founder Modal */}
       {activeModal === 'OUTREACH' && (
         <OutreachModal
@@ -321,24 +333,14 @@ export function App() {
         </div>
       )}
 
-      {/* 6. JobPilot Footer */}
-      <footer className="bg-[#07080C] border-t border-[#161822] py-12 text-xs font-mono text-[#687087] mt-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-white font-bold">
-            <div className="w-5 h-5 rounded bg-white text-black flex items-center justify-center font-bold text-[10px]">
-              JP
-            </div>
-            <span>JobPilot</span>
-            <span className="text-[#4E546C] font-normal">— Autonomous Reverse Recruiter for Tech Startups</span>
-          </div>
-
-          <div className="flex items-center gap-6 text-[11px] text-[#A3A8BD]">
-            <span className="hover:text-white transition-colors cursor-pointer">Indiranagar · Koramangala · HSR Layout · Remote</span>
-            <span className="text-[#2B3042]">•</span>
-            <span>JobPilot AI © 2026</span>
-          </div>
-        </div>
-      </footer>
+      {/* 7. Comprehensive Enterprise Tech Footer */}
+      <Footer
+        onOpenOutreach={() => setActiveModal('OUTREACH')}
+        onOpenPortfolio={() => setActiveModal('PORTFOLIO')}
+        onOpenAts={() => setActiveModal('ATS')}
+        onOpenTracker={() => setActiveModal('APPLICATIONS')}
+        onScrollToTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      />
     </div>
   );
 }

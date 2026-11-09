@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { Mail, Check, Send, Globe, Zap, ExternalLink } from 'lucide-react';
+import { Mail, Check, Send, Globe, Zap, ExternalLink, Activity, ShieldCheck } from 'lucide-react';
 import { TiltCard3D } from './TiltCard3D';
+import { SupersonicMissionControl } from './SupersonicMissionControl';
 import confetti from 'canvas-confetti';
 
 interface JobPilotFeaturesProps {
   onOpenOutreachModal: () => void;
   onOpenPortfolioModal: () => void;
   onOpenApplicationsTab: () => void;
+  onExploreCluster?: (clusterName: string) => void;
 }
 
 export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
   onOpenOutreachModal,
   onOpenPortfolioModal,
   onOpenApplicationsTab,
+  onExploreCluster,
 }) => {
   const [emailSent, setEmailSent] = useState(false);
 
@@ -22,89 +25,81 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
       particleCount: 25,
       spread: 45,
       origin: { y: 0.8 },
-      colors: ['#FFFFFF', '#10B981']
+      colors: ['#FFFFFF', '#10B981'],
     });
     setTimeout(() => setEmailSent(false), 3000);
   };
 
   return (
-    <div className="space-y-16 pt-12">
-      {/* Section Header */}
+    <div className="space-y-20 pt-12">
+      {/* 1. Section Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#13151F] border border-[#1E2230] text-xs font-mono text-[#A3A8BD] shadow-sm">
-          <span>◈</span>
-          <span>Autonomous Copilot Capabilities</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#131522] border border-[#202538] text-xs font-mono text-[#A3A8BD] shadow-sm">
+          <span className="text-[#38BDF8]">◈</span>
+          <span>JobPilot Core Systems</span>
+          <span className="text-[#3E455E]">•</span>
+          <span className="text-[#10B981] font-semibold">Autonomous Architecture</span>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
-          Everything you need to bypass ATS and close offers
+        <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+          Engineered for speed, unadvertised roles, and founder access
         </h2>
 
         <p className="text-sm text-[#8C93A8] leading-relaxed max-w-xl mx-auto font-sans">
-          Gmail auto-tracking, an interactive proof-of-work portfolio, 80% response cold emails to founders, and Bangalore startup intelligence.
+          Four interconnected engines engineered to eliminate ATS rejection, prove production caliber, and put your tech career on autopilot.
         </p>
       </div>
 
-      {/* 2x2 Bento Grid with 3D Interactive Tilting */}
+      {/* 2. 2x2 Bento Grid with 3D Interactive Tilting */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-        {/* Bento Card 1: Gmail Tracking */}
-        <TiltCard3D 
+        {/* Bento Card 1: Autonomous Inbound Telemetry */}
+        <TiltCard3D
           onClick={onOpenApplicationsTab}
           className="jp-card p-6 flex flex-col justify-between space-y-6 cursor-pointer group rounded-2xl"
         >
-          {/* Visual: Simulated Dark Mode 4-Column Board */}
-          <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-3 text-[10px] font-mono space-y-2">
-            <div className="grid grid-cols-4 gap-2 text-[#687087] pb-2 border-b border-[#1E2230]">
-              <div className="flex items-center gap-1 text-white font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" /> Applied (3)
+          {/* Visual: Live Telemetry & Pipeline Console */}
+          <div className="bg-[#0A0C13] rounded-xl border border-[#1E2335] p-3.5 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#1A1F30] text-[10px] text-[#71788E]">
+              <div className="flex items-center gap-1.5 text-white font-bold">
+                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+                <span>INBOUND GMAIL STREAM</span>
               </div>
-              <div className="flex items-center gap-1 text-[#8C93A8]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1]" /> Interview (2)
+              <span className="text-[#10B981] font-semibold">Auto-Sync Active</span>
+            </div>
+
+            {/* Inbound Packet Stream */}
+            <div className="space-y-2">
+              <div className="p-2.5 rounded-lg bg-[#111420] border border-[#1E2438] space-y-1">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-[#38BDF8] font-bold">Sarvam AI · Technical Founder</span>
+                  <span className="text-[#646B82]">14 mins ago</span>
+                </div>
+                <div className="text-[11px] text-white truncate">
+                  "Reviewed your sub-45ms order dispatch code. Can we chat Thursday 4 PM?"
+                </div>
+                <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#10B981]/15 text-[#10B981] text-[9px]">
+                  <span>⚡ Interview Auto-Moved to Calendar</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-[#8C93A8]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" /> Offer (1)
-              </div>
-              <div className="flex items-center gap-1 text-[#8C93A8]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]" /> Rejected
+
+              <div className="p-2.5 rounded-lg bg-[#111420] border border-[#1E2438] space-y-1 opacity-80">
+                <div className="flex items-center justify-between text-[10px]">
+                  <span className="text-[#A3A8BD] font-bold">CognitiveHQ (YC W24)</span>
+                  <span className="text-[#646B82]">2 hrs ago</span>
+                </div>
+                <div className="text-[11px] text-[#A3A8BD] truncate">
+                  "Application received via Sumit Kesarwani pitch formula."
+                </div>
+                <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#6366F1]/15 text-[#818CF8] text-[9px]">
+                  <span>Stage: Under Founder Review</span>
+                </div>
               </div>
             </div>
 
-            {/* Kanban Columns Preview */}
-            <div className="grid grid-cols-4 gap-2">
-              <div className="space-y-1.5">
-                <div className="p-2 rounded bg-[#131622] border border-[#1E2230] space-y-0.5">
-                  <div className="font-bold text-white text-[9px] truncate">Machine Learning Intern</div>
-                  <div className="text-[8px] text-[#8C93A8]">Prayog AI</div>
-                  <div className="text-[8px] text-[#52576B] truncate">"We received your application"</div>
-                </div>
-                <div className="p-2 rounded bg-[#131622] border border-[#1E2230] space-y-0.5">
-                  <div className="font-bold text-white text-[9px] truncate">Senior Data Engineer</div>
-                  <div className="text-[8px] text-[#8C93A8]">Mosaic Retail</div>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="p-2 rounded bg-[#131622] border border-[#6366F1]/40 space-y-0.5">
-                  <div className="font-bold text-[#818CF8] text-[9px] truncate">Senior Frontend Eng.</div>
-                  <div className="text-[8px] text-[#8C93A8]">Meridian Retail</div>
-                  <div className="text-[8px] text-[#10B981] truncate">"Interview booked: Thu 4pm"</div>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="p-2 rounded bg-[#131622] border border-[#F59E0B]/40 space-y-0.5">
-                  <div className="font-bold text-[#F59E0B] text-[9px] truncate">Founding AI Engineer</div>
-                  <div className="text-[8px] text-[#8C93A8]">CognitiveHQ</div>
-                  <div className="text-[8px] text-[#F59E0B] truncate">"Your offer from CognitiveHQ"</div>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="p-2 rounded bg-[#131622] border border-[#1E2230] space-y-0.5 opacity-60">
-                  <div className="font-bold text-white text-[9px] truncate">Security Engineer</div>
-                  <div className="text-[8px] text-[#8C93A8]">Ironvale</div>
-                </div>
-              </div>
+            {/* Bottom Status Ticker */}
+            <div className="pt-2 border-t border-[#1A1F30] flex items-center justify-between text-[10px] text-[#71788E]">
+              <span>Avg Reply Velocity: 14.2 hrs</span>
+              <span className="text-[#10B981]">100% Inbound Capture</span>
             </div>
           </div>
 
@@ -112,35 +107,65 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-base font-bold text-white">
               <Zap className="w-4 h-4 text-[#F59E0B]" />
-              <span>Gmail Inbound Tracking</span>
+              <span>Autonomous Inbound Telemetry</span>
             </div>
             <p className="text-xs text-[#8C93A8] leading-relaxed">
-              Every day our background agent scans Gmail and updates Applied, Interview, Offer, and Rejected on your board.
+              JobPilot monitors your email in the background, parses founder replies and Ashby invites via OCR & regex, and automatically syncs your recruitment pipeline.
             </p>
           </div>
         </TiltCard3D>
 
-        {/* Bento Card 2: Resume to Portfolio */}
-        <TiltCard3D 
+        {/* Bento Card 2: Interactive Proof-of-Work Studio */}
+        <TiltCard3D
           onClick={onOpenPortfolioModal}
           className="jp-card p-6 flex flex-col justify-between space-y-6 cursor-pointer group rounded-2xl"
         >
-          {/* Visual: Browser Frame Preview */}
-          <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-4 text-xs font-mono space-y-3">
-            <div className="flex items-center justify-between text-[10px] text-[#687087] pb-2 border-b border-[#1E2230]">
-              <span className="px-1.5 py-0.5 rounded bg-[#161926] border border-[#23273B] text-white">Live URL</span>
-              <span className="text-[#A3A8BD]">jobpilot.dev/p/arjunmehta</span>
-              <ExternalLink className="w-3 h-3 text-[#687087]" />
+          {/* Visual: Code & Latency Benchmark Preview */}
+          <div className="bg-[#0A0C13] rounded-xl border border-[#1E2335] p-3.5 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between text-[10px] text-[#71788E] pb-2 border-b border-[#1A1F30]">
+              <div className="flex items-center gap-1.5 text-white">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1]" />
+                <span className="font-bold">PROVING PRODUCTION CALIBER</span>
+              </div>
+              <span className="text-[#38BDF8]">jobpilot.dev/p/arjunmehta</span>
             </div>
 
-            <div className="bg-[#121522] rounded-lg p-5 border border-[#1E2230] text-center space-y-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 mx-auto text-white flex items-center justify-center font-bold text-xs shadow-md">
-                AM
+            {/* Live Microservice Telemetry */}
+            <div className="bg-[#111420] rounded-lg p-3 border border-[#1E2438] space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-3.5 h-3.5 text-[#10B981]" />
+                  <span className="text-xs font-bold text-white">Order Dispatch Microservice</span>
+                </div>
+                <span className="px-2 py-0.5 rounded bg-[#10B981]/15 text-[#10B981] text-[10px] font-bold">
+                  p99: 42.4ms
+                </span>
               </div>
-              <h4 className="text-sm font-bold text-white font-sans">Your proof-of-work portfolio from GitHub</h4>
-              <p className="text-[11px] text-[#8C93A8] max-w-sm mx-auto font-sans">
-                Sub-45ms latency benchmarks, verified GitHub commits, and shipped production code ready to share with founders.
-              </p>
+
+              {/* Simulated Latency Bars */}
+              <div className="grid grid-cols-4 gap-1.5 pt-1 text-[9px] text-[#8C93A8]">
+                <div className="p-1.5 rounded bg-[#0A0C13] border border-[#1A1F30] text-center">
+                  <div className="text-white font-bold">120k</div>
+                  <div className="text-[8px] text-[#646B82]">RPM</div>
+                </div>
+                <div className="p-1.5 rounded bg-[#0A0C13] border border-[#1A1F30] text-center">
+                  <div className="text-white font-bold">99.99%</div>
+                  <div className="text-[8px] text-[#646B82]">Accuracy</div>
+                </div>
+                <div className="p-1.5 rounded bg-[#0A0C13] border border-[#1A1F30] text-center">
+                  <div className="text-white font-bold">2,410</div>
+                  <div className="text-[8px] text-[#646B82]">Commits</div>
+                </div>
+                <div className="p-1.5 rounded bg-[#0A0C13] border border-[#1A1F30] text-center">
+                  <div className="text-[#10B981] font-bold">Passed</div>
+                  <div className="text-[8px] text-[#646B82]">Benchmarks</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#1A1F30] flex items-center justify-between text-[10px] text-[#71788E]">
+              <span>Verified GitHub Proof-of-Work</span>
+              <ExternalLink className="w-3 h-3 text-[#A3A8BD]" />
             </div>
           </div>
 
@@ -148,50 +173,50 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-base font-bold text-white">
               <Globe className="w-4 h-4 text-[#60A5FA]" />
-              <span>Resume to Proof-of-Work</span>
+              <span>Resume to Proof-of-Work Studio</span>
             </div>
             <p className="text-xs text-[#8C93A8] leading-relaxed">
-              Drop in your resume and GitHub. You get an interactive portfolio out of it with live latency benchmarks, without building a site yourself.
+              Founders don't read static PDFs. JobPilot generates an interactive engineering showcase with live sub-45ms latency benchmarks, system architecture diagrams, and GitHub commit heatmaps.
             </p>
           </div>
         </TiltCard3D>
 
-        {/* Bento Card 3: Cold Email to Founders */}
+        {/* Bento Card 3: CrackColdEmail™ Formula Engine */}
         <TiltCard3D className="jp-card p-6 flex flex-col justify-between space-y-6 rounded-2xl">
-          {/* Visual: Exact Cold Email Composer Preview */}
-          <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-4 text-xs font-mono space-y-3">
-            <div className="space-y-1 pb-2 border-b border-[#1E2230] text-[11px]">
-              <div className="text-[#8C93A8]">
-                <strong className="text-white">To:</strong> Siddharth Varma at CognitiveHQ (YC W24)
+          {/* Visual: Pitch Composer Preview */}
+          <div className="bg-[#0A0C13] rounded-xl border border-[#1E2335] p-3.5 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#1A1F30] text-[10px]">
+              <div className="flex items-center gap-1.5 text-white font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                <span>SUMIT KESARWANI 4-PART FORMULA</span>
               </div>
-              <div className="text-[#8C93A8]">
-                <strong className="text-white">Subject:</strong> high-throughput order dispatch at 120k RPM
-              </div>
+              <span className="text-[#10B981] font-bold">81.6% Reply Rate</span>
             </div>
 
-            <div className="text-[11px] text-[#D4D4D4] leading-relaxed space-y-2 font-mono">
+            <div className="text-[11px] text-[#D4D4D4] leading-relaxed space-y-2 font-mono bg-[#111420] p-3 rounded-lg border border-[#1E2438]">
+              <div className="text-[#8C93A8] text-[10px] flex items-center justify-between pb-1 border-b border-[#1A1F30]">
+                <span>To: founder@cognitivehq.ai</span>
+                <span className="text-[#10B981]">Ashby Scraped</span>
+              </div>
               <p>Hey Siddharth,</p>
-              <p className="text-[#8C93A8]">Full stack & AI platform engineer, low-latency backends mostly.</p>
-              <p>CognitiveHQ building autonomous supply chain agents is the problem space I spent 2 years optimizing at Swiggy.</p>
-              <div className="p-2 rounded bg-[#131622] border border-[#1E2230] text-[10px] text-[#8C93A8] space-y-0.5">
-                <span className="text-white font-bold block">things I've shipped:</span>
+              <p className="text-[#8C93A8]">
+                <span className="text-[#38BDF8]">[Relevance]</span> Building autonomous supply chain agents is the problem space I spent 2 years optimizing at Swiggy.
+              </p>
+              <div className="p-2 rounded bg-[#0A0C13] border border-[#1A1F30] text-[10px] text-[#A3A8BD] space-y-0.5">
+                <span className="text-white font-bold block">[Proof]:</span>
                 <div>• Order dispatch engine: scaled to 120k req/min with sub-45ms p99.</div>
-                <div>• Reconciliation pipeline: ₹40Cr daily GMV with 99.99% accuracy via Celery/SQS.</div>
-                <div>• Reactive UI: WebSockets state streaming in React 18, cutting render thrash by 34%.</div>
+                <div>• Reconciliation pipeline: ₹40Cr daily GMV with 99.99% accuracy.</div>
               </div>
-              <p>would love to build the agent core with you. Open to a 10 minute chat this Thursday?</p>
-              <p className="text-[#8C93A8]">Arjun • github.com/arjunmehta-dev</p>
-              <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[#161926] border border-[#23273B] text-[10px] text-white">
-                <span>📄</span>
-                <span>arjun-mehta-resume.pdf</span>
-              </div>
+              <p className="text-[#10B981]">
+                <span className="text-[#F59E0B]">[Small Ask]:</span> Would love to build the agent core with you. Open to a 10 min chat this Thursday?
+              </p>
             </div>
 
             {/* Bottom Actions Bar */}
-            <div className="pt-2 border-t border-[#1E2230] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px]">
-              <span className="text-[#687087]">Sends from arjun@demo.jobpilot.com</span>
+            <div className="pt-2 border-t border-[#1A1F30] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[10px]">
+              <span className="text-[#687087]">Primary Inbox Deliverability: 99.4%</span>
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={onOpenOutreachModal}
                   className="px-2.5 py-1 text-[#8C93A8] hover:text-white"
                 >
@@ -202,7 +227,7 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
                   className="px-3 py-1 bg-white hover:bg-[#EDEDED] text-black font-bold rounded-md transition-all flex items-center gap-1 shadow-sm"
                 >
                   {emailSent ? <Check className="w-3 h-3 text-[#10B981]" /> : <Send className="w-3 h-3" />}
-                  <span>{emailSent ? 'Sent to Siddharth!' : 'Send email'}</span>
+                  <span>{emailSent ? 'Dispatched to Founder!' : 'Dispatch Pitch'}</span>
                 </button>
               </div>
             </div>
@@ -212,61 +237,95 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-base font-bold text-white">
               <Mail className="w-4 h-4 text-[#34D399]" />
-              <span>CrackColdEmail 80% Playbook</span>
+              <span>CrackColdEmail™ Founder Engine</span>
             </div>
             <p className="text-xs text-[#8C93A8] leading-relaxed">
-              The agent crafts 4-part cold emails (Context + Relevance + Proof + Small Ask) with your resume attached, and dispatches directly from your Gmail once you approve.
+              Auto-compiles battle-tested pitches with Context, Relevance, Proof, and a low-friction Small Ask. Launches directly into Gmail, WhatsApp Web, or X DM in one click.
             </p>
           </div>
         </TiltCard3D>
 
-        {/* Bento Card 4: 10,000+ Startups */}
+        {/* Bento Card 4: Bangalore & YC Startup Cluster Radar */}
         <TiltCard3D className="jp-card p-6 flex flex-col justify-between space-y-6 rounded-2xl">
-          {/* Visual: Logo Grid of Startups */}
-          <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-5 text-xs font-mono">
-            <div className="grid grid-cols-3 gap-3">
-              <div className="p-3 rounded-xl bg-[#131622] border border-[#1E2230] flex items-center justify-center font-bold text-xs text-white">
-                perplexity
+          {/* Visual: Startup Cluster Matrix */}
+          <div className="bg-[#0A0C13] rounded-xl border border-[#1E2335] p-3.5 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-[#1A1F30] text-[10px] text-[#71788E]">
+              <div className="flex items-center gap-1.5 text-white font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
+                <span>UNADVERTISED STARTUP RADAR</span>
               </div>
-              <div className="p-3 rounded-xl bg-[#131622] border border-[#1E2230] flex items-center justify-center font-bold text-xs text-white">
-                🤗 Hugging Face
+              <span className="text-[#38BDF8]">Live Feed</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[11px]">
+              <div className="p-2.5 rounded-lg bg-[#111420] border border-[#1E2438] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-bold">Indiranagar</span>
+                  <span className="text-[#10B981] font-bold">48 Roles</span>
+                </div>
+                <div className="text-[10px] text-[#71788E]">AI & Foundation Models</div>
+                <div className="text-[9px] text-[#38BDF8]">Avg: ₹28-65 LPA</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#131622] border border-[#1E2230] flex items-center justify-center font-bold text-xs text-white">
-                Resend
+
+              <div className="p-2.5 rounded-lg bg-[#111420] border border-[#1E2438] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-bold">Koramangala</span>
+                  <span className="text-[#10B981] font-bold">62 Roles</span>
+                </div>
+                <div className="text-[10px] text-[#71788E]">High-Throughput Fintech</div>
+                <div className="text-[9px] text-[#38BDF8]">Avg: ₹32-75 LPA</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#131622] border border-[#1E2230] flex items-center justify-center font-bold text-xs text-white">
-                mintlify
+
+              <div className="p-2.5 rounded-lg bg-[#111420] border border-[#1E2438] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-bold">HSR Layout</span>
+                  <span className="text-[#10B981] font-bold">54 Roles</span>
+                </div>
+                <div className="text-[10px] text-[#71788E]">DevTools & Cloud Infra</div>
+                <div className="text-[9px] text-[#38BDF8]">Avg: ₹26-55 LPA</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#131622] border border-[#1E2230] flex items-center justify-center font-bold text-xs text-white">
-                ⚡ Supabase
+
+              <div className="p-2.5 rounded-lg bg-[#111420] border border-[#1E2438] space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-bold">YC W24 / S24</span>
+                  <span className="text-[#10B981] font-bold">38 Roles</span>
+                </div>
+                <div className="text-[10px] text-[#71788E]">Seed to Series A</div>
+                <div className="text-[9px] text-[#38BDF8]">$110k-160k (₹50-85L)</div>
               </div>
-              <div className="p-3 rounded-xl bg-[#131622] border border-[#1E2230] flex items-center justify-center font-bold text-xs text-white">
-                Linear
-              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#1A1F30] flex items-center justify-between text-[10px] text-[#71788E]">
+              <span className="text-[#10B981]">34 Teams Financing Notice Buyouts</span>
+              <span>10,000+ Startups Indexed</span>
             </div>
           </div>
 
           {/* Description */}
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-base font-bold text-white">
-              <span>🏹</span>
-              <span>10,000+ Tech Startups Indexed</span>
+              <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
+              <span>Bangalore & YC Startup Cluster Radar</span>
             </div>
             <p className="text-xs text-[#8C93A8] leading-relaxed">
-              Updated every 24 hours across Bangalore clusters (Indiranagar, HSR, Koramangala) and YC W24/S24 cohorts with verified founder contacts.
+              Scrapes unadvertised seed roles across Indiranagar, Koramangala, and HSR Layout directly through founder LinkedIn, Ashby APIs, and YC job boards.
             </p>
           </div>
         </TiltCard3D>
       </div>
 
-      {/* 3. Real JobPilot Customer Stories with 3D Tilt */}
-      <section className="space-y-8 pt-8 max-w-5xl mx-auto">
+      {/* 3. Real JobPilot Customer Stories */}
+      <section className="space-y-8 pt-6 max-w-5xl mx-auto">
         <div className="text-center space-y-2">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight">
-            Built for startup velocity
-          </h2>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#131522] border border-[#202538] text-xs font-mono text-[#A3A8BD]">
+            <span>⚡</span>
+            <span>Startup Velocity Case Studies</span>
+          </div>
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            How engineers are closing offers across top startup teams
+          </h3>
           <p className="text-xs text-[#71788E] font-mono">
-            How engineers are closing offers across top Bangalore & YC teams.
+            Direct founder outreach and proof-of-work benchmarks replacing traditional resumes.
           </p>
         </div>
 
@@ -333,15 +392,12 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
         </div>
       </section>
 
-      {/* 4. Community Illustration Banner */}
-      <div className="pt-10 max-w-6xl mx-auto overflow-hidden">
-        <img
-          src="/crowd-illustration.png"
-          alt="Tech startup engineering community"
-          className="w-full h-auto object-cover opacity-80 rounded-2xl border border-[#1E2230]"
-        />
-      </div>
+      {/* 4. Supersonic Mission Control Visualizer (Replacing the old crowd illustration completely) */}
+      <section className="pt-6">
+        <SupersonicMissionControl onExploreCluster={onExploreCluster} />
+      </section>
     </div>
   );
 };
+
 export default JobPilotFeatures;
