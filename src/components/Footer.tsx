@@ -17,7 +17,7 @@ export const Footer: React.FC<FooterProps> = ({
   onScrollToTop,
 }) => {
   return (
-    <footer className="bg-[#06080E] border-t border-[#161A28] pt-16 pb-12 text-xs font-sans text-[#8C93A8]">
+    <footer className="bg-[#000000] border-t border-[#1F1F1F] pt-16 pb-12 text-xs font-sans text-[#888888]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-12">
         {/* Main 4-Column Directory */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">

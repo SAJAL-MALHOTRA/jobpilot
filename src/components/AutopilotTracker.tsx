@@ -7,9 +7,8 @@ import {
   Trash2, 
   Send, 
   Mail, 
-  RefreshCw
+  Download
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 interface AutopilotTrackerProps {
   cards: ApplicationCard[];
@@ -33,25 +32,28 @@ export const AutopilotTracker: React.FC<AutopilotTrackerProps> = ({
   onOpenOutreachForCard,
 }) => {
   const [followUpCopiedId, setFollowUpCopiedId] = useState<string | null>(null);
-  const [isSyncingGmail, setIsSyncingGmail] = useState(false);
-  const [gmailSyncMessage, setGmailSyncMessage] = useState<string | null>(
-    'Connected to arjun.mehta.dev@gmail.com · Inbound webhooks active.'
-  );
 
-  const handleSyncGmail = () => {
-    setIsSyncingGmail(true);
-    setTimeout(() => {
-      setIsSyncingGmail(false);
-      setGmailSyncMessage(
-        '✓ Gmail Inbound Synced: 28 messages analyzed · 1 Calendly invite detected from Sarvam AI (booked Round 1 screening) · 0 rejections.'
-      );
-      confetti({
-        particleCount: 25,
-        spread: 50,
-        origin: { y: 0.8 },
-        colors: ['#EDEDED', '#10B981']
-      });
-    }, 1200);
+  const handleExportCsv = () => {
+    const headers = ['Company', 'Role', 'Status', 'Founder Name', 'Founder Email', 'Location', 'Salary', 'Notes'];
+    const rows = cards.map((c) => [
+      `"${c.job.company}"`,
+      `"${c.job.title}"`,
+      `"${c.status}"`,
+      `"${c.job.founderName}"`,
+      `"${c.job.founderEmail}"`,
+      `"${c.job.location}"`,
+      `"${c.job.salaryDisplay || `₹${c.job.minCtcLpa}L`}"`,
+      `"${(c.notes || '').replace(/"/g, '""')}"`,
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `jobpilot_applications_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const getCardsByStatus = (status: KanbanStatus) => cards.filter((c) => c.status === status);
@@ -67,17 +69,10 @@ Just following up quickly on my note from a few days ago regarding the ${card.jo
 Given your focus on ${card.job.requiredSkills.slice(0, 3).join(', ')}, I'd love to share how we solved similar scale challenges at ${card.job.company}. Would you be open to a brief 10-minute chat this Thursday?
 
 Best regards,
-Arjun Mehta
-Portfolio: https://jobpilot.dev/p/arjunmehta`;
+Arjun Mehta`;
 
     navigator.clipboard.writeText(text);
     setFollowUpCopiedId(card.id);
-    confetti({
-      particleCount: 20,
-      spread: 40,
-      origin: { y: 0.7 },
-      colors: ['#EDEDED', '#F59E0B']
-    });
     setTimeout(() => setFollowUpCopiedId(null), 2500);
   };
 
@@ -140,30 +135,31 @@ Portfolio: https://jobpilot.dev/p/arjunmehta`;
         </div>
       </div>
 
-      {/* Gmail Application Tracker Hub (Matches & Outperforms Aarivi) */}
-      <div className="bg-[#111115] p-4 rounded-2xl border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono">
+      {/* Real Pipeline Export Bar */}
+      <div className="bg-[#0A0A0A] p-4 rounded-xl border border-[#1F1F1F] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-emerald-400">
-            <Mail className="w-4 h-4" />
+          <div className="w-8 h-8 rounded-lg bg-[#141414] border border-[#262626] flex items-center justify-center text-white">
+            <Mail className="w-4 h-4 text-[#888888]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-white font-sans text-sm">Gmail Inbound Auto-Tracker</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-neutral-900 text-neutral-300 border border-neutral-800">
-                Aarivi Parity
+              <span className="font-bold text-white font-sans text-sm">Application Pipeline Tracker</span>
+              <span className="px-2 py-0.5 rounded text-[10px] bg-[#141414] text-[#888888] border border-[#262626]">
+                Local Storage Persistence
               </span>
             </div>
-            <p className="text-[11px] text-neutral-400 mt-0.5">{gmailSyncMessage}</p>
+            <p className="text-[11px] text-[#888888] mt-0.5">
+              All applications and outreach logs persist in your browser. Export to CSV anytime.
+            </p>
           </div>
         </div>
 
         <button
-          onClick={handleSyncGmail}
-          disabled={isSyncingGmail}
-          className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-medium border border-neutral-800 transition-all flex items-center gap-2 shrink-0"
+          onClick={handleExportCsv}
+          className="px-3.5 py-2 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-white font-medium border border-[#262626] transition-colors flex items-center gap-2 shrink-0 text-xs"
         >
-          <RefreshCw className={`w-3.5 h-3.5 text-neutral-400 ${isSyncingGmail ? 'animate-spin' : ''}`} />
-          <span>{isSyncingGmail ? 'Scanning Gmail Inbound...' : 'Sync Inbound Messages'}</span>
+          <Download className="w-3.5 h-3.5 text-[#888888]" />
+          <span>Export to CSV</span>
         </button>
       </div>
 

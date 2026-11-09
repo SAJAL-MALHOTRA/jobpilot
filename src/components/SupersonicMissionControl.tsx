@@ -179,32 +179,32 @@ export const SupersonicMissionControl: React.FC<{ onExploreCluster?: (clusterNam
   }, []);
 
   return (
-    <div className="rounded-2xl border border-[#1E2230] bg-[#0A0C13] overflow-hidden shadow-2xl relative">
+    <div className="rounded-xl border border-[#1F1F1F] bg-[#0A0A0A] overflow-hidden shadow-xl relative">
       {/* Background Radar Canvas */}
-      <div className="absolute inset-0 pointer-events-none opacity-60">
+      <div className="absolute inset-0 pointer-events-none opacity-40">
         <canvas ref={canvasRef} className="w-full h-full block" />
       </div>
 
-      {/* Top Cockpit Header Bar */}
-      <div className="relative z-10 bg-[#10131E]/90 backdrop-blur-md px-5 py-3 border-b border-[#1E2230] flex flex-wrap items-center justify-between gap-4">
+      {/* Top Header Bar */}
+      <div className="relative z-10 bg-[#0A0A0A] px-5 py-3 border-b border-[#1F1F1F] flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#161A28] border border-[#252B40] text-xs font-mono text-[#38BDF8]">
-            <Radio className="w-3.5 h-3.5 animate-pulse text-[#10B981]" />
-            <span className="font-bold">MISSION CONTROL</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#141414] border border-[#262626] text-xs font-mono text-white">
+            <Radio className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-bold">STARTUP CORRIDORS</span>
           </div>
-          <span className="text-xs text-[#8C93A8] font-mono hidden sm:inline">
-            Bangalore & YC Startup Cluster Telemetry
+          <span className="text-xs text-[#888888] font-mono hidden sm:inline">
+            Bangalore & YC Startup Cluster Directory
           </span>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-mono text-[#A3A8BD]">
+        <div className="flex items-center gap-4 text-xs font-mono text-[#888888]">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-            <span className="text-white font-medium">99.4% In-Box Deliverability</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="text-white font-medium">Direct Founder Inboxes</span>
           </div>
-          <span className="text-[#3A4055]">•</span>
-          <div className="flex items-center gap-1.5 text-[#8C93A8]">
-            <Activity className="w-3.5 h-3.5 text-[#6366F1]" />
+          <span className="text-[#333333]">•</span>
+          <div className="flex items-center gap-1.5 text-[#888888]">
+            <Activity className="w-3.5 h-3.5 text-[#888888]" />
             <span>Telemetry Ping: {22 + (telemetryTick % 5)}ms</span>
           </div>
         </div>

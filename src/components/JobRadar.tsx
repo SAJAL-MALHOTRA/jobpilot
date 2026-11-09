@@ -6,7 +6,6 @@ import {
   Send, 
   FileText, 
   Check, 
-  Bot, 
   MessageSquare, 
   Briefcase, 
   Inbox, 
@@ -82,39 +81,39 @@ export const JobRadar: React.FC<JobRadarProps> = ({
 
   return (
     <div className="space-y-12">
-      {/* 1. JobPilot Studio Desktop Window (Proprietary Dark Obsidian UI) */}
-      <div className="rounded-2xl border border-[#1E2230] bg-[#0E1017] shadow-2xl overflow-hidden">
+      {/* 1. JobPilot Studio Desktop Window (Pure Black Minimalist UI) */}
+      <div className="rounded-xl border border-[#1F1F1F] bg-[#000000] shadow-2xl overflow-hidden">
         {/* Top Window Bar */}
-        <div className="bg-[#141722] px-4 py-2.5 border-b border-[#1E2230] flex items-center justify-between text-xs text-[#8C93A8]">
+        <div className="bg-[#0A0A0A] px-4 py-2.5 border-b border-[#1F1F1F] flex items-center justify-between text-xs text-[#888888]">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#2A2F42] inline-block" />
-            <span className="w-3 h-3 rounded-full bg-[#2A2F42] inline-block" />
-            <span className="w-3 h-3 rounded-full bg-[#2A2F42] inline-block" />
-            <span className="ml-2 font-mono text-[11px] text-[#A3A8BD]">JobPilot Studio — Autonomous Startup Search & Dispatch</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#262626] inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#262626] inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#262626] inline-block" />
+            <span className="ml-2 font-mono text-[11px] text-[#A1A1A1]">Startup Roles Radar — Direct Founder Outreach</span>
           </div>
-          <div className="flex items-center gap-2 text-[11px] font-mono text-[#10B981]">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-            <span>Bangalore & YC S24/W24 Live Feed</span>
+          <div className="flex items-center gap-2 text-[11px] font-mono text-emerald-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span>Bangalore & YC S24/W24 Feed</span>
           </div>
         </div>
 
         {/* Dual-Pane View */}
-        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[580px] bg-[#0F111A]">
+        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[580px] bg-[#000000]">
           {/* Left Sidebar */}
-          <aside className="md:col-span-3 border-r border-[#1B1E2B] bg-[#0C0E14] p-4 flex flex-col justify-between">
+          <aside className="md:col-span-3 border-r border-[#1F1F1F] bg-[#0A0A0A] p-4 flex flex-col justify-between">
             <div className="space-y-6">
               {/* Sidebar Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-[#1B1E2B]">
+              <div className="flex items-center justify-between pb-3 border-b border-[#1F1F1F]">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-6 h-6 rounded-md bg-white text-black flex items-center justify-center font-black text-[11px] shadow-sm">
+                  <div className="w-6 h-6 rounded-md bg-white text-black flex items-center justify-center font-bold text-[11px] shadow-sm">
                     JP
                   </div>
                   <div>
                     <h4 className="font-bold text-xs text-white tracking-tight">JobPilot</h4>
-                    <p className="text-[10px] text-[#71788E] font-mono">Reverse Recruiter</p>
+                    <p className="text-[10px] text-[#888888] font-mono">Roles & Pitches</p>
                   </div>
                 </div>
-                <div className="text-[#565C70] text-xs">
+                <div className="text-[#666666] text-xs">
                   <ExternalLink className="w-3.5 h-3.5" />
                 </div>
               </div>
@@ -362,10 +361,11 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                   e.stopPropagation();
                                   onSimulateApply(job);
                                 }}
-                                className="px-2 py-1 bg-[#161926] hover:bg-[#202538] text-[#818CF8] border border-[#23273B] text-[11px] font-medium rounded-md transition-all"
-                                title="Simulate Autopilot Apply"
+                                className="px-2.5 py-1 bg-[#141414] hover:bg-[#222222] text-[#A1A1A1] hover:text-white border border-[#262626] text-[11px] font-medium rounded-md transition-all flex items-center gap-1"
+                                title="Open Careers Page & Track"
                               >
-                                <Bot className="w-2.5 h-2.5" />
+                                <ExternalLink className="w-2.5 h-2.5" />
+                                <span>Apply</span>
                               </button>
 
                               <button

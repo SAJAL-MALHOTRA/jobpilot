@@ -3,7 +3,6 @@ import type { JobListing, CandidateProfile, ATSMatchResult } from '../types';
 import { runATSTailoring } from '../lib/atsTailorEngine';
 import { 
   X, 
-  Sparkles, 
   CheckCircle2, 
   AlertTriangle, 
   Copy, 
@@ -11,10 +10,10 @@ import {
   ArrowRight, 
   FileText, 
   Download, 
-  Printer, 
+  Printer,
+  Sparkles,
   Terminal
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 interface AtsResumeTailorModalProps {
   job: JobListing;
@@ -77,12 +76,6 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
     const text = generateFormattedResumeText();
     navigator.clipboard.writeText(text);
     setCopied(true);
-    confetti({
-      particleCount: 25,
-      spread: 50,
-      origin: { y: 0.7 },
-      colors: ['#EDEDED', '#10B981']
-    });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -97,13 +90,6 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-
-    confetti({
-      particleCount: 35,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#10B981', '#EDEDED']
-    });
   };
 
   const handlePrintPdf = () => {

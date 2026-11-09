@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Mail, Check, Send, Globe, Zap, ExternalLink, Activity, ShieldCheck } from 'lucide-react';
 import { TiltCard3D } from './TiltCard3D';
 import { SupersonicMissionControl } from './SupersonicMissionControl';
-import confetti from 'canvas-confetti';
 
 interface JobPilotFeaturesProps {
   onOpenOutreachModal: () => void;
@@ -21,13 +20,7 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
 
   const handleSendSimulatedEmail = () => {
     setEmailSent(true);
-    confetti({
-      particleCount: 25,
-      spread: 45,
-      origin: { y: 0.8 },
-      colors: ['#FFFFFF', '#10B981'],
-    });
-    setTimeout(() => setEmailSent(false), 3000);
+    setTimeout(() => setEmailSent(false), 2500);
   };
 
   return (

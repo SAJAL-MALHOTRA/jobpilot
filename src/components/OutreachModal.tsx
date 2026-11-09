@@ -9,7 +9,6 @@ import {
   MessageCircle, 
   FileText
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 interface OutreachModalProps {
   job: JobListing;
@@ -55,12 +54,6 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
   const handleCopy = () => {
     navigator.clipboard.writeText(`${subject ? `Subject: ${subject}\n\n` : ''}${body}`);
     setCopied(true);
-    confetti({
-      particleCount: 25,
-      spread: 45,
-      origin: { y: 0.8 },
-      colors: ['#FFFFFF', '#10B981']
-    });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -69,12 +62,6 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
     const mailtoUrl = `mailto:${job.founderEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl, '_blank');
     onLogOutreachSent(job, subject, body);
-    confetti({
-      particleCount: 35,
-      spread: 60,
-      origin: { y: 0.7 },
-      colors: ['#10B981', '#FFFFFF']
-    });
     setTimeout(() => {
       setIsSending(false);
       onClose();
