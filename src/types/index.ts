@@ -45,6 +45,9 @@ export interface JobListing {
   founderTwitter?: string;
   hiringUrgency: 'Immediate' | 'High' | 'Normal';
   atsMatchScore?: number;
+  experienceDisplay?: string;
+  salaryDisplay?: string;
+  roleCategory?: string;
   // Explee-grade prospecting & enrichment attributes
   emailDeliverabilityPct?: number;
   fundingRound?: string;

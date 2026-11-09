@@ -1,138 +1,125 @@
 import React from 'react';
-import { Bot, Radar, FileCheck, Send, Kanban, UserCheck, Play, Pause, Globe } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: 'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM' | 'PORTFOLIO';
   setActiveTab: (tab: 'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM' | 'PORTFOLIO') => void;
-  autopilotEnabled: boolean;
-  setAutopilotEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   onOpenProfile: () => void;
+  candidateName: string;
+  candidateYoe: number;
   applicationsCount: number;
-  interviewsCount: number;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
-  autopilotEnabled,
-  setAutopilotEnabled,
   onOpenProfile,
+  candidateName,
+  candidateYoe,
   applicationsCount,
-  interviewsCount,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-[#0E131F]/90 backdrop-blur-md border-b border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 bg-[#FAFAFA]/90 backdrop-blur-md border-b border-[#E5E7EB] transition-all">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
-          {/* Brand & Live Agent Status */}
+          {/* Brand - Clean Minimalist Wordmark (Aarivi Style) */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-              <Bot className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-white text-lg tracking-tight">JobPilot</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
-                  AI AGENT
-                </span>
+            <button 
+              onClick={() => setActiveTab('RADAR')}
+              className="flex items-center gap-2 text-left group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-[#111827] text-white flex items-center justify-center font-bold text-xs tracking-tight shadow-sm">
+                JP
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <span className={`w-2 h-2 rounded-full ${autopilotEnabled ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-                <span className="text-[11px] font-medium">
-                  {autopilotEnabled ? 'Autopilot Active: Sourcing & Matching' : 'Autopilot Paused'}
-                </span>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-base text-[#111827] tracking-tight group-hover:text-black">
+                    JobPilot
+                  </span>
+                  <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-[#F3F4F6] text-[#4B5563] border border-[#E5E7EB]">
+                    YC / Bangalore
+                  </span>
+                </div>
               </div>
-            </div>
+            </button>
           </div>
 
-          {/* Navigation Tabs */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
+          {/* Clean Segmented Navigation (Aarivi / Linear Style) */}
+          <nav className="hidden md:flex items-center gap-1 p-1 rounded-full bg-[#F3F4F6] border border-[#E5E7EB] text-xs font-medium">
             <button
               onClick={() => setActiveTab('RADAR')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-full transition-all ${
                 activeTab === 'RADAR'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-white text-[#111827] shadow-sm font-semibold'
+                  : 'text-[#6B7280] hover:text-[#111827]'
               }`}
             >
-              <Radar className="w-4 h-4" />
-              <span>Job Radar</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('ATS_LAB')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTab === 'ATS_LAB'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <FileCheck className="w-4 h-4" />
-              <span>ATS Resume Lab</span>
+              Startup Roles
             </button>
 
             <button
               onClick={() => setActiveTab('OUTREACH')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
                 activeTab === 'OUTREACH'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-white text-[#111827] shadow-sm font-semibold'
+                  : 'text-[#6B7280] hover:text-[#111827]'
               }`}
             >
-              <Send className="w-4 h-4" />
-              <span>Founder Outreach</span>
+              <span>Cold Email Playbook</span>
+              <span className="text-[10px] font-mono px-1 rounded bg-[#E5E7EB] text-[#374151]">80%</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('ATS_LAB')}
+              className={`px-3.5 py-1.5 rounded-full transition-all ${
+                activeTab === 'ATS_LAB'
+                  ? 'bg-white text-[#111827] shadow-sm font-semibold'
+                  : 'text-[#6B7280] hover:text-[#111827]'
+              }`}
+            >
+              ATS Resume Lab
             </button>
 
             <button
               onClick={() => setActiveTab('CRM')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 ${
                 activeTab === 'CRM'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-white text-[#111827] shadow-sm font-semibold'
+                  : 'text-[#6B7280] hover:text-[#111827]'
               }`}
             >
-              <Kanban className="w-4 h-4" />
-              <span>Application CRM</span>
+              <span>Applications</span>
               {applicationsCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-mono">
+                <span className="w-4 h-4 rounded-full bg-[#111827] text-white text-[10px] flex items-center justify-center font-bold">
                   {applicationsCount}
-                  {interviewsCount > 0 && ` (${interviewsCount} interviews)`}
                 </span>
               )}
             </button>
+
             <button
               onClick={() => setActiveTab('PORTFOLIO')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-full transition-all ${
                 activeTab === 'PORTFOLIO'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-white text-[#111827] shadow-sm font-semibold'
+                  : 'text-[#6B7280] hover:text-[#111827]'
               }`}
             >
-              <Globe className="w-4 h-4" />
-              <span>Portfolio Studio</span>
+              Proof-of-Work
             </button>
           </nav>
 
-          {/* Quick Actions & Autopilot Toggle */}
+          {/* Right Action: Candidate Profile Vault (Aarivi Style) */}
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setAutopilotEnabled(!autopilotEnabled)}
-              className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                autopilotEnabled
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-800'
-              }`}
-            >
-              {autopilotEnabled ? <Pause className="w-3.5 h-3.5 text-emerald-400" /> : <Play className="w-3.5 h-3.5 text-indigo-400" />}
-              <span>{autopilotEnabled ? 'Autopilot: ON' : 'Turn ON Autopilot'}</span>
-            </button>
-
-            <button
               onClick={onOpenProfile}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold transition-all"
+              className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full bg-white hover:bg-[#F9FAFB] border border-[#E5E7EB] text-xs transition-all shadow-sm group"
             >
-              <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="hidden sm:inline">Profile Vault</span>
+              <div className="w-5 h-5 rounded-full bg-[#111827] text-white flex items-center justify-center text-[10px] font-bold">
+                {candidateName.charAt(0)}
+              </div>
+              <div className="text-left font-medium text-[#374151] group-hover:text-[#111827]">
+                <span>{candidateName}</span>
+                <span className="text-[#9CA3AF] ml-1 text-[11px]">({candidateYoe} YOE)</span>
+              </div>
             </button>
           </div>
         </div>
@@ -140,3 +127,4 @@ export const Navbar: React.FC<NavbarProps> = ({
     </header>
   );
 };
+export default Navbar;

@@ -6,12 +6,8 @@ import {
   Send, 
   Copy, 
   Check, 
-  Mail, 
   MessageCircle, 
-  CheckCircle2, 
-  Sparkles, 
-  ShieldCheck, 
-  Gauge
+  FileText
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -22,13 +18,13 @@ interface OutreachModalProps {
   onLogOutreachSent: (job: JobListing, subject: string, body: string) => void;
 }
 
-const TEMPLATES: { id: OutreachTemplateType; label: string; icon: string; tag: string }[] = [
-  { id: 'FOUNDER_STARTUP', label: '1. Founder Cold Email', icon: '⚡', tag: 'High Urgency' },
-  { id: 'INTERNSHIP_JUNIOR', label: '2. Junior / Intern', icon: '🚀', tag: 'High Curiosity' },
-  { id: 'PEER_REFERRAL', label: '3. Team Referral', icon: '🤝', tag: 'Team Context' },
-  { id: 'FREELANCE_PROPOSAL', label: '4. Problem Proposal', icon: '🛠️', tag: 'Direct Audit' },
-  { id: 'LINKEDIN_X_DM', label: '5. LinkedIn / X DM', icon: '💬', tag: 'Under 100 Words' },
-  { id: 'FOLLOW_UP_NUDGE', label: '6. Follow-Up Nudge', icon: '⏳', tag: '3-Day Polite' },
+const TEMPLATES: { id: OutreachTemplateType; label: string; tag: string }[] = [
+  { id: 'FOUNDER_STARTUP', label: 'Founder Startup Pitch', tag: '80% reply rate' },
+  { id: 'INTERNSHIP_JUNIOR', label: 'Junior / Intern Pitch', tag: 'Proof-first' },
+  { id: 'PEER_REFERRAL', label: 'Team Referral', tag: 'Direct engineering' },
+  { id: 'FREELANCE_PROPOSAL', label: 'Problem Proposal', tag: 'Audit & fix' },
+  { id: 'LINKEDIN_X_DM', label: 'LinkedIn / X DM', tag: '<100 words' },
+  { id: 'FOLLOW_UP_NUDGE', label: '3-Day Follow-Up', tag: 'Polite reminder' },
 ];
 
 export const OutreachModal: React.FC<OutreachModalProps> = ({
@@ -39,6 +35,7 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
 }) => {
   const [style, setStyle] = useState<OutreachTemplateType>('FOUNDER_STARTUP');
   const [copied, setCopied] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const [outreach, setOutreach] = useState<ColdOutreach>(() =>
     generateColdOutreach(candidate, job, 'FOUNDER_STARTUP')
@@ -55,25 +52,33 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
     setBody(updated.body);
   };
 
-  const wordCount = body.trim().split(/\s+/).filter(Boolean).length;
-  const isWordCountOptimal = wordCount >= 70 && wordCount <= 160;
-
   const handleCopy = () => {
     navigator.clipboard.writeText(`${subject ? `Subject: ${subject}\n\n` : ''}${body}`);
     setCopied(true);
     confetti({
-      particleCount: 30,
-      spread: 60,
+      particleCount: 25,
+      spread: 45,
       origin: { y: 0.8 },
-      colors: ['#EDEDED', '#10B981']
+      colors: ['#FFFFFF', '#10B981']
     });
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleOpenEmailClient = () => {
+  const handleSendEmail = () => {
+    setIsSending(true);
     const mailtoUrl = `mailto:${job.founderEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailtoUrl, '_blank');
     onLogOutreachSent(job, subject, body);
+    confetti({
+      particleCount: 35,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#10B981', '#FFFFFF']
+    });
+    setTimeout(() => {
+      setIsSending(false);
+      onClose();
+    }, 1000);
   };
 
   const handleOpenWhatsApp = () => {
@@ -90,197 +95,138 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#0c0d12] border border-neutral-800 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-8 space-y-6 text-[#EDEDED]">
-        {/* Header */}
-        <div className="flex items-start justify-between border-b border-neutral-800/80 pb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white">
-              <Send className="w-5 h-5 text-emerald-400" />
-            </div>
+      <div className="bg-[#121212] border border-[#262626] rounded-2xl max-w-2xl w-full max-h-[94vh] overflow-y-auto shadow-2xl p-6 space-y-5 text-white font-sans">
+        {/* Top Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-[#262626]">
+          <div className="flex items-center gap-2">
+            <span className="text-base">✉️</span>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-white tracking-tight">Founder Cold Outreach Studio</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  80% Response Playbook
-                </span>
-              </div>
-              <p className="text-xs text-neutral-400 mt-0.5">
-                Targeting: <strong className="text-white font-medium">{job.founderName}</strong> ({job.founderRole}) at {job.company}
+              <h3 className="font-bold text-sm text-white">Cold email to founder</h3>
+              <p className="text-[11px] text-[#A3A3A3] font-mono">
+                {job.founderName} ({job.founderRole}) at {job.company}
               </p>
             </div>
           </div>
-
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+            className="p-1 rounded-md text-[#A3A3A3] hover:text-white hover:bg-[#262626] transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* 6 Battle-Tested Template Selector */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-bold text-neutral-300 uppercase tracking-wider">
-              Sumit Kesarwani's Battle-Tested Formulas (CrackColdEmail)
-            </span>
-            <span className="text-[11px] text-neutral-500 font-mono">6 Proven Variants</span>
+        {/* 6 Template Selector Pills (CrackColdEmail Playbook) */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] text-[#A3A3A3] font-mono">
+            <span>Template formula (Sumit Kesarwani Playbook):</span>
+            <span className="text-[#10B981]">80% response rate</span>
           </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {TEMPLATES.map((tmpl) => (
               <button
                 key={tmpl.id}
                 onClick={() => handleStyleChange(tmpl.id)}
-                className={`py-2 px-3 rounded-xl text-xs font-medium transition-all text-left flex flex-col justify-between border ${
+                className={`px-3 py-1 rounded-full text-xs transition-all font-mono border ${
                   style === tmpl.id
-                    ? 'bg-neutral-100 text-black border-white shadow-md'
-                    : 'bg-[#111115] border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-900'
+                    ? 'bg-white text-black border-white font-bold'
+                    : 'bg-[#1C1C1C] text-[#A3A3A3] border-[#2E2E2E] hover:text-white'
                 }`}
               >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-bold truncate">{tmpl.label}</span>
-                  <span className="text-[10px] opacity-70">{tmpl.icon}</span>
-                </div>
-                <span className={`text-[10px] font-mono mt-1 ${style === tmpl.id ? 'text-neutral-600' : 'text-neutral-500'}`}>
-                  {tmpl.tag}
-                </span>
+                {tmpl.label}
               </button>
             ))}
           </div>
-
-          <div className="text-xs text-neutral-400 italic bg-[#111115] px-3.5 py-2 rounded-xl border border-neutral-800 font-mono flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span>{outreach.bestFor}</span>
-          </div>
         </div>
 
-        {/* 4-Part Formula Breakdown Box (Context + Relevance + Proof + Small Ask) */}
-        <div className="bg-[#111115] p-4 rounded-2xl border border-neutral-800 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 font-mono">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>The 4-Part Winning Psychological Structure:</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-400">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-              <span>Deliverability Score: <strong className="text-white">99.6%</strong></span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-[11px] font-mono">
-            <div className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 space-y-1">
-              <span className="font-bold text-emerald-400 block uppercase tracking-wide">1. Context</span>
-              <p className="text-neutral-400 leading-snug">Specific reason for pitching {job.company} (batch / funding / launch).</p>
+        {/* Email Window (Exact Aarivi Image 5 Design) */}
+        <div className="bg-[#0A0A0A] rounded-xl border border-[#262626] p-4 text-xs font-mono space-y-3 shadow-inner">
+          {/* Metadata Rows */}
+          <div className="space-y-2 pb-3 border-b border-[#262626]">
+            <div className="flex items-center gap-2 text-[11px]">
+              <span className="text-[#737373] w-14 font-mono">To:</span>
+              <span className="font-semibold text-white">{job.founderName} at {job.company}</span>
+              <span className="text-[10px] text-[#A3A3A3] ml-auto font-mono">({job.founderEmail})</span>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 space-y-1">
-              <span className="font-bold text-blue-400 block uppercase tracking-wide">2. Relevance</span>
-              <p className="text-neutral-400 leading-snug">Maps candidate stack ({candidate.primarySkills.slice(0, 3).join(', ')}) directly to their roadmap.</p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 space-y-1">
-              <span className="font-bold text-purple-400 block uppercase tracking-wide">3. Proof</span>
-              <p className="text-neutral-400 leading-snug">120k RPM scale metric + hosted portfolio link attached.</p>
-            </div>
-
-            <div className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 space-y-1">
-              <span className="font-bold text-amber-400 block uppercase tracking-wide">4. Small Ask</span>
-              <p className="text-neutral-400 leading-snug">One low-friction question (zero Calendly burden).</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Editor Area */}
-        <div className="space-y-4">
-          {/* Recipient & Subject */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-mono font-semibold text-neutral-400 mb-1">
-                To (Founder / Engineering Lead)
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={job.founderEmail}
-                  readOnly
-                  className="w-full px-3.5 py-2 bg-[#111115] border border-neutral-800 rounded-xl text-neutral-300 text-xs font-mono"
-                />
-                <span className="absolute right-3 top-2 text-[10px] font-mono text-emerald-400">Verified Direct</span>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-mono font-semibold text-neutral-400 mb-1">
-                Subject Line (Tested Open Rate &gt; 82%)
-              </label>
+            <div className="flex items-center gap-2 text-[11px]">
+              <span className="text-[#737373] w-14 font-mono">Subject:</span>
               <input
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full px-3.5 py-2 bg-[#111115] border border-neutral-800 rounded-xl text-white text-xs font-mono focus:outline-none focus:ring-1 focus:ring-white"
+                className="flex-1 bg-transparent border-b border-transparent hover:border-[#333] focus:border-white text-white focus:outline-none text-[11px] font-mono"
               />
             </div>
           </div>
 
-          {/* Body */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center text-xs font-mono">
-              <label className="font-semibold text-neutral-300">Message Body</label>
-              <span className={`flex items-center gap-1.5 ${isWordCountOptimal ? 'text-emerald-400' : 'text-amber-400'}`}>
-                <Gauge className="w-3.5 h-3.5" />
-                <span>{wordCount} words (Target: 80–150 words)</span>
-              </span>
+          {/* Email Body */}
+          <textarea
+            rows={10}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            className="w-full bg-transparent text-[#D4D4D4] text-xs font-mono leading-relaxed focus:outline-none resize-none"
+          />
+
+          {/* Resume Attachment Chip (Aarivi Image 5) */}
+          <div className="pt-2 border-t border-[#1F1F1F] flex items-center justify-between">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#171717] border border-[#2E2E2E] text-[11px] text-white font-mono">
+              <FileText className="w-3.5 h-3.5 text-[#A3A3A3]" />
+              <span>{candidate.fullName.toLowerCase().replace(/\s+/g, '-')}-resume.pdf</span>
+              <span className="text-[#737373] text-[10px]">(attached)</span>
             </div>
-            <textarea
-              rows={8}
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              className="w-full p-4 bg-[#111115] border border-neutral-800 rounded-2xl text-xs font-mono leading-relaxed text-neutral-200 focus:outline-none focus:ring-1 focus:ring-white"
-            />
+            <div className="text-[10px] text-[#737373] font-mono">
+              {body.trim().split(/\s+/).filter(Boolean).length} words
+            </div>
           </div>
         </div>
 
-        {/* Multi-Channel Launch Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-neutral-800">
-          <button
-            onClick={handleCopy}
-            className="w-full sm:w-auto px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-200 rounded-xl text-xs font-mono font-medium transition-all flex items-center justify-center gap-2 border border-neutral-800"
-          >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? 'Copied Full Pitch!' : 'Copy to Clipboard'}</span>
-          </button>
+        {/* Bottom Actions Bar (Aarivi Image 5) */}
+        <div className="pt-3 border-t border-[#262626] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+          <span className="text-[#737373] text-[11px]">
+            Sends from {candidate.email}. Edit it or reply below to change it.
+          </span>
 
-          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
-            {/* WhatsApp Web */}
+          <div className="flex items-center gap-2">
             <button
               onClick={handleOpenWhatsApp}
-              className="px-3.5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-emerald-400 rounded-xl text-xs font-mono font-medium border border-neutral-800 transition-all flex items-center gap-1.5"
-              title="Open in WhatsApp Web"
+              className="p-1.5 rounded-lg bg-[#1C1C1C] hover:bg-[#262626] text-[#34D399] border border-[#2E2E2E] transition-colors"
+              title="Open WhatsApp Web"
             >
-              <MessageCircle className="w-4 h-4 text-emerald-400" />
-              <span>WhatsApp Web</span>
+              <MessageCircle className="w-3.5 h-3.5" />
             </button>
 
-            {/* Twitter / X */}
             <button
               onClick={handleOpenTwitter}
-              className="px-3.5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-sky-400 rounded-xl text-xs font-mono font-medium border border-neutral-800 transition-all flex items-center gap-1.5"
-              title="Open in X / Twitter Direct Message"
+              className="p-1.5 rounded-lg bg-[#1C1C1C] hover:bg-[#262626] text-[#38BDF8] border border-[#2E2E2E] transition-colors"
+              title="Open X / Twitter DM"
             >
               <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
-              <span>X (Twitter) DM</span>
             </button>
 
-            {/* Email Launcher */}
             <button
-              onClick={handleOpenEmailClient}
-              className="px-4 py-2.5 bg-white hover:bg-neutral-200 text-black rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 shadow-md"
+              onClick={handleCopy}
+              className="px-3 py-1.5 rounded-lg bg-[#1C1C1C] hover:bg-[#262626] text-[#D4D4D4] border border-[#2E2E2E] text-xs font-medium transition-colors flex items-center gap-1"
             >
-              <Mail className="w-4 h-4" />
-              <span>Launch Mail & Sync CRM</span>
+              {copied ? <Check className="w-3.5 h-3.5 text-[#10B981]" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Copied' : 'Copy'}</span>
+            </button>
+
+            <button
+              onClick={onClose}
+              className="px-3 py-1.5 text-[#A3A3A3] hover:text-white transition-colors"
+            >
+              Don't send
+            </button>
+
+            <button
+              onClick={handleSendEmail}
+              disabled={isSending}
+              className="px-4 py-1.5 bg-white hover:bg-[#F3F4F6] text-black font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <Send className="w-3 h-3" />
+              <span>{isSending ? 'Launching...' : 'Send email'}</span>
             </button>
           </div>
         </div>
