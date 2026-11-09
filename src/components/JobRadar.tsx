@@ -25,18 +25,19 @@ interface JobRadarProps {
   appliedJobIds: Set<string>;
   onOpenPortfolio: () => void;
   onOpenApplications: () => void;
+  onOpenAtsLab: () => void;
 }
 
 const ROLE_CATEGORIES = [
   'All Roles',
+  'Founding AI Engineer',
   'Full Stack Developer',
-  'AI Engineer',
-  'Frontend Engineer',
-  'Backend Engineer',
-  'DevOps Engineer',
-  'Data Scientist',
-  'Security Engineer',
-  'Mobile Engineer'
+  'Distributed Systems',
+  'Frontend & Canvas',
+  'DevOps & SRE',
+  'Data & Analytics',
+  'Security Infrastructure',
+  'Mobile Engineering'
 ];
 
 export const JobRadar: React.FC<JobRadarProps> = ({
@@ -49,10 +50,11 @@ export const JobRadar: React.FC<JobRadarProps> = ({
   appliedJobIds,
   onOpenPortfolio,
   onOpenApplications,
+  onOpenAtsLab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('All Roles');
-  const [sidebarTab, setSidebarTab] = useState<'JOBS' | 'CHAT' | 'APPLICATIONS' | 'PORTFOLIO'>('JOBS');
+  const [sidebarTab, setSidebarTab] = useState<'JOBS' | 'CHAT' | 'APPLICATIONS' | 'PORTFOLIO' | 'ATS'>('JOBS');
 
   const filteredJobs = jobs.filter((job) => {
     const q = searchQuery.toLowerCase().trim();
@@ -66,81 +68,84 @@ export const JobRadar: React.FC<JobRadarProps> = ({
     const matchesRole =
       selectedRole === 'All Roles' ||
       job.roleCategory === selectedRole ||
+      (selectedRole === 'Founding AI Engineer' && (job.title.toLowerCase().includes('ai') || job.title.toLowerCase().includes('machine learning'))) ||
       (selectedRole === 'Full Stack Developer' && job.title.toLowerCase().includes('full stack')) ||
-      (selectedRole === 'AI Engineer' && (job.title.toLowerCase().includes('ai') || job.title.toLowerCase().includes('machine learning'))) ||
-      (selectedRole === 'Frontend Engineer' && job.title.toLowerCase().includes('frontend')) ||
-      (selectedRole === 'Backend Engineer' && job.title.toLowerCase().includes('backend')) ||
-      (selectedRole === 'DevOps Engineer' && (job.title.toLowerCase().includes('reliability') || job.title.toLowerCase().includes('devops')));
+      (selectedRole === 'Distributed Systems' && (job.title.toLowerCase().includes('backend') || job.title.toLowerCase().includes('systems'))) ||
+      (selectedRole === 'Frontend & Canvas' && job.title.toLowerCase().includes('frontend')) ||
+      (selectedRole === 'DevOps & SRE' && (job.title.toLowerCase().includes('reliability') || job.title.toLowerCase().includes('devops'))) ||
+      (selectedRole === 'Data & Analytics' && job.title.toLowerCase().includes('data')) ||
+      (selectedRole === 'Security Infrastructure' && job.title.toLowerCase().includes('security')) ||
+      (selectedRole === 'Mobile Engineering' && job.title.toLowerCase().includes('mobile'));
 
     return matchesSearch && matchesRole;
   });
 
   return (
     <div className="space-y-12">
-      {/* 1. The Central Aarivi Desktop Dashboard Frame (Pixel-Matched to User's Uploaded Screenshot) */}
-      <div className="rounded-2xl border border-[#262626] bg-[#111111] shadow-2xl overflow-hidden">
+      {/* 1. JobPilot Studio Desktop Window (Proprietary Dark Obsidian UI) */}
+      <div className="rounded-2xl border border-[#1E2230] bg-[#0E1017] shadow-2xl overflow-hidden">
         {/* Top Window Bar */}
-        <div className="bg-[#1A1A1A] px-4 py-2.5 border-b border-[#262626] flex items-center justify-between text-xs text-[#888888]">
+        <div className="bg-[#141722] px-4 py-2.5 border-b border-[#1E2230] flex items-center justify-between text-xs text-[#8C93A8]">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#333333] inline-block" />
-            <span className="w-3 h-3 rounded-full bg-[#333333] inline-block" />
-            <span className="w-3 h-3 rounded-full bg-[#333333] inline-block" />
-            <span className="ml-2 font-mono text-[11px] text-[#A3A3A3]">JobPilot Studio — Live YC & Bangalore Startup Radar</span>
+            <span className="w-3 h-3 rounded-full bg-[#2A2F42] inline-block" />
+            <span className="w-3 h-3 rounded-full bg-[#2A2F42] inline-block" />
+            <span className="w-3 h-3 rounded-full bg-[#2A2F42] inline-block" />
+            <span className="ml-2 font-mono text-[11px] text-[#A3A8BD]">JobPilot Studio — Autonomous Startup Search & Dispatch</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] font-mono text-[#10B981]">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-            <span>Connected to verified founder direct inbox pipeline</span>
+            <span>Bangalore & YC S24/W24 Live Feed</span>
           </div>
         </div>
 
-        {/* Inner Dual-Pane Desktop View (Image 2) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[580px] bg-white text-[#111827]">
-          {/* Left Sidebar (Aarivi Style) */}
-          <aside className="md:col-span-3 border-r border-[#E5E7EB] bg-[#FAFAFA] p-4 flex flex-col justify-between">
+        {/* Dual-Pane View */}
+        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[580px] bg-[#0F111A]">
+          {/* Left Sidebar */}
+          <aside className="md:col-span-3 border-r border-[#1B1E2B] bg-[#0C0E14] p-4 flex flex-col justify-between">
             <div className="space-y-6">
               {/* Sidebar Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded bg-[#111827] text-white flex items-center justify-center font-black text-[10px]">
-                    ▲
+              <div className="flex items-center justify-between pb-3 border-b border-[#1B1E2B]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-6 h-6 rounded-md bg-white text-black flex items-center justify-center font-black text-[11px] shadow-sm">
+                    JP
                   </div>
                   <div>
-                    <h4 className="font-bold text-xs text-[#111827] tracking-tight">JobPilot</h4>
-                    <p className="text-[10px] text-[#6B7280]">Dashboard</p>
+                    <h4 className="font-bold text-xs text-white tracking-tight">JobPilot</h4>
+                    <p className="text-[10px] text-[#71788E] font-mono">Reverse Recruiter</p>
                   </div>
                 </div>
-                <div className="text-[#9CA3AF] text-xs">
+                <div className="text-[#565C70] text-xs">
                   <ExternalLink className="w-3.5 h-3.5" />
                 </div>
               </div>
 
               {/* CAREER Navigation */}
               <div className="space-y-1">
-                <span className="text-[10px] font-mono font-semibold text-[#9CA3AF] uppercase tracking-wider block px-2 mb-1.5">
+                <span className="text-[10px] font-mono font-semibold text-[#666D82] uppercase tracking-wider block px-2 mb-1.5">
                   CAREER
                 </span>
 
                 <button
                   onClick={() => setSidebarTab('CHAT')}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    sidebarTab === 'CHAT' ? 'bg-[#E5E7EB] text-[#111827] font-semibold' : 'text-[#4B5563] hover:bg-[#F3F4F6]'
+                    sidebarTab === 'CHAT' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
                   }`}
                 >
-                  <MessageSquare className="w-4 h-4 text-[#6B7280]" />
-                  <span>New Chat</span>
+                  <MessageSquare className="w-4 h-4 text-[#71788E]" />
+                  <span>Copilot Chat</span>
                 </button>
 
                 <button
                   onClick={() => setSidebarTab('JOBS')}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
-                    sidebarTab === 'JOBS' ? 'bg-[#E5E7EB] text-[#111827] font-semibold' : 'text-[#4B5563] hover:bg-[#F3F4F6]'
+                    sidebarTab === 'JOBS' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Briefcase className="w-4 h-4 text-[#111827]" />
-                    <span>Jobs</span>
+                    <Briefcase className="w-4 h-4 text-white" />
+                    <span>Open Roles</span>
                   </div>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#D1D5DB] text-[#111827] font-bold">
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-white text-black font-bold">
                     {filteredJobs.length}
                   </span>
                 </button>
@@ -151,14 +156,14 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     onOpenApplications();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
-                    sidebarTab === 'APPLICATIONS' ? 'bg-[#E5E7EB] text-[#111827] font-semibold' : 'text-[#4B5563] hover:bg-[#F3F4F6]'
+                    sidebarTab === 'APPLICATIONS' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Inbox className="w-4 h-4 text-[#6B7280]" />
+                    <Inbox className="w-4 h-4 text-[#71788E]" />
                     <span>Applications</span>
                   </div>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#E5E7EB] text-[#4B5563]">
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#1A1D2B] text-[#A3A8BD] border border-[#262B3D]">
                     {appliedJobIds.size}
                   </span>
                 </button>
@@ -166,7 +171,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
 
               {/* TOOLS Navigation */}
               <div className="space-y-1">
-                <span className="text-[10px] font-mono font-semibold text-[#9CA3AF] uppercase tracking-wider block px-2 mb-1.5">
+                <span className="text-[10px] font-mono font-semibold text-[#666D82] uppercase tracking-wider block px-2 mb-1.5">
                   TOOLS
                 </span>
 
@@ -176,59 +181,72 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     onOpenPortfolio();
                   }}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    sidebarTab === 'PORTFOLIO' ? 'bg-[#E5E7EB] text-[#111827] font-semibold' : 'text-[#4B5563] hover:bg-[#F3F4F6]'
+                    sidebarTab === 'PORTFOLIO' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
                   }`}
                 >
-                  <Globe className="w-4 h-4 text-[#6B7280]" />
-                  <span>Portfolio</span>
+                  <Globe className="w-4 h-4 text-[#71788E]" />
+                  <span>Proof-of-Work</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setSidebarTab('ATS');
+                    onOpenAtsLab();
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                    sidebarTab === 'ATS' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
+                  }`}
+                >
+                  <FileText className="w-4 h-4 text-[#71788E]" />
+                  <span>ATS Resume Lab</span>
                 </button>
               </div>
             </div>
 
-            {/* Sidebar Footer User Pill (Aarivi Image 2) */}
-            <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
+            {/* Sidebar User Footer */}
+            <div className="pt-3 border-t border-[#1B1E2B] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-[#E5E7EB] text-[#374151] font-bold text-xs flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-white text-black font-bold text-xs flex items-center justify-center shadow-sm">
                   {candidate.fullName.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div className="text-left">
-                  <div className="font-semibold text-xs text-[#111827] truncate max-w-[120px]">
+                  <div className="font-semibold text-xs text-white truncate max-w-[120px]">
                     {candidate.fullName}
                   </div>
-                  <div className="text-[10px] text-[#6B7280] truncate max-w-[120px]">
-                    {candidate.email}
+                  <div className="text-[10px] text-[#71788E] truncate max-w-[120px] font-mono">
+                    ₹{candidate.minTargetCtcLpa}L+ Target
                   </div>
                 </div>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-[#9CA3AF]" />
+              <ChevronDown className="w-3.5 h-3.5 text-[#565C70]" />
             </div>
           </aside>
 
-          {/* Right Main Table Content (Exact Aarivi Layout) */}
-          <main className="md:col-span-9 p-5 flex flex-col justify-between space-y-4 overflow-x-auto">
+          {/* Right Main Table Content */}
+          <main className="md:col-span-9 p-5 flex flex-col justify-between space-y-4 overflow-x-auto bg-[#0E1017]">
             <div className="space-y-4">
               {/* Top Search & Actions Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#F3F4F6]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A1D2A]">
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-[#111827]" />
-                  <h3 className="font-bold text-sm text-[#111827]">Jobs</h3>
-                  <span className="text-xs text-[#9CA3AF]">•</span>
-                  <span className="text-xs text-[#6B7280]">Verified Direct Founder Listings</span>
+                  <Briefcase className="w-4 h-4 text-white" />
+                  <h3 className="font-bold text-sm text-white">Open Roles Directory</h3>
+                  <span className="text-xs text-[#3A3F55]">•</span>
+                  <span className="text-xs text-[#8C93A8] font-mono">Verified Founder Contacts</span>
                 </div>
 
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-[#9CA3AF] absolute left-3 top-2.5" />
+                  <Search className="w-3.5 h-3.5 text-[#666D82] absolute left-3 top-2.5" />
                   <input
                     type="text"
-                    placeholder="Search by role, company, stack, or city..."
+                    placeholder="Search role, stack (React, Python), or city..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg text-xs text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#111827] w-64"
+                    className="pl-8 pr-3 py-1.5 bg-[#141724] border border-[#202538] rounded-lg text-xs text-white placeholder-[#666D82] focus:outline-none focus:border-white w-64 font-sans"
                   />
                 </div>
               </div>
 
-              {/* Aarivi Table View */}
+              {/* Table View */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <tbody>
@@ -237,22 +255,22 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                       return (
                         <tr 
                           key={job.id} 
-                          className="border-b border-[#F3F4F6] hover:bg-[#F9FAFB] transition-colors group cursor-pointer"
+                          className="border-b border-[#171926] hover:bg-[#141724] transition-colors group cursor-pointer"
                         >
                           {/* 1. Icon + Title + Company */}
                           <td className="py-3.5 pr-4 pl-1">
                             <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-lg ${job.logoColor} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm`}>
+                              <div className={`w-8 h-8 rounded-lg ${job.logoColor} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm font-mono`}>
                                 {job.company.charAt(0)}
                               </div>
                               <div>
-                                <div className="font-semibold text-xs text-[#111827] group-hover:text-black">
+                                <div className="font-semibold text-xs text-white group-hover:text-[#A5B4FC] transition-colors">
                                   {job.title}
                                 </div>
-                                <div className="text-[11px] text-[#6B7280] flex items-center gap-1.5 mt-0.5">
+                                <div className="text-[11px] text-[#8C93A8] flex items-center gap-1.5 mt-0.5">
                                   <span>{job.company}</span>
                                   {job.noticeBuyoutCovered && (
-                                    <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">
+                                    <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-[#064E3B]/40 text-[#34D399] border border-[#059669]/40">
                                       Notice Buyout
                                     </span>
                                   )}
@@ -262,19 +280,19 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                           </td>
 
                           {/* 2. Location */}
-                          <td className="py-3.5 px-3 text-[#4B5563] text-[11px] whitespace-nowrap">
+                          <td className="py-3.5 px-3 text-[#A3A8BD] text-[11px] whitespace-nowrap font-sans">
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-[#9CA3AF]" />
+                              <MapPin className="w-3 h-3 text-[#666D82]" />
                               {job.location}
                             </span>
                           </td>
 
                           {/* 3. Experience & Salary (Indian INR format) */}
                           <td className="py-3.5 px-3 whitespace-nowrap">
-                            <div className="text-[11px] text-[#374151] font-medium">
+                            <div className="text-[11px] text-white font-medium">
                               {job.experienceDisplay || '2–4 years'}
                             </div>
-                            <div className="text-[11px] text-[#6B7280] font-mono">
+                            <div className="text-[11px] text-[#A3A8BD] font-mono">
                               {job.salaryDisplay || `₹${job.minCtcLpa}L–₹${job.maxCtcLpa}L`}
                             </div>
                           </td>
@@ -285,35 +303,35 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                               {job.requiredSkills.slice(0, 2).map((sk) => (
                                 <span
                                   key={sk}
-                                  className="px-2 py-0.5 rounded bg-[#F3F4F6] text-[#4B5563] text-[10px] font-mono font-medium border border-[#E5E7EB]"
+                                  className="px-2 py-0.5 rounded bg-[#161926] text-[#A3A8BD] text-[10px] font-mono font-medium border border-[#23273B]"
                                 >
                                   {sk}
                                 </span>
                               ))}
                               {job.requiredSkills.length > 2 && (
-                                <span className="text-[10px] font-mono text-[#9CA3AF]">
+                                <span className="text-[10px] font-mono text-[#666D82]">
                                   +{job.requiredSkills.length - 2}
                                 </span>
                               )}
                             </div>
                           </td>
 
-                          {/* 5. Match Score Bar (Aarivi Style) */}
+                          {/* 5. Match Score Bar */}
                           <td className="py-3.5 px-3 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <div className="w-16 bg-[#E5E7EB] h-1.5 rounded-full overflow-hidden">
+                              <div className="w-16 bg-[#1A1E2C] h-1.5 rounded-full overflow-hidden">
                                 <div
                                   className="bg-[#F59E0B] h-full rounded-full"
                                   style={{ width: `${job.atsMatchScore || 80}%` }}
                                 />
                               </div>
-                              <span className="font-mono font-bold text-xs text-[#374151]">
+                              <span className="font-mono font-bold text-xs text-[#F59E0B]">
                                 {job.atsMatchScore || 80}%
                               </span>
                             </div>
                           </td>
 
-                          {/* 6. Quick Action Buttons on Hover */}
+                          {/* 6. Action Buttons */}
                           <td className="py-3.5 pl-3 pr-2 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
@@ -321,11 +339,11 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                   e.stopPropagation();
                                   onSelectJobForOutreach(job);
                                 }}
-                                className="px-2.5 py-1 bg-[#111827] hover:bg-black text-white text-[11px] font-medium rounded-md shadow-sm transition-all flex items-center gap-1"
+                                className="px-2.5 py-1 bg-white hover:bg-[#EDEDED] text-black text-[11px] font-bold rounded-md shadow-sm transition-all flex items-center gap-1"
                                 title="Draft Cold Email (80% formula)"
                               >
                                 <Send className="w-2.5 h-2.5" />
-                                <span>Email</span>
+                                <span>Pitch</span>
                               </button>
 
                               <button
@@ -333,8 +351,8 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                   e.stopPropagation();
                                   onSelectJobForATS(job);
                                 }}
-                                className="px-2 py-1 bg-white hover:bg-[#F3F4F6] text-[#374151] border border-[#D1D5DB] text-[11px] font-medium rounded-md transition-all"
-                                title="Tailor Resume"
+                                className="px-2 py-1 bg-[#161926] hover:bg-[#202538] text-[#C5CADB] border border-[#23273B] text-[11px] font-medium rounded-md transition-all"
+                                title="Tailor Resume (Google X-Y-Z)"
                               >
                                 <FileText className="w-2.5 h-2.5" />
                               </button>
@@ -344,10 +362,10 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                   e.stopPropagation();
                                   onSimulateApply(job);
                                 }}
-                                className="px-2 py-1 bg-white hover:bg-[#F3F4F6] text-[#374151] border border-[#D1D5DB] text-[11px] font-medium rounded-md transition-all"
-                                title="Autopilot Apply"
+                                className="px-2 py-1 bg-[#161926] hover:bg-[#202538] text-[#818CF8] border border-[#23273B] text-[11px] font-medium rounded-md transition-all"
+                                title="Simulate Autopilot Apply"
                               >
-                                <Bot className="w-2.5 h-2.5 text-[#6366F1]" />
+                                <Bot className="w-2.5 h-2.5" />
                               </button>
 
                               <button
@@ -356,7 +374,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                   onAddToPipeline(job);
                                 }}
                                 className={`px-2 py-1 text-[11px] font-medium rounded-md transition-all ${
-                                  isApplied ? 'bg-[#F3F4F6] text-[#9CA3AF]' : 'bg-white hover:bg-[#F3F4F6] text-[#374151] border border-[#D1D5DB]'
+                                  isApplied ? 'bg-[#161926] text-[#666D82]' : 'bg-[#161926] hover:bg-[#202538] text-[#C5CADB] border border-[#23273B]'
                                 }`}
                                 title={isApplied ? 'Tracked in Applications' : 'Track in Applications'}
                               >
@@ -372,22 +390,22 @@ export const JobRadar: React.FC<JobRadarProps> = ({
               </div>
             </div>
 
-            {/* Table Footer (Image 2) */}
-            <div className="pt-3 border-t border-[#F3F4F6] flex items-center justify-between text-[11px] text-[#6B7280] font-mono">
-              <span>Showing 1–{filteredJobs.length} of {jobs.length} matched roles</span>
-              <span>Updated live from startup directories</span>
+            {/* Table Footer */}
+            <div className="pt-3 border-t border-[#1A1D2A] flex items-center justify-between text-[11px] text-[#71788E] font-mono">
+              <span>Showing 1–{filteredJobs.length} of {jobs.length} open roles</span>
+              <span>Direct verified founder routing</span>
             </div>
           </main>
         </div>
       </div>
 
-      {/* 2. "Companies you'll see, funded by" (Aarivi Image 3) */}
+      {/* 2. Startup Clusters Funded By */}
       <section className="text-center space-y-5 pt-4">
-        <h3 className="text-xs font-mono font-medium text-[#737373] tracking-wide uppercase">
-          Companies you'll see, funded by
+        <h3 className="text-xs font-mono font-medium text-[#71788E] tracking-wide uppercase">
+          Startup clusters & portfolio companies backed by
         </h3>
 
-        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-80 grayscale hover:grayscale-0 transition-all text-xs font-mono text-[#A3A3A3]">
+        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-80 text-xs font-mono text-[#A3A8BD]">
           <div className="flex items-center gap-1.5 font-bold tracking-tight text-sm text-white">
             <span className="w-5 h-5 rounded bg-[#F97316] text-white flex items-center justify-center font-black text-xs font-mono">
               Y
@@ -401,7 +419,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
 
           <div className="flex items-center gap-1 font-semibold text-xs text-white">
             <span className="text-red-500">🔥</span>
-            <span>lightspeed</span>
+            <span>lightspeed india</span>
           </div>
 
           <div className="font-mono text-xs text-white tracking-tight">
@@ -414,22 +432,22 @@ export const JobRadar: React.FC<JobRadarProps> = ({
         </div>
       </section>
 
-      {/* 3. "All kinds of roles" Pill Filter Section (Aarivi Image 3) */}
+      {/* 3. Role Categories Pill Filter Section */}
       <section className="text-center space-y-6 pt-8 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#171717] border border-[#262626] text-xs font-mono text-[#A3A3A3]">
-          <span>🌐</span>
-          <span>All kinds of roles</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#13151F] border border-[#1E2230] text-xs font-mono text-[#A3A8BD]">
+          <span>◈</span>
+          <span>Target Engineering Disciplines</span>
         </div>
 
         <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Find every kind of role in one place
+          Find high-conviction roles across startup tiers
         </h2>
 
-        <p className="text-sm text-[#A3A3A3] leading-relaxed max-w-xl mx-auto font-sans">
-          Engineering, design, data, product, internships. If people are hiring for it, you can look for it here.
+        <p className="text-sm text-[#8C93A8] leading-relaxed max-w-xl mx-auto font-sans">
+          From seed-stage founding engineers in Indiranagar to Series B scale-ups in HSR Layout.
         </p>
 
-        {/* Role Pills with Checkmarks (Image 3) */}
+        {/* Role Pills */}
         <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
           {ROLE_CATEGORIES.map((role) => {
             const isSelected = selectedRole === role;
@@ -440,7 +458,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border ${
                   isSelected
                     ? 'bg-white text-black border-white shadow-sm font-semibold'
-                    : 'bg-[#171717] text-[#A3A3A3] border-[#262626] hover:text-white hover:border-[#404040]'
+                    : 'bg-[#12141E] text-[#8C93A8] border-[#1E2230] hover:text-white hover:border-[#31374C]'
                 }`}
               >
                 {isSelected && <Check className="w-3.5 h-3.5 text-black" />}

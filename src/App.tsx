@@ -2,8 +2,9 @@ import { useState } from 'react';
 import type { CandidateProfile, JobListing, ApplicationCard, KanbanStatus } from './types';
 import { initialProfile } from './lib/defaultProfile';
 import { curatedJobs } from './lib/jobRadarEngine';
+import { Navbar } from './components/Navbar';
 import { JobRadar } from './components/JobRadar';
-import { AariviBentoFeatures } from './components/AariviBentoFeatures';
+import { JobPilotFeatures } from './components/JobPilotFeatures';
 import { AtsResumeTailorModal } from './components/AtsResumeTailorModal';
 import { OutreachModal } from './components/OutreachModal';
 import { AutopilotApplyModal } from './components/AutopilotApplyModal';
@@ -106,84 +107,70 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#EDEDED] flex flex-col font-sans selection:bg-white/20 selection:text-white">
-      {/* 1. Aarivi Top Navigation (Image 1) */}
-      <header className="sticky top-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-[#1A1A1A]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          {/* Logo (Triangle Glyph + Aarivi wordmark) */}
-          <div className="flex items-center gap-2 text-white font-bold tracking-tight text-base cursor-pointer">
-            <span className="text-sm">▲</span>
-            <span>Aarivi</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#171717] border border-[#262626] text-[#A3A3A3] ml-1">
-              JobPilot v2
-            </span>
-          </div>
-
-          {/* Links (Image 1) */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-[#888888]">
-            <a href="#dashboard-view" className="hover:text-white transition-colors">Features</a>
-            <a href="#dashboard-view" className="hover:text-white transition-colors">Pricing</a>
-            <a href="#faq-section" className="hover:text-white transition-colors">Faq</a>
-            <a href="mailto:hi@aarivi.com" className="hover:text-white transition-colors">Contact</a>
-          </nav>
-
-          {/* Right CTA Button (Image 1) */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setActiveModal('PROFILE')}
-              className="text-xs text-[#888888] hover:text-white transition-colors hidden sm:inline"
-            >
-              {candidate.fullName}
-            </button>
-            <button
-              onClick={scrollToDashboard}
-              className="px-4 py-2 rounded-full bg-white hover:bg-[#F0F0F0] text-black font-semibold text-xs transition-all shadow-sm"
-            >
-              Get started
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#090A0F] text-[#EDEDED] flex flex-col font-sans selection:bg-white/20 selection:text-white jp-radar-glow">
+      {/* 1. JobPilot Top Navigation */}
+      <Navbar
+        activeTab="RADAR"
+        setActiveTab={(tab) => {
+          if (tab === 'OUTREACH') setActiveModal('OUTREACH');
+          else if (tab === 'ATS_LAB') setActiveModal('ATS');
+          else if (tab === 'CRM') setActiveModal('APPLICATIONS');
+          else if (tab === 'PORTFOLIO') setActiveModal('PORTFOLIO');
+          else scrollToDashboard();
+        }}
+        onOpenProfile={() => setActiveModal('PROFILE')}
+        candidateName={candidate.fullName}
+        candidateYoe={candidate.yearsOfExperience}
+        applicationsCount={cards.length}
+      />
 
       {/* Main Container */}
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-20">
-        {/* 2. Aarivi Landing Hero Section (Pixel Matched to Image 1) */}
+        {/* 2. Hero Section */}
         <section className="relative text-center max-w-4xl mx-auto space-y-6 pt-8 pb-4">
-          {/* Subtle Halftone Pattern Accents on Left & Right */}
-          <div className="absolute -left-20 top-0 bottom-0 w-32 aarivi-dots opacity-40 pointer-events-none hidden lg:block" />
-          <div className="absolute -right-20 top-0 bottom-0 w-32 aarivi-dots opacity-40 pointer-events-none hidden lg:block" />
+          {/* Subtle Ambient Mesh Accents */}
+          <div className="absolute -left-20 top-0 bottom-0 w-32 jp-mesh-grid opacity-30 pointer-events-none hidden lg:block" />
+          <div className="absolute -right-20 top-0 bottom-0 w-32 jp-mesh-grid opacity-30 pointer-events-none hidden lg:block" />
 
-          {/* Eyebrow Pill (Image 1) */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#141414] border border-[#262626] text-xs font-sans text-neutral-300">
-            <span className="px-1.5 py-0.2 rounded bg-[#262626] text-white text-[10px] font-bold">New</span>
-            <span>Watch the demo</span>
-            <span className="text-[#888888]">→</span>
+          {/* Eyebrow Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#131520] border border-[#202436] text-xs font-mono text-[#A3A8BD]">
+            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+            <span>YC W24/S24 & Bangalore Startup Radar</span>
+            <span className="text-[#4E546C]">•</span>
+            <span className="text-white font-medium">80% Response Playbook</span>
           </div>
 
-          {/* Headline (Exact Two-Line Stagger from Image 1) */}
+          {/* Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.08]">
-            Your job hunt, on <br />
-            autopilot
+            Your career search, on <br />
+            autopilot.
           </h1>
 
-          {/* Subtitle with Dotted Underlines (Image 1) */}
-          <p className="text-base sm:text-lg text-[#A3A3A3] max-w-2xl mx-auto font-sans leading-relaxed">
-            Aarivi finds jobs, <span className="dotted-link text-white cursor-pointer" onClick={() => setActiveModal('OUTREACH')}>cold emails</span> your profile to <span className="dotted-link text-white cursor-pointer" onClick={() => setActiveModal('OUTREACH')}>founders</span>, tracks every application, and builds your resume and portfolio.
+          {/* Subtitle with Dotted Underlines */}
+          <p className="text-base sm:text-lg text-[#8C93A8] max-w-2xl mx-auto font-sans leading-relaxed">
+            JobPilot reverse-engineers startup hiring: indexes unadvertised roles, <span className="jp-dotted-link text-white cursor-pointer" onClick={() => setActiveModal('OUTREACH')}>cold emails</span> founders directly, tracks every application via Gmail, and builds your <span className="jp-dotted-link text-white cursor-pointer" onClick={() => setActiveModal('PORTFOLIO')}>proof-of-work</span> portfolio.
           </p>
 
-          {/* CTA Button (Image 1) */}
-          <div className="pt-2">
+          {/* CTA Buttons */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <button
               onClick={scrollToDashboard}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#F0F0F0] text-black font-semibold text-sm transition-all shadow-md group"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#EDEDED] text-black font-semibold text-sm transition-all shadow-md group"
             >
-              <span>Get started</span>
+              <span>Explore Open Roles</span>
               <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+            </button>
+
+            <button
+              onClick={() => setActiveModal('OUTREACH')}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#141622] hover:bg-[#1C1F30] border border-[#23273B] text-white font-semibold text-sm transition-all"
+            >
+              <span>CrackColdEmail Playbook</span>
             </button>
           </div>
         </section>
 
-        {/* 3. The Central Embedded Dashboard (Exact Match to Image 2) */}
+        {/* 3. The Central Embedded Dashboard */}
         <section id="dashboard-view" className="scroll-mt-24">
           <JobRadar
             jobs={jobs}
@@ -204,12 +191,13 @@ export function App() {
             appliedJobIds={appliedJobIds}
             onOpenPortfolio={() => setActiveModal('PORTFOLIO')}
             onOpenApplications={() => setActiveModal('APPLICATIONS')}
+            onOpenAtsLab={() => setActiveModal('ATS')}
           />
         </section>
 
-        {/* 4. Aarivi Feature Bento Grid & Testimonials (Images 4, 5, 6, 7) */}
+        {/* 4. Feature Bento Grid & Engineering Stories */}
         <section>
-          <AariviBentoFeatures
+          <JobPilotFeatures
             onOpenOutreachModal={() => setActiveModal('OUTREACH')}
             onOpenPortfolioModal={() => setActiveModal('PORTFOLIO')}
             onOpenApplicationsTab={() => setActiveModal('APPLICATIONS')}
@@ -217,8 +205,8 @@ export function App() {
         </section>
       </main>
 
-      {/* 5. Modals (Overlays when user clicks actions) */}
-      {/* Cold Email to Founder Modal (Image 5) */}
+      {/* 5. Modals */}
+      {/* Cold Email to Founder Modal */}
       {activeModal === 'OUTREACH' && (
         <OutreachModal
           job={selectedJob}
@@ -269,15 +257,15 @@ export function App() {
       {/* Applications Kanban Modal */}
       {activeModal === 'APPLICATIONS' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#121212] border border-[#262626] rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 space-y-6 text-white font-sans">
-            <div className="flex items-center justify-between pb-3 border-b border-[#262626]">
+          <div className="bg-[#10121A] border border-[#1E2230] rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 space-y-6 text-white font-sans">
+            <div className="flex items-center justify-between pb-3 border-b border-[#1E2230]">
               <div className="flex items-center gap-2">
                 <span className="text-base">⚡</span>
-                <h3 className="font-bold text-sm text-white">Application Pipeline & Gmail Tracking</h3>
+                <h3 className="font-bold text-sm text-white">Application Pipeline & Gmail Inbound Sync</h3>
               </div>
               <button
                 onClick={() => setActiveModal('NONE')}
-                className="px-3 py-1 bg-[#1C1C1C] hover:bg-[#262626] rounded-md text-xs text-[#A3A3A3] hover:text-white"
+                className="px-3 py-1 bg-[#1A1D2B] hover:bg-[#252A3D] rounded-md text-xs text-[#A3A8BD] hover:text-white font-mono"
               >
                 Close
               </button>
@@ -298,15 +286,15 @@ export function App() {
       {/* Proof of Work Portfolio Modal */}
       {activeModal === 'PORTFOLIO' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#121212] border border-[#262626] rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 space-y-6 text-white font-sans">
-            <div className="flex items-center justify-between pb-3 border-b border-[#262626]">
+          <div className="bg-[#10121A] border border-[#1E2230] rounded-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 space-y-6 text-white font-sans">
+            <div className="flex items-center justify-between pb-3 border-b border-[#1E2230]">
               <div className="flex items-center gap-2">
                 <span className="text-base">💻</span>
-                <h3 className="font-bold text-sm text-white">Developer Proof-of-Work Portfolio</h3>
+                <h3 className="font-bold text-sm text-white">Developer Proof-of-Work Portfolio Studio</h3>
               </div>
               <button
                 onClick={() => setActiveModal('NONE')}
-                className="px-3 py-1 bg-[#1C1C1C] hover:bg-[#262626] rounded-md text-xs text-[#A3A3A3] hover:text-white"
+                className="px-3 py-1 bg-[#1A1D2B] hover:bg-[#252A3D] rounded-md text-xs text-[#A3A8BD] hover:text-white font-mono"
               >
                 Close
               </button>
@@ -321,19 +309,21 @@ export function App() {
         </div>
       )}
 
-      {/* 6. Footer (Aarivi Style) */}
-      <footer className="bg-[#050505] border-t border-[#1F1F1F] py-12 text-xs font-mono text-[#737373] mt-20">
+      {/* 6. JobPilot Footer */}
+      <footer className="bg-[#07080C] border-t border-[#161822] py-12 text-xs font-mono text-[#687087] mt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-white font-bold">
-            <span>▲</span>
-            <span>Aarivi</span>
-            <span className="text-[#525252] font-normal">— find jobs & get hired faster</span>
+            <div className="w-5 h-5 rounded bg-white text-black flex items-center justify-center font-bold text-[10px]">
+              JP
+            </div>
+            <span>JobPilot</span>
+            <span className="text-[#4E546C] font-normal">— Autonomous Reverse Recruiter for Tech Startups</span>
           </div>
 
-          <div className="flex items-center gap-6 text-[11px] text-[#A3A3A3]">
-            <a href="mailto:hi@aarivi.com" className="hover:text-white transition-colors">hi@aarivi.com</a>
-            <span className="text-[#333]">•</span>
-            <span>Bengaluru · Remote · San Francisco</span>
+          <div className="flex items-center gap-6 text-[11px] text-[#A3A8BD]">
+            <span className="hover:text-white transition-colors cursor-pointer">Indiranagar · Koramangala · HSR Layout · Remote</span>
+            <span className="text-[#2B3042]">•</span>
+            <span>JobPilot AI © 2026</span>
           </div>
         </div>
       </footer>
