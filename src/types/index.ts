@@ -60,13 +60,29 @@ export interface ATSMatchResult {
   weaknessAnalysis: string;
 }
 
+export type OutreachTemplateType =
+  | 'FOUNDER_STARTUP'
+  | 'INTERNSHIP_JUNIOR'
+  | 'PEER_REFERRAL'
+  | 'FREELANCE_PROPOSAL'
+  | 'LINKEDIN_X_DM'
+  | 'FOLLOW_UP_NUDGE';
+
 export interface ColdOutreach {
   id: string;
   jobId: string;
-  style: 'FOUNDER_PUNCHY' | 'PROOF_OF_WORK' | 'LINKEDIN_INMAIL';
+  style: OutreachTemplateType;
+  templateTitle: string;
+  bestFor: string;
   subject: string;
   body: string;
   recipient: string;
+  formulaBreakdown: {
+    context: string;
+    relevance: string;
+    proof: string;
+    smallAsk: string;
+  };
 }
 
 export type KanbanStatus =
