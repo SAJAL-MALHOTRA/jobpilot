@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Check, Send, Globe, Zap, ExternalLink } from 'lucide-react';
+import { TiltCard3D } from './TiltCard3D';
 import confetti from 'canvas-confetti';
 
 interface JobPilotFeaturesProps {
@@ -30,7 +31,7 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
     <div className="space-y-16 pt-12">
       {/* Section Header */}
       <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#13151F] border border-[#1E2230] text-xs font-mono text-[#A3A8BD]">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#13151F] border border-[#1E2230] text-xs font-mono text-[#A3A8BD] shadow-sm">
           <span>◈</span>
           <span>Autonomous Copilot Capabilities</span>
         </div>
@@ -44,12 +45,12 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
         </p>
       </div>
 
-      {/* 2x2 Bento Grid */}
+      {/* 2x2 Bento Grid with 3D Interactive Tilting */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
         {/* Bento Card 1: Gmail Tracking */}
-        <div 
+        <TiltCard3D 
           onClick={onOpenApplicationsTab}
-          className="jp-card p-6 flex flex-col justify-between space-y-6 cursor-pointer group"
+          className="jp-card p-6 flex flex-col justify-between space-y-6 cursor-pointer group rounded-2xl"
         >
           {/* Visual: Simulated Dark Mode 4-Column Board */}
           <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-3 text-[10px] font-mono space-y-2">
@@ -117,12 +118,12 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
               Every day our background agent scans Gmail and updates Applied, Interview, Offer, and Rejected on your board.
             </p>
           </div>
-        </div>
+        </TiltCard3D>
 
         {/* Bento Card 2: Resume to Portfolio */}
-        <div 
+        <TiltCard3D 
           onClick={onOpenPortfolioModal}
-          className="jp-card p-6 flex flex-col justify-between space-y-6 cursor-pointer group"
+          className="jp-card p-6 flex flex-col justify-between space-y-6 cursor-pointer group rounded-2xl"
         >
           {/* Visual: Browser Frame Preview */}
           <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-4 text-xs font-mono space-y-3">
@@ -153,10 +154,10 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
               Drop in your resume and GitHub. You get an interactive portfolio out of it with live latency benchmarks, without building a site yourself.
             </p>
           </div>
-        </div>
+        </TiltCard3D>
 
         {/* Bento Card 3: Cold Email to Founders */}
-        <div className="jp-card p-6 flex flex-col justify-between space-y-6">
+        <TiltCard3D className="jp-card p-6 flex flex-col justify-between space-y-6 rounded-2xl">
           {/* Visual: Exact Cold Email Composer Preview */}
           <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-4 text-xs font-mono space-y-3">
             <div className="space-y-1 pb-2 border-b border-[#1E2230] text-[11px]">
@@ -198,7 +199,7 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
                 </button>
                 <button
                   onClick={handleSendSimulatedEmail}
-                  className="px-3 py-1 bg-white hover:bg-[#EDEDED] text-black font-bold rounded-md transition-all flex items-center gap-1"
+                  className="px-3 py-1 bg-white hover:bg-[#EDEDED] text-black font-bold rounded-md transition-all flex items-center gap-1 shadow-sm"
                 >
                   {emailSent ? <Check className="w-3 h-3 text-[#10B981]" /> : <Send className="w-3 h-3" />}
                   <span>{emailSent ? 'Sent to Siddharth!' : 'Send email'}</span>
@@ -217,10 +218,10 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
               The agent crafts 4-part cold emails (Context + Relevance + Proof + Small Ask) with your resume attached, and dispatches directly from your Gmail once you approve.
             </p>
           </div>
-        </div>
+        </TiltCard3D>
 
         {/* Bento Card 4: 10,000+ Startups */}
-        <div className="jp-card p-6 flex flex-col justify-between space-y-6">
+        <TiltCard3D className="jp-card p-6 flex flex-col justify-between space-y-6 rounded-2xl">
           {/* Visual: Logo Grid of Startups */}
           <div className="bg-[#0C0E14] rounded-xl border border-[#1E2230] p-5 text-xs font-mono">
             <div className="grid grid-cols-3 gap-3">
@@ -255,10 +256,10 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
               Updated every 24 hours across Bangalore clusters (Indiranagar, HSR, Koramangala) and YC W24/S24 cohorts with verified founder contacts.
             </p>
           </div>
-        </div>
+        </TiltCard3D>
       </div>
 
-      {/* 3. Real JobPilot Customer Stories */}
+      {/* 3. Real JobPilot Customer Stories with 3D Tilt */}
       <section className="space-y-8 pt-8 max-w-5xl mx-auto">
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-extrabold text-white tracking-tight">
@@ -270,7 +271,7 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="jp-card p-5 space-y-4">
+          <TiltCard3D className="jp-card p-5 space-y-4 rounded-2xl">
             <p className="text-xs text-[#D4D4D4] leading-relaxed font-sans">
               "Landed a Founding Engineer role at a YC W24 AI startup in Indiranagar in 8 days. The cold email formula got me 3 founder replies in 24 hours."
             </p>
@@ -283,9 +284,9 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
                 <span className="text-[10px] text-[#687087]">Founding Engineer, Ex-Swiggy</span>
               </div>
             </div>
-          </div>
+          </TiltCard3D>
 
-          <div className="jp-card p-5 space-y-4">
+          <TiltCard3D className="jp-card p-5 space-y-4 rounded-2xl">
             <p className="text-xs text-[#D4D4D4] leading-relaxed font-sans">
               "Most job boards are black holes. JobPilot found 4 seed startups in HSR Layout that bought out my 60-day notice period. Offer signed."
             </p>
@@ -298,9 +299,9 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
                 <span className="text-[10px] text-[#687087]">Backend Systems Engineer</span>
               </div>
             </div>
-          </div>
+          </TiltCard3D>
 
-          <div className="jp-card p-5 space-y-4">
+          <TiltCard3D className="jp-card p-5 space-y-4 rounded-2xl">
             <p className="text-xs text-[#D4D4D4] leading-relaxed font-sans">
               "The Google X-Y-Z resume rewriter bumped my Ashby ATS match to 94%. Dispatched the pitch and had a technical screening scheduled by Thursday."
             </p>
@@ -313,9 +314,9 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
                 <span className="text-[10px] text-[#687087]">Full Stack Developer</span>
               </div>
             </div>
-          </div>
+          </TiltCard3D>
 
-          <div className="jp-card p-5 space-y-4">
+          <TiltCard3D className="jp-card p-5 space-y-4 rounded-2xl">
             <p className="text-xs text-[#D4D4D4] leading-relaxed font-sans">
               "Connected my Gmail and the agent detected an inbound interview invitation from Sarvam AI automatically. Game changer."
             </p>
@@ -328,7 +329,7 @@ export const JobPilotFeatures: React.FC<JobPilotFeaturesProps> = ({
                 <span className="text-[10px] text-[#687087]">Senior Frontend Lead</span>
               </div>
             </div>
-          </div>
+          </TiltCard3D>
         </div>
       </section>
 

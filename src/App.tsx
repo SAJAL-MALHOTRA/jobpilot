@@ -11,6 +11,8 @@ import { AutopilotApplyModal } from './components/AutopilotApplyModal';
 import { ProfileVaultModal } from './components/ProfileVaultModal';
 import { AutopilotTracker } from './components/AutopilotTracker';
 import { PortfolioStudio } from './components/PortfolioStudio';
+import { RadarGlobe3D } from './components/RadarGlobe3D';
+import { TiltCard3D } from './components/TiltCard3D';
 import confetti from 'canvas-confetti';
 
 export function App() {
@@ -126,73 +128,83 @@ export function App() {
 
       {/* Main Container */}
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-20">
-        {/* 2. Hero Section */}
-        <section className="relative text-center max-w-4xl mx-auto space-y-6 pt-8 pb-4">
+        {/* 2. Hero Section with 3D Radar Globe */}
+        <section className="relative text-center max-w-4xl mx-auto space-y-6 pt-12 pb-8 overflow-visible">
+          {/* Interactive 3D WebGL Radar Canvas */}
+          <RadarGlobe3D />
+
           {/* Subtle Ambient Mesh Accents */}
           <div className="absolute -left-20 top-0 bottom-0 w-32 jp-mesh-grid opacity-30 pointer-events-none hidden lg:block" />
           <div className="absolute -right-20 top-0 bottom-0 w-32 jp-mesh-grid opacity-30 pointer-events-none hidden lg:block" />
 
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#131520] border border-[#202436] text-xs font-mono text-[#A3A8BD]">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-            <span>YC W24/S24 & Bangalore Startup Radar</span>
-            <span className="text-[#4E546C]">•</span>
-            <span className="text-white font-medium">80% Response Playbook</span>
-          </div>
+          {/* Content Wrapper to sit crisp above 3D WebGL canvas */}
+          <div className="relative z-10 space-y-6">
+            {/* Eyebrow Pill */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#131520]/80 backdrop-blur-md border border-[#202436] text-xs font-mono text-[#A3A8BD] shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+              <span>YC W24/S24 & Bangalore Startup Radar</span>
+              <span className="text-[#4E546C]">•</span>
+              <span className="text-white font-medium">80% Response Playbook</span>
+            </div>
 
-          {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.08]">
-            Your career search, on <br />
-            autopilot.
-          </h1>
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.08] drop-shadow-sm">
+              Your career search, on <br />
+              <span className="bg-gradient-to-r from-white via-neutral-200 to-indigo-300 bg-clip-text text-transparent">
+                autopilot.
+              </span>
+            </h1>
 
-          {/* Subtitle with Dotted Underlines */}
-          <p className="text-base sm:text-lg text-[#8C93A8] max-w-2xl mx-auto font-sans leading-relaxed">
-            JobPilot reverse-engineers startup hiring: indexes unadvertised roles, <span className="jp-dotted-link text-white cursor-pointer" onClick={() => setActiveModal('OUTREACH')}>cold emails</span> founders directly, tracks every application via Gmail, and builds your <span className="jp-dotted-link text-white cursor-pointer" onClick={() => setActiveModal('PORTFOLIO')}>proof-of-work</span> portfolio.
-          </p>
+            {/* Subtitle with Dotted Underlines */}
+            <p className="text-base sm:text-lg text-[#8C93A8] max-w-2xl mx-auto font-sans leading-relaxed">
+              JobPilot reverse-engineers startup hiring: indexes unadvertised roles, <span className="jp-dotted-link text-white cursor-pointer" onClick={() => setActiveModal('OUTREACH')}>cold emails</span> founders directly, tracks every application via Gmail, and builds your <span className="jp-dotted-link text-white cursor-pointer" onClick={() => setActiveModal('PORTFOLIO')}>proof-of-work</span> portfolio.
+            </p>
 
-          {/* CTA Buttons */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={scrollToDashboard}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#EDEDED] text-black font-semibold text-sm transition-all shadow-md group"
-            >
-              <span>Explore Open Roles</span>
-              <span className="group-hover:translate-x-0.5 transition-transform">→</span>
-            </button>
+            {/* CTA Buttons */}
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={scrollToDashboard}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#EDEDED] text-black font-semibold text-sm transition-all shadow-xl group"
+              >
+                <span>Explore Open Roles</span>
+                <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+              </button>
 
-            <button
-              onClick={() => setActiveModal('OUTREACH')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#141622] hover:bg-[#1C1F30] border border-[#23273B] text-white font-semibold text-sm transition-all"
-            >
-              <span>CrackColdEmail Playbook</span>
-            </button>
+              <button
+                onClick={() => setActiveModal('OUTREACH')}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#141622]/90 backdrop-blur-md hover:bg-[#1C1F30] border border-[#23273B] text-white font-semibold text-sm transition-all shadow-md"
+              >
+                <span>CrackColdEmail Playbook</span>
+              </button>
+            </div>
           </div>
         </section>
 
-        {/* 3. The Central Embedded Dashboard */}
+        {/* 3. The Central Embedded Dashboard with 3D Specular Tilt */}
         <section id="dashboard-view" className="scroll-mt-24">
-          <JobRadar
-            jobs={jobs}
-            candidate={candidate}
-            onSelectJobForATS={(job) => {
-              setSelectedJob(job);
-              setActiveModal('ATS');
-            }}
-            onSelectJobForOutreach={(job) => {
-              setSelectedJob(job);
-              setActiveModal('OUTREACH');
-            }}
-            onAddToPipeline={handleAddToPipeline}
-            onSimulateApply={(job) => {
-              setSelectedJob(job);
-              setActiveModal('SIMULATE');
-            }}
-            appliedJobIds={appliedJobIds}
-            onOpenPortfolio={() => setActiveModal('PORTFOLIO')}
-            onOpenApplications={() => setActiveModal('APPLICATIONS')}
-            onOpenAtsLab={() => setActiveModal('ATS')}
-          />
+          <TiltCard3D maxTilt={2} className="rounded-2xl">
+            <JobRadar
+              jobs={jobs}
+              candidate={candidate}
+              onSelectJobForATS={(job) => {
+                setSelectedJob(job);
+                setActiveModal('ATS');
+              }}
+              onSelectJobForOutreach={(job) => {
+                setSelectedJob(job);
+                setActiveModal('OUTREACH');
+              }}
+              onAddToPipeline={handleAddToPipeline}
+              onSimulateApply={(job) => {
+                setSelectedJob(job);
+                setActiveModal('SIMULATE');
+              }}
+              appliedJobIds={appliedJobIds}
+              onOpenPortfolio={() => setActiveModal('PORTFOLIO')}
+              onOpenApplications={() => setActiveModal('APPLICATIONS')}
+              onOpenAtsLab={() => setActiveModal('ATS')}
+            />
+          </TiltCard3D>
         </section>
 
         {/* 4. Feature Bento Grid & Engineering Stories */}
