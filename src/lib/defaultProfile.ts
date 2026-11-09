@@ -12,6 +12,7 @@ export const initialProfile: CandidateProfile = {
   primarySkills: ['React', 'TypeScript', 'Node.js', 'Python', 'FastAPI', 'PostgreSQL', 'Docker', 'AWS'],
   secondarySkills: ['Next.js', 'Redis', 'Kafka', 'LangChain', 'Kubernetes', 'GraphQL', 'Tailwind CSS'],
   minTargetCtcLpa: 24.0,
+  location: 'Bangalore, India',
   locationPreference: 'Bangalore',
   githubUrl: 'https://github.com/arjunmehta-dev',
   linkedinUrl: 'https://linkedin.com/in/arjunmehta-engineer',

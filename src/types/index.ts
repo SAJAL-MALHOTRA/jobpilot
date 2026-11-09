@@ -10,6 +10,7 @@ export interface CandidateProfile {
   primarySkills: string[];
   secondarySkills: string[];
   minTargetCtcLpa: number;
+  location: string;
   locationPreference: 'Remote' | 'Bangalore' | 'Hybrid / Flexible' | 'Delhi-NCR';
   githubUrl: string;
   linkedinUrl: string;
