@@ -1,9 +1,9 @@
 import React from 'react';
-import { Bot, Radar, FileCheck, Send, Kanban, UserCheck, Play, Pause } from 'lucide-react';
+import { Bot, Radar, FileCheck, Send, Kanban, UserCheck, Play, Pause, Globe } from 'lucide-react';
 
 interface NavbarProps {
-  activeTab: 'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM';
-  setActiveTab: (tab: 'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM') => void;
+  activeTab: 'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM' | 'PORTFOLIO';
+  setActiveTab: (tab: 'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM' | 'PORTFOLIO') => void;
   autopilotEnabled: boolean;
   setAutopilotEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   onOpenProfile: () => void;
@@ -99,6 +99,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {interviewsCount > 0 && ` (${interviewsCount} interviews)`}
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => setActiveTab('PORTFOLIO')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                activeTab === 'PORTFOLIO'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              <span>Portfolio Studio</span>
             </button>
           </nav>
 

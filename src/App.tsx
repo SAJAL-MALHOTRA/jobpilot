@@ -9,11 +9,12 @@ import { OutreachModal } from './components/OutreachModal';
 import { AutopilotTracker } from './components/AutopilotTracker';
 import { ProfileVaultModal } from './components/ProfileVaultModal';
 import { LiveAgentConsole } from './components/LiveAgentConsole';
+import { PortfolioStudio } from './components/PortfolioStudio';
 import { Sparkles, Bot, Zap, ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM'>('RADAR');
+  const [activeTab, setActiveTab] = useState<'RADAR' | 'ATS_LAB' | 'OUTREACH' | 'CRM' | 'PORTFOLIO'>('RADAR');
   const [candidate, setCandidate] = useState<CandidateProfile>(initialProfile);
   const [jobs] = useState<JobListing[]>(curatedJobs);
   const [autopilotEnabled, setAutopilotEnabled] = useState(true);
@@ -210,6 +211,13 @@ export function App() {
               onUpdateCardStatus={handleUpdateCardStatus}
               onRemoveCard={handleRemoveCard}
               onOpenOutreachForCard={(job) => setSelectedJobForOutreach(job)}
+            />
+          )}
+
+          {activeTab === 'PORTFOLIO' && (
+            <PortfolioStudio
+              candidate={candidate}
+              onNavigateToOutreach={() => setActiveTab('OUTREACH')}
             />
           )}
         </div>
