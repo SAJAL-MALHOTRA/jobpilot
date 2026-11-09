@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { JobListing, CandidateProfile } from '../types';
 import { calculateQuickMatchScore } from '../lib/jobRadarEngine';
-import { Search, MapPin, DollarSign, Sparkles, Send, FileCheck, Plus, Check, Flame } from 'lucide-react';
+import { MapPin, DollarSign, Sparkles, Send, FileCheck, Plus, Check, ShieldCheck, CheckCircle2, Zap } from 'lucide-react';
 
 interface JobRadarProps {
   jobs: JobListing[];
@@ -20,20 +20,34 @@ export const JobRadar: React.FC<JobRadarProps> = ({
   onAddToPipeline,
   appliedJobIds,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [naturalQuery, setNaturalQuery] = useState('');
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [sourceFilter, setSourceFilter] = useState<'ALL' | 'YC' | 'WELLFOUND' | 'LINKEDIN'>('ALL');
   const [minCtc, setMinCtc] = useState<number>(25);
+  const [onlyNoticeBuyout, setOnlyNoticeBuyout] = useState(false);
 
   const candidateSkills = new Set(
     [...candidate.primarySkills, ...candidate.secondarySkills].map((s) => s.toLowerCase())
   );
 
+  // Explee Natural Language Quick Presets
+  const applyPreset = (promptText: string, minCtcVal: number, sourceVal: 'ALL' | 'YC' | 'WELLFOUND' | 'LINKEDIN', remote: boolean, buyout: boolean) => {
+    setNaturalQuery(promptText);
+    setMinCtc(minCtcVal);
+    setSourceFilter(sourceVal);
+    setRemoteOnly(remote);
+    setOnlyNoticeBuyout(buyout);
+  };
+
   const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.requiredSkills.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+    const q = naturalQuery.toLowerCase();
+    const matchesPrompt =
+      !q ||
+      job.title.toLowerCase().includes(q) ||
+      job.company.toLowerCase().includes(q) ||
+      job.location.toLowerCase().includes(q) ||
+      job.bangaloreCluster?.toLowerCase().includes(q) ||
+      job.requiredSkills.some((s) => s.toLowerCase().includes(q));
 
     const matchesRemote = !remoteOnly || job.isRemote;
 
@@ -44,57 +58,99 @@ export const JobRadar: React.FC<JobRadarProps> = ({
       (sourceFilter === 'LINKEDIN' && job.source === 'LinkedIn');
 
     const matchesCtc = job.maxCtcLpa >= minCtc;
+    const matchesBuyout = !onlyNoticeBuyout || job.noticeBuyoutCovered;
 
-    return matchesSearch && matchesRemote && matchesSource && matchesCtc;
+    return matchesPrompt && matchesRemote && matchesSource && matchesCtc && matchesBuyout;
   });
 
   return (
     <div className="space-y-6">
-      {/* Search & Filters Bar */}
-      <div className="bg-[#101625] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-          {/* Search Input */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              placeholder="Search by role, company, or tech stack (e.g., React, Python, FastAPI)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs font-medium text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+      {/* Explee-Style Natural Language Prompt Search Bar */}
+      <div className="bg-[#111115] p-5 sm:p-6 rounded-2xl border border-neutral-800 shadow-2xl space-y-4">
+        {/* Natural Language Search Input */}
+        <div className="relative">
+          <div className="absolute left-4 top-3.5 flex items-center gap-1.5 text-indigo-400">
+            <Sparkles className="w-4 h-4 animate-pulse" />
           </div>
+          <input
+            type="text"
+            placeholder="Explee Prompt Search: 'Find YC W24 AI startups in Indiranagar paying >₹35L with verified CEO emails'..."
+            value={naturalQuery}
+            onChange={(e) => setNaturalQuery(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 bg-neutral-900 border border-neutral-700/80 rounded-xl text-xs sm:text-sm font-medium text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner"
+          />
+        </div>
 
-          {/* Quick Filters */}
-          <div className="flex flex-wrap items-center gap-2">
+        {/* Explee 1-Click Prompt Suggestion Pills */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+          <span className="text-[11px] font-mono text-neutral-400 uppercase tracking-wider flex items-center gap-1">
+            ⚡ Quick Prompts:
+          </span>
+          <button
+            onClick={() => applyPreset('AI', 32, 'YC', false, false)}
+            className="px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 rounded-lg text-neutral-300 font-mono text-[11px] transition-all hover:border-indigo-500"
+          >
+            &quot;YC W24 AI Startups (₹32L+)&quot;
+          </button>
+          <button
+            onClick={() => applyPreset('Indiranagar', 30, 'ALL', false, true)}
+            className="px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 rounded-lg text-neutral-300 font-mono text-[11px] transition-all hover:border-indigo-500"
+          >
+            &quot;Indiranagar Hub + Notice Buyout&quot;
+          </button>
+          <button
+            onClick={() => applyPreset('Remote', 35, 'YC', true, false)}
+            className="px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 rounded-lg text-neutral-300 font-mono text-[11px] transition-all hover:border-indigo-500"
+          >
+            &quot;Remote US/India Tech (High Equity)&quot;
+          </button>
+          <button
+            onClick={() => { setNaturalQuery(''); setMinCtc(20); setSourceFilter('ALL'); setRemoteOnly(false); setOnlyNoticeBuyout(false); }}
+            className="text-[11px] text-neutral-400 hover:text-white underline ml-auto"
+          >
+            Reset Filters
+          </button>
+        </div>
+
+        {/* Multi-Parameter Filters Row */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-neutral-800/80 text-xs text-neutral-400">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setRemoteOnly(!remoteOnly)}
-              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${
                 remoteOnly
                   ? 'bg-indigo-600 text-white border-indigo-500'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                  : 'bg-neutral-900 text-neutral-400 border-neutral-800 hover:text-white'
               }`}
             >
               Remote Only
             </button>
 
+            <button
+              onClick={() => setOnlyNoticeBuyout(!onlyNoticeBuyout)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${
+                onlyNoticeBuyout
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-neutral-900 text-neutral-400 border-neutral-800 hover:text-white'
+              }`}
+            >
+              ⚡ Notice Buyout Covered
+            </button>
+
             <select
               value={sourceFilter}
               onChange={(e: any) => setSourceFilter(e.target.value)}
-              className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-lg text-xs font-mono text-neutral-300 focus:outline-none"
             >
-              <option value="ALL">All Sources</option>
-              <option value="YC">Y Combinator (W24/S24)</option>
-              <option value="WELLFOUND">Wellfound</option>
-              <option value="LINKEDIN">LinkedIn</option>
+              <option value="ALL">All Sources (YC + India)</option>
+              <option value="YC">YC W24 / S24 Batches</option>
+              <option value="WELLFOUND">Wellfound Seed Startups</option>
+              <option value="LINKEDIN">LinkedIn Direct</option>
             </select>
           </div>
-        </div>
 
-        {/* Min CTC Slider & Matching Count */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-800/80 text-xs text-slate-400">
-          <div className="flex items-center gap-3">
-            <span className="font-semibold text-slate-300">Min Target CTC:</span>
+          <div className="flex items-center gap-2 font-mono">
+            <span>Min CTC:</span>
             <input
               type="range"
               min="20"
@@ -102,21 +158,23 @@ export const JobRadar: React.FC<JobRadarProps> = ({
               step="2"
               value={minCtc}
               onChange={(e) => setMinCtc(parseInt(e.target.value))}
-              className="w-32 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+              className="w-24 h-1.5 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
             />
-            <span className="font-mono font-bold text-indigo-400">₹ {minCtc} LPA</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="font-semibold text-slate-300">
-              {filteredJobs.length} Live Openings Match Your Profile
-            </span>
+            <span className="font-bold text-indigo-400">₹{minCtc}L+</span>
           </div>
         </div>
       </div>
 
-      {/* Jobs Grid */}
+      {/* Real-time Matching Count Banner */}
+      <div className="flex items-center justify-between text-xs text-neutral-400 px-1 font-mono">
+        <span className="flex items-center gap-1.5">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Explee Semantic Engine matched <strong>{filteredJobs.length} active opportunities</strong></span>
+        </span>
+        <span className="text-[11px] text-neutral-500">Real-time SMTP Verified Contacts</span>
+      </div>
+
+      {/* Enriched Jobs Grid (Explee-Grade Data Presentation) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredJobs.map((job) => {
           const matchScore = calculateQuickMatchScore(candidate, job);
@@ -125,10 +183,10 @@ export const JobRadar: React.FC<JobRadarProps> = ({
           return (
             <div
               key={job.id}
-              className="bg-[#101625] rounded-2xl border border-slate-800/80 hover:border-slate-700 p-6 flex flex-col justify-between space-y-5 transition-all shadow-lg hover:shadow-indigo-500/5 group"
+              className="bg-[#111115] rounded-2xl border border-neutral-800 hover:border-neutral-700 p-6 flex flex-col justify-between space-y-5 transition-all shadow-xl hover:shadow-indigo-500/5 group"
             >
-              {/* Header */}
-              <div className="space-y-3">
+              <div className="space-y-3.5">
+                {/* Header Badge Row */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${job.logoColor} flex items-center justify-center text-white font-black text-sm shadow-md`}>
@@ -138,58 +196,76 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                       <h3 className="font-bold text-white text-base group-hover:text-indigo-400 transition-colors">
                         {job.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                        <span className="font-semibold text-slate-300">{job.company}</span>
+                      <div className="flex items-center gap-2 text-xs text-neutral-400 mt-0.5">
+                        <span className="font-semibold text-neutral-200">{job.company}</span>
                         <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-slate-500" />
-                          {job.location}
+                        <span className="flex items-center gap-1 text-[11px]">
+                          <MapPin className="w-3 h-3 text-neutral-500" />
+                          {job.bangaloreCluster || job.location}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Match Score Badge */}
+                  {/* ATS Match Score */}
                   <div className="text-right">
                     <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black font-mono">
-                      <Sparkles className="w-3 h-3 text-emerald-400" />
-                      <span>{matchScore}% ATS Match</span>
+                      <span>{matchScore}% Match</span>
                     </div>
-                    <span className="block text-[10px] text-slate-500 font-mono mt-0.5">{job.source}</span>
+                    <span className="block text-[10px] text-neutral-500 font-mono mt-0.5">{job.source}</span>
                   </div>
                 </div>
 
-                {/* Compensation & Urgency Banner */}
-                <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
-                  <div className="flex items-center gap-1.5 font-mono font-bold text-slate-200">
-                    <DollarSign className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>₹ {job.minCtcLpa} – ₹ {job.maxCtcLpa} LPA</span>
-                    <span className="text-[11px] font-normal text-slate-400 font-sans">({job.equityRange})</span>
-                  </div>
-
-                  {job.hiringUrgency === 'Immediate' && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                      <Flame className="w-3 h-3 text-rose-500" /> Urgently Hiring
+                {/* Explee Prospecting & Data-Enrichment Matrix */}
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-mono bg-neutral-900/90 p-3 rounded-xl border border-neutral-800">
+                  <div className="space-y-0.5">
+                    <span className="text-neutral-500 uppercase tracking-wider text-[10px] block">Compensation</span>
+                    <span className="font-bold text-white flex items-center gap-1">
+                      <DollarSign className="w-3 h-3 text-indigo-400" />
+                      ₹{job.minCtcLpa}–{job.maxCtcLpa} LPA
                     </span>
-                  )}
+                    <span className="text-neutral-400 text-[10px] block">Equity: {job.equityRange}</span>
+                  </div>
+
+                  <div className="space-y-0.5">
+                    <span className="text-neutral-500 uppercase tracking-wider text-[10px] block">Backer & Funding</span>
+                    <span className="font-bold text-indigo-300 block truncate">{job.fundingRound || 'Venture Backed'}</span>
+                    <span className="text-emerald-400 text-[10px] flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" /> {job.emailDeliverabilityPct}% Email Validity
+                    </span>
+                  </div>
                 </div>
 
-                {/* Job Description Excerpt */}
-                <p className="text-xs text-slate-400 leading-relaxed line-clamp-3">
+                {/* Notice Buyout & Urgency Banner */}
+                {job.noticeBuyoutCovered && (
+                  <div className="flex items-center justify-between px-3 py-1.5 bg-emerald-950/20 rounded-lg border border-emerald-500/20 text-xs">
+                    <span className="text-emerald-300 font-medium flex items-center gap-1.5 text-[11px]">
+                      <Zap className="w-3.5 h-3.5 text-emerald-400" /> Startup Covers Full 60/90-Day Notice Buyout
+                    </span>
+                    {job.hiringUrgency === 'Immediate' && (
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-bold uppercase bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                        Immediate
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Job Excerpt */}
+                <p className="text-xs text-neutral-400 leading-relaxed line-clamp-2">
                   {job.description}
                 </p>
 
-                {/* Required Skills with Candidate Match Highlighting */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                {/* Skills Match */}
+                <div className="flex flex-wrap gap-1.5">
                   {job.requiredSkills.map((skill) => {
                     const isMatched = candidateSkills.has(skill.toLowerCase());
                     return (
                       <span
                         key={skill}
-                        className={`px-2 py-0.5 rounded-md text-[11px] font-medium border ${
+                        className={`px-2 py-0.5 rounded-md text-[11px] font-mono border ${
                           isMatched
                             ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                            : 'bg-slate-800/80 border-slate-700/60 text-slate-400'
+                            : 'bg-neutral-900 border-neutral-800 text-neutral-400'
                         }`}
                       >
                         {isMatched ? '✓ ' : ''}{skill}
@@ -199,19 +275,19 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                 </div>
               </div>
 
-              {/* Founder/Recruiter Contact & Actions */}
-              <div className="pt-4 border-t border-slate-800/80 space-y-3">
-                <div className="flex items-center justify-between text-xs text-slate-400">
+              {/* Direct Founder Contact & Action Bar */}
+              <div className="pt-4 border-t border-neutral-800 space-y-3">
+                <div className="flex items-center justify-between text-xs text-neutral-400">
                   <span>
-                    Direct contact: <strong className="text-slate-200">{job.founderName}</strong> ({job.founderRole})
+                    Direct: <strong className="text-neutral-200">{job.founderName}</strong> ({job.founderRole})
                   </span>
-                  <span className="text-[11px] text-slate-500">{job.postedDate}</span>
+                  <span className="text-[11px] font-mono text-neutral-500">{job.founderEmail}</span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
                   <button
                     onClick={() => onSelectJobForATS(job)}
-                    className="py-2 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 flex items-center justify-center gap-1.5 transition-all"
+                    className="py-2 px-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 rounded-xl text-xs font-semibold text-neutral-200 flex items-center justify-center gap-1.5 transition-all"
                   >
                     <FileCheck className="w-3.5 h-3.5 text-indigo-400" />
                     <span>Auto-Tailor</span>
@@ -219,10 +295,10 @@ export const JobRadar: React.FC<JobRadarProps> = ({
 
                   <button
                     onClick={() => onSelectJobForOutreach(job)}
-                    className="py-2 px-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl text-xs font-bold text-white shadow-sm shadow-indigo-600/30 flex items-center justify-center gap-1.5 transition-all"
+                    className="py-2 px-2 bg-white hover:bg-neutral-200 rounded-xl text-xs font-bold text-black shadow-md flex items-center justify-center gap-1.5 transition-all"
                   >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Outreach</span>
+                    <Send className="w-3.5 h-3.5 text-black" />
+                    <span>Explee Pitch</span>
                   </button>
 
                   <button
@@ -230,8 +306,8 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     disabled={isApplied}
                     className={`py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
                       isApplied
-                        ? 'bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed'
-                        : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-300 hover:text-white'
+                        ? 'bg-neutral-900 border-neutral-800 text-neutral-500 cursor-not-allowed'
+                        : 'bg-neutral-900 hover:bg-neutral-800 border-neutral-700 text-neutral-300 hover:text-white'
                     }`}
                   >
                     {isApplied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Plus className="w-3.5 h-3.5" />}

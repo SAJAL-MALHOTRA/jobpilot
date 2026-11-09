@@ -41,8 +41,14 @@ export interface JobListing {
   founderRole: string;
   founderEmail: string;
   founderLinkedin?: string;
+  founderTwitter?: string;
   hiringUrgency: 'Immediate' | 'High' | 'Normal';
   atsMatchScore?: number;
+  // Explee-grade prospecting & enrichment attributes
+  emailDeliverabilityPct?: number;
+  fundingRound?: string;
+  bangaloreCluster?: string;
+  noticeBuyoutCovered?: boolean;
 }
 
 export interface ATSMatchResult {
