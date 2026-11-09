@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import type { JobListing, CandidateProfile } from '../types';
+import { CompanySwipeDeck } from './CompanySwipeDeck';
 import { 
   Search, 
   MapPin, 
   Send, 
   FileText, 
   Check, 
-  MessageSquare, 
   Briefcase, 
   Inbox, 
   Globe, 
   ChevronDown,
-  ExternalLink
+  ExternalLink,
+  Layers
 } from 'lucide-react';
 
 interface JobRadarProps {
@@ -54,6 +55,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [sidebarTab, setSidebarTab] = useState<'JOBS' | 'CHAT' | 'APPLICATIONS' | 'PORTFOLIO' | 'ATS'>('JOBS');
+  const [viewMode, setViewMode] = useState<'TABLE' | 'SWIPE'>('SWIPE');
 
   const filteredJobs = jobs.filter((job) => {
     const q = searchQuery.toLowerCase().trim();
@@ -120,31 +122,46 @@ export const JobRadar: React.FC<JobRadarProps> = ({
 
               {/* CAREER Navigation */}
               <div className="space-y-1">
-                <span className="text-[10px] font-mono font-semibold text-[#666D82] uppercase tracking-wider block px-2 mb-1.5">
-                  CAREER
+                <span className="text-[10px] font-mono font-semibold text-[#666666] uppercase tracking-wider block px-2 mb-1.5">
+                  DISCOVERY
                 </span>
 
                 <button
-                  onClick={() => setSidebarTab('CHAT')}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    sidebarTab === 'CHAT' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
+                  onClick={() => {
+                    setSidebarTab('JOBS');
+                    setViewMode('SWIPE');
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
+                    sidebarTab === 'JOBS' && viewMode === 'SWIPE'
+                      ? 'bg-[#1A1A1A] text-white font-semibold border border-[#333333]'
+                      : 'text-[#888888] hover:bg-[#141414] hover:text-white'
                   }`}
                 >
-                  <MessageSquare className="w-4 h-4 text-[#71788E]" />
-                  <span>Copilot Chat</span>
+                  <div className="flex items-center gap-2.5">
+                    <span>⚡</span>
+                    <span>Swipe Deck</span>
+                  </div>
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-white text-black font-bold">
+                    HOT
+                  </span>
                 </button>
 
                 <button
-                  onClick={() => setSidebarTab('JOBS')}
+                  onClick={() => {
+                    setSidebarTab('JOBS');
+                    setViewMode('TABLE');
+                  }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
-                    sidebarTab === 'JOBS' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
+                    sidebarTab === 'JOBS' && viewMode === 'TABLE'
+                      ? 'bg-[#1A1A1A] text-white font-semibold border border-[#333333]'
+                      : 'text-[#888888] hover:bg-[#141414] hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <Briefcase className="w-4 h-4 text-white" />
-                    <span>Open Roles</span>
+                    <span>Table Directory</span>
                   </div>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-white text-black font-bold">
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#1A1A1A] text-white font-bold border border-[#262626]">
                     {filteredJobs.length}
                   </span>
                 </button>
@@ -155,14 +172,14 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     onOpenApplications();
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-colors ${
-                    sidebarTab === 'APPLICATIONS' ? 'bg-[#1C2030] text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
+                    sidebarTab === 'APPLICATIONS' ? 'bg-[#1A1A1A] text-white font-semibold border border-[#333333]' : 'text-[#888888] hover:bg-[#141414] hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Inbox className="w-4 h-4 text-[#71788E]" />
+                    <Inbox className="w-4 h-4 text-[#888888]" />
                     <span>Applications</span>
                   </div>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#1A1D2B] text-[#A3A8BD] border border-[#262B3D]">
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-[#1A1A1A] text-[#888888] border border-[#262626]">
                     {appliedJobIds.size}
                   </span>
                 </button>
@@ -222,177 +239,214 @@ export const JobRadar: React.FC<JobRadarProps> = ({
           </aside>
 
           {/* Right Main Table Content */}
-          <main className="md:col-span-9 p-5 flex flex-col justify-between space-y-4 overflow-x-auto bg-[#0E1017]">
+          <main className="md:col-span-9 p-5 flex flex-col justify-between space-y-4 overflow-x-auto bg-[#000000]">
             <div className="space-y-4">
-              {/* Top Search & Actions Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1A1D2A]">
+              {/* Top Search & Actions Bar with View Mode Switcher */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#1F1F1F]">
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-white" />
-                  <h3 className="font-bold text-sm text-white">Open Roles Directory</h3>
-                  <span className="text-xs text-[#3A3F55]">•</span>
-                  <span className="text-xs text-[#8C93A8] font-mono">Verified Founder Contacts</span>
+                  {/* View Mode Toggle */}
+                  <div className="flex items-center gap-1 p-0.5 rounded-lg bg-[#0A0A0A] border border-[#222222] text-xs font-mono">
+                    <button
+                      onClick={() => setViewMode('SWIPE')}
+                      className={`px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 ${
+                        viewMode === 'SWIPE'
+                          ? 'bg-white text-black font-bold'
+                          : 'text-[#888888] hover:text-white'
+                      }`}
+                    >
+                      <span>⚡ Swipe Deck</span>
+                      <span className="text-[9px] px-1 rounded bg-[#262626] text-white">CARD MODE</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('TABLE')}
+                      className={`px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 ${
+                        viewMode === 'TABLE'
+                          ? 'bg-white text-black font-bold'
+                          : 'text-[#888888] hover:text-white'
+                      }`}
+                    >
+                      <Layers className="w-3 h-3" />
+                      <span>Table Directory ({filteredJobs.length})</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-[#666D82] absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    placeholder="Search role, stack (React, Python), or city..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 bg-[#141724] border border-[#202538] rounded-lg text-xs text-white placeholder-[#666D82] focus:outline-none focus:border-white w-64 font-sans"
+                {viewMode === 'TABLE' && (
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 text-[#666666] absolute left-3 top-2.5" />
+                    <input
+                      type="text"
+                      placeholder="Search role, stack (React, Python)..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 bg-[#0A0A0A] border border-[#262626] rounded-lg text-xs text-white placeholder-[#666666] focus:outline-none focus:border-white w-64 font-sans"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {viewMode === 'SWIPE' ? (
+                /* Addictive Interactive Company Card Swipe Deck */
+                <div className="py-2">
+                  <CompanySwipeDeck
+                    jobs={jobs}
+                    candidate={candidate}
+                    onPitch={onSelectJobForOutreach}
+                    onTailorAts={onSelectJobForATS}
+                    onAddToPipeline={onAddToPipeline}
+                    appliedJobIds={appliedJobIds}
                   />
                 </div>
-              </div>
-
-              {/* Table View */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <tbody>
-                    {filteredJobs.map((job) => {
-                      const isApplied = appliedJobIds.has(job.id);
-                      return (
-                        <tr 
-                          key={job.id} 
-                          className="border-b border-[#171926] hover:bg-[#141724] transition-colors group cursor-pointer"
-                        >
-                          {/* 1. Icon + Title + Company */}
-                          <td className="py-3.5 pr-4 pl-1">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-lg ${job.logoColor} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm font-mono`}>
-                                {job.company.charAt(0)}
-                              </div>
-                              <div>
-                                <div className="font-semibold text-xs text-white group-hover:text-[#A5B4FC] transition-colors">
-                                  {job.title}
+              ) : (
+                /* Table View */
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <tbody>
+                      {filteredJobs.map((job) => {
+                        const isApplied = appliedJobIds.has(job.id);
+                        return (
+                          <tr 
+                            key={job.id} 
+                            className="border-b border-[#171717] hover:bg-[#0A0A0A] transition-colors group cursor-pointer"
+                          >
+                            {/* 1. Icon + Title + Company */}
+                            <td className="py-3.5 pr-4 pl-1">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-lg ${job.logoColor} text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm font-mono`}>
+                                  {job.company.charAt(0)}
                                 </div>
-                                <div className="text-[11px] text-[#8C93A8] flex items-center gap-1.5 mt-0.5">
-                                  <span>{job.company}</span>
-                                  {job.noticeBuyoutCovered && (
-                                    <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-[#064E3B]/40 text-[#34D399] border border-[#059669]/40">
-                                      Notice Buyout
-                                    </span>
-                                  )}
+                                <div>
+                                  <div className="font-semibold text-xs text-white group-hover:text-neutral-200 transition-colors">
+                                    {job.title}
+                                  </div>
+                                  <div className="text-[11px] text-[#888888] flex items-center gap-1.5 mt-0.5">
+                                    <span>{job.company}</span>
+                                    {job.noticeBuyoutCovered && (
+                                      <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/60">
+                                        Notice Buyout
+                                      </span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
+                            </td>
 
-                          {/* 2. Location */}
-                          <td className="py-3.5 px-3 text-[#A3A8BD] text-[11px] whitespace-nowrap font-sans">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-[#666D82]" />
-                              {job.location}
-                            </span>
-                          </td>
-
-                          {/* 3. Experience & Salary (Indian INR format) */}
-                          <td className="py-3.5 px-3 whitespace-nowrap">
-                            <div className="text-[11px] text-white font-medium">
-                              {job.experienceDisplay || '2–4 years'}
-                            </div>
-                            <div className="text-[11px] text-[#A3A8BD] font-mono">
-                              {job.salaryDisplay || `₹${job.minCtcLpa}L–₹${job.maxCtcLpa}L`}
-                            </div>
-                          </td>
-
-                          {/* 4. Tech Stack Pills */}
-                          <td className="py-3.5 px-3">
-                            <div className="flex items-center gap-1">
-                              {job.requiredSkills.slice(0, 2).map((sk) => (
-                                <span
-                                  key={sk}
-                                  className="px-2 py-0.5 rounded bg-[#161926] text-[#A3A8BD] text-[10px] font-mono font-medium border border-[#23273B]"
-                                >
-                                  {sk}
-                                </span>
-                              ))}
-                              {job.requiredSkills.length > 2 && (
-                                <span className="text-[10px] font-mono text-[#666D82]">
-                                  +{job.requiredSkills.length - 2}
-                                </span>
-                              )}
-                            </div>
-                          </td>
-
-                          {/* 5. Match Score Bar */}
-                          <td className="py-3.5 px-3 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <div className="w-16 bg-[#1A1E2C] h-1.5 rounded-full overflow-hidden">
-                                <div
-                                  className="bg-[#F59E0B] h-full rounded-full"
-                                  style={{ width: `${job.atsMatchScore || 80}%` }}
-                                />
-                              </div>
-                              <span className="font-mono font-bold text-xs text-[#F59E0B]">
-                                {job.atsMatchScore || 80}%
+                            {/* 2. Location */}
+                            <td className="py-3.5 px-3 text-[#A1A1A1] text-[11px] whitespace-nowrap font-sans">
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3 h-3 text-[#666666]" />
+                                {job.location}
                               </span>
-                            </div>
-                          </td>
+                            </td>
 
-                          {/* 6. Action Buttons */}
-                          <td className="py-3.5 pl-3 pr-2 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1.5">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onSelectJobForOutreach(job);
-                                }}
-                                className="px-2.5 py-1 bg-white hover:bg-[#EDEDED] text-black text-[11px] font-bold rounded-md shadow-sm transition-all flex items-center gap-1"
-                                title="Draft Cold Email (80% formula)"
-                              >
-                                <Send className="w-2.5 h-2.5" />
-                                <span>Pitch</span>
-                              </button>
+                            {/* 3. Experience & Salary (Indian INR format) */}
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <div className="text-[11px] text-white font-medium">
+                                {job.experienceDisplay || '2–4 years'}
+                              </div>
+                              <div className="text-[11px] text-[#888888] font-mono">
+                                {job.salaryDisplay || `₹${job.minCtcLpa}L–₹${job.maxCtcLpa}L`}
+                              </div>
+                            </td>
 
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onSelectJobForATS(job);
-                                }}
-                                className="px-2 py-1 bg-[#161926] hover:bg-[#202538] text-[#C5CADB] border border-[#23273B] text-[11px] font-medium rounded-md transition-all"
-                                title="Tailor Resume (Google X-Y-Z)"
-                              >
-                                <FileText className="w-2.5 h-2.5" />
-                              </button>
+                            {/* 4. Tech Stack Pills */}
+                            <td className="py-3.5 px-3">
+                              <div className="flex items-center gap-1">
+                                {job.requiredSkills.slice(0, 2).map((sk) => (
+                                  <span
+                                    key={sk}
+                                    className="px-2 py-0.5 rounded bg-[#111111] text-[#A1A1A1] text-[10px] font-mono font-medium border border-[#222222]"
+                                  >
+                                    {sk}
+                                  </span>
+                                ))}
+                                {job.requiredSkills.length > 2 && (
+                                  <span className="text-[10px] font-mono text-[#666666]">
+                                    +{job.requiredSkills.length - 2}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
 
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onSimulateApply(job);
-                                }}
-                                className="px-2.5 py-1 bg-[#141414] hover:bg-[#222222] text-[#A1A1A1] hover:text-white border border-[#262626] text-[11px] font-medium rounded-md transition-all flex items-center gap-1"
-                                title="Open Careers Page & Track"
-                              >
-                                <ExternalLink className="w-2.5 h-2.5" />
-                                <span>Apply</span>
-                              </button>
+                            {/* 5. Match Score Bar */}
+                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <div className="w-16 bg-[#1A1A1A] h-1.5 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-white h-full rounded-full"
+                                    style={{ width: `${job.atsMatchScore || 80}%` }}
+                                  />
+                                </div>
+                                <span className="font-mono font-bold text-xs text-white">
+                                  {job.atsMatchScore || 80}%
+                                </span>
+                              </div>
+                            </td>
 
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onAddToPipeline(job);
-                                }}
-                                className={`px-2 py-1 text-[11px] font-medium rounded-md transition-all ${
-                                  isApplied ? 'bg-[#161926] text-[#666D82]' : 'bg-[#161926] hover:bg-[#202538] text-[#C5CADB] border border-[#23273B]'
-                                }`}
-                                title={isApplied ? 'Tracked in Applications' : 'Track in Applications'}
-                              >
-                                {isApplied ? 'Tracked' : '+ Track'}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            {/* 6. Action Buttons */}
+                            <td className="py-3.5 pl-3 pr-2 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSelectJobForOutreach(job);
+                                  }}
+                                  className="px-2.5 py-1 bg-white hover:bg-neutral-200 text-black text-[11px] font-bold rounded-md shadow-sm transition-all flex items-center gap-1"
+                                  title="Draft Cold Email (80% formula)"
+                                >
+                                  <Send className="w-2.5 h-2.5" />
+                                  <span>Pitch</span>
+                                </button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSelectJobForATS(job);
+                                  }}
+                                  className="px-2 py-1 bg-[#141414] hover:bg-[#1F1F1F] text-[#A1A1A1] border border-[#262626] text-[11px] font-medium rounded-md transition-all"
+                                  title="Tailor Resume (Google X-Y-Z)"
+                                >
+                                  <FileText className="w-2.5 h-2.5" />
+                                </button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onSimulateApply(job);
+                                  }}
+                                  className="px-2.5 py-1 bg-[#141414] hover:bg-[#222222] text-[#A1A1A1] hover:text-white border border-[#262626] text-[11px] font-medium rounded-md transition-all flex items-center gap-1"
+                                  title="Open Careers Page & Track"
+                                >
+                                  <ExternalLink className="w-2.5 h-2.5" />
+                                  <span>Apply</span>
+                                </button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onAddToPipeline(job);
+                                  }}
+                                  className={`px-2 py-1 text-[11px] font-medium rounded-md transition-all ${
+                                    isApplied ? 'bg-[#141414] text-[#666666]' : 'bg-[#141414] hover:bg-[#1F1F1F] text-[#A1A1A1] border border-[#262626]'
+                                  }`}
+                                  title={isApplied ? 'Tracked in Applications' : 'Track in Applications'}
+                                >
+                                  {isApplied ? 'Tracked' : '+ Track'}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
 
             {/* Table Footer */}
-            <div className="pt-3 border-t border-[#1A1D2A] flex items-center justify-between text-[11px] text-[#71788E] font-mono">
-              <span>Showing 1–{filteredJobs.length} of {jobs.length} open roles</span>
+            <div className="pt-3 border-t border-[#1F1F1F] flex items-center justify-between text-[11px] text-[#666666] font-mono">
+              <span>{viewMode === 'SWIPE' ? 'Swipe Mode: Keyboard ← (Pass) / → (Pitch)' : `Showing 1–${filteredJobs.length} of ${jobs.length} open roles`}</span>
               <span>Direct verified founder routing</span>
             </div>
           </main>
