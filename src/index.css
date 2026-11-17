@@ -24,6 +24,10 @@
     --border-muted: #E2E8F0;
     --border-highlight: #CBD5E1;
 
+    /* Kokonut UI Micro-Craft Curves */
+    --kokonut-ease: cubic-bezier(0.23, 1, 0.32, 1);
+    --kokonut-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
     /* Apple iOS Signal & Accent */
     --accent-indigo: #0071E3;
     --accent-indigo-hover: #0077ED;
@@ -171,4 +175,33 @@
 
 .animate-pulse-glow {
   animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+/* Kokonut UI Hairline & Card Tokens */
+.kokonut-hairline {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.dark .kokonut-hairline {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.kokonut-card {
+  border-radius: 14px;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  transition: all 240ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.dark .kokonut-card {
+  background-color: #121316;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.kokonut-card:hover {
+  border-color: rgba(0, 0, 0, 0.16);
+  transform: translateY(-1.5px);
+}
+.dark .kokonut-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
 }

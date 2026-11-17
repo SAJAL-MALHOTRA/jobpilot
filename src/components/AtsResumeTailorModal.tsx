@@ -2,18 +2,21 @@ import React, { useState } from 'react';
 import type { JobListing, CandidateProfile, ATSMatchResult } from '../types';
 import { runATSTailoring } from '../lib/atsTailorEngine';
 import { Modal } from './Modal';
+import AIDiffReview, { type FileChange } from './kokonutui/ai-diff-review';
+import HoldButton from './kokonutui/hold-button';
 import { 
   CheckCircle2, 
   AlertTriangle, 
   Copy, 
   Check, 
-  ArrowRight, 
   FileText, 
   Download, 
-  Printer,
-  Terminal,
-  Edit3,
-  CheckCheck
+  Printer, 
+  Terminal, 
+  Edit3, 
+  CheckCheck,
+  GitCompare,
+  LayoutList
 } from 'lucide-react';
 
 interface AtsResumeTailorModalProps {
@@ -41,6 +44,7 @@ export const AtsResumeTailorModal: React.FC<AtsResumeTailorModalProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'DIFF' | 'PREVIEW' | 'PARSER_VIEW'>('DIFF');
+  const [diffSubMode, setDiffSubMode] = useState<'KOKONUT_HUNK' | 'CARDS'>('KOKONUT_HUNK');
   const atsResult: ATSMatchResult = runATSTailoring(candidate, job);
 
   // Allow candidate to edit tailored bullets before exporting
@@ -52,6 +56,21 @@ export const AtsResumeTailorModal: React.FC<AtsResumeTailorModalProps> = ({
       prev.map((b) => (b.id === id ? { ...b, tailored: newText } : b))
     );
   };
+
+  const diffFiles: FileChange[] = [
+    {
+      path: `resume/bullets_${job.company.toLowerCase().replace(/[^a-z0-9]/g, '_')}.md`,
+      hunks: tailoredBullets.map((b, idx) => ({
+        start: idx * 4 + 1,
+        lines: [
+          { type: 'context' as const, text: `### Experience Item ${idx + 1}:` },
+          { type: 'remove' as const, text: `- ${b.original}` },
+          { type: 'add' as const, text: `+ ${b.tailored}` },
+          { type: 'context' as const, text: `  // Rationale: ${b.reasoning}` },
+        ],
+      })),
+    },
+  ];
 
   // Generate plain-text standard ATS formatted resume using actual candidate profile data
   const generateFormattedResumeText = () => {
@@ -354,11 +373,40 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
         {/* Tab 1: Bullet Points Before vs After Diff */}
         {activeTab === 'DIFF' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 font-mono uppercase tracking-wider flex items-center gap-2">
-                <FileText className="w-4 h-4 text-neutral-500" />
-                <span>Candidate Experience Alignment</span>
-              </h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 font-mono uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-neutral-500" />
+                  <span>Alignment Review</span>
+                </h3>
+
+                {/* Kokonut Diff Toggle */}
+                <div className="flex items-center bg-neutral-100 dark:bg-neutral-800 p-0.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-xs font-mono">
+                  <button
+                    onClick={() => setDiffSubMode('KOKONUT_HUNK')}
+                    className={`px-2 py-1 rounded text-[11px] flex items-center gap-1 transition-colors ${
+                      diffSubMode === 'KOKONUT_HUNK'
+                        ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-xs font-semibold'
+                        : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <GitCompare className="w-3 h-3 text-indigo-500" />
+                    <span>Diff View</span>
+                  </button>
+                  <button
+                    onClick={() => setDiffSubMode('CARDS')}
+                    className={`px-2 py-1 rounded text-[11px] flex items-center gap-1 transition-colors ${
+                      diffSubMode === 'CARDS'
+                        ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-xs font-semibold'
+                        : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <LayoutList className="w-3 h-3 text-emerald-500" />
+                    <span>Cards</span>
+                  </button>
+                </div>
+              </div>
+
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleDownloadPlainText}
@@ -384,56 +432,62 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
               </div>
             </div>
 
-            <div className="space-y-3">
-              {tailoredBullets.map((bullet) => (
-                <div key={bullet.id} className="bg-neutral-50 dark:bg-[#0c0d10] p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-3">
-                  {/* Original */}
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-mono text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
-                      Candidate Original Bullet
-                    </span>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans">
-                      {bullet.original}
-                    </p>
-                  </div>
-
-                  {/* Tailored / Editable */}
-                  <div className="space-y-1 bg-white dark:bg-neutral-900/60 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block flex items-center gap-1">
-                        <CheckCheck className="w-3 h-3" /> Tailored Phrasing (Verifiable)
+            {diffSubMode === 'KOKONUT_HUNK' ? (
+              <div className="border border-neutral-200/80 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs">
+                <AIDiffReview files={diffFiles} />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {tailoredBullets.map((bullet) => (
+                  <div key={bullet.id} className="bg-neutral-50 dark:bg-[#0c0d10] p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-3">
+                    {/* Original */}
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-mono text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
+                        Candidate Original Bullet
                       </span>
-                      <button
-                        onClick={() => setEditingBulletId(editingBulletId === bullet.id ? null : bullet.id)}
-                        className="text-[10px] text-neutral-500 hover:text-neutral-900 dark:hover:text-white font-mono flex items-center gap-1"
-                      >
-                        <Edit3 className="w-3 h-3" />
-                        <span>{editingBulletId === bullet.id ? 'Done' : 'Edit'}</span>
-                      </button>
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans">
+                        {bullet.original}
+                      </p>
                     </div>
 
-                    {editingBulletId === bullet.id ? (
-                      <textarea
-                        value={bullet.tailored}
-                        onChange={(e) => handleUpdateBullet(bullet.id, e.target.value)}
-                        className="w-full mt-1 p-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-md text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white"
-                        rows={3}
-                      />
-                    ) : (
-                      <p className="text-xs text-neutral-900 dark:text-neutral-100 font-medium leading-relaxed mt-1">
-                        {bullet.tailored}
-                      </p>
-                    )}
-                  </div>
+                    {/* Tailored / Editable */}
+                    <div className="space-y-1 bg-white dark:bg-neutral-900/60 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block flex items-center gap-1">
+                          <CheckCheck className="w-3 h-3" /> Tailored Phrasing (Verifiable)
+                        </span>
+                        <button
+                          onClick={() => setEditingBulletId(editingBulletId === bullet.id ? null : bullet.id)}
+                          className="text-[10px] text-neutral-500 hover:text-neutral-900 dark:hover:text-white font-mono flex items-center gap-1"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>{editingBulletId === bullet.id ? 'Done' : 'Edit'}</span>
+                        </button>
+                      </div>
 
-                  {/* Reasoning */}
-                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 font-mono">
-                    <span className="font-semibold text-neutral-700 dark:text-neutral-300">Rationale:</span>
-                    <span>{bullet.reasoning}</span>
+                      {editingBulletId === bullet.id ? (
+                        <textarea
+                          value={bullet.tailored}
+                          onChange={(e) => handleUpdateBullet(bullet.id, e.target.value)}
+                          className="w-full mt-1 p-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-md text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white"
+                          rows={3}
+                        />
+                      ) : (
+                        <p className="text-xs text-neutral-900 dark:text-neutral-100 font-medium leading-relaxed mt-1">
+                          {bullet.tailored}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Reasoning */}
+                    <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 font-mono">
+                      <span className="font-semibold text-neutral-700 dark:text-neutral-300">Rationale:</span>
+                      <span>{bullet.reasoning}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -493,13 +547,16 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
             Close Lab
           </button>
 
-          <button
-            onClick={() => onProceedToOutreach(job)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-[#EBF946] dark:text-black dark:hover:bg-[#d4e23f] text-xs font-semibold transition-colors shadow-sm"
+          <HoldButton
+            variant="blue"
+            holdDuration={800}
+            onHoldComplete={() => onProceedToOutreach(job)}
+            holdingLabel="Launching Outreach Lab..."
+            completeLabel="Opening Pitch Lab"
+            className="h-9 px-4 text-xs font-semibold"
           >
-            <span>Proceed to Founder Outreach</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+            Hold to Proceed to Founder Outreach
+          </HoldButton>
         </div>
       </div>
     </Modal>

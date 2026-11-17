@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import type { JobListing, CandidateProfile, ColdOutreach, OutreachTemplateType } from '../types';
 import { generateColdOutreach } from '../lib/outreachEngine';
 import { Modal } from './Modal';
+import HoldButton from './kokonutui/hold-button';
 import { 
-  Send, 
   Copy, 
   Check, 
   MessageCircle, 
@@ -238,19 +238,22 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
 
             <button
               onClick={handleOpenEmailDraft}
-              className="px-3.5 py-1.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 font-medium rounded-md transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 font-medium rounded-lg transition-colors flex items-center gap-1.5 text-xs"
             >
               <ExternalLink className="w-3.5 h-3.5 text-neutral-500" />
               <span>Launch Mail Client</span>
             </button>
 
-            <button
-              onClick={handleConfirmSent}
-              className="px-4 py-1.5 bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-[#EBF946] dark:text-black dark:hover:bg-[#d4e23f] font-semibold rounded-md transition-colors flex items-center gap-1.5 shadow-sm"
+            <HoldButton
+              variant="blue"
+              holdDuration={800}
+              onHoldComplete={handleConfirmSent}
+              holdingLabel="Dispatched..."
+              completeLabel="Sent to Pipeline!"
+              className="h-9 px-4 text-xs font-semibold"
             >
-              <Send className="w-3.5 h-3.5" />
-              <span>Mark as Sent</span>
-            </button>
+              Hold to Confirm Sent
+            </HoldButton>
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ import type {
 import { generateColdOutreach } from '../lib/outreachEngine';
 import { runATSTailoring } from '../lib/atsTailorEngine';
 import { getCompanyDossier, evaluateMultiFactorFit, getCompanyBrandStyle } from '../lib/jobRadarEngine';
+import HoldButton from './kokonutui/hold-button';
 import { 
   X, 
   Briefcase, 
@@ -593,17 +594,23 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
                 </button>
               </div>
 
-              <button
-                onClick={handleConfirmDispatched}
-                className={`w-full py-2.5 px-3.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 active:scale-95 transition-all ${
-                  isOutreachDispatched
-                    ? 'bg-emerald-50 dark:bg-[#10B981]/15 border-emerald-300 dark:border-[#10B981]/40 text-emerald-700 dark:text-[#34D399]'
-                    : 'bg-slate-50 hover:bg-slate-100 dark:bg-[#1F2228] dark:hover:bg-[#262932] border-slate-200 dark:border-[#292C33] text-slate-600 dark:text-[#969BA6]'
-                }`}
-              >
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{isOutreachDispatched ? 'Logged in Pipeline CRM' : 'Confirm Sent (Update Pipeline)'}</span>
-              </button>
+              {isOutreachDispatched ? (
+                <div className="w-full py-2.5 px-3.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 bg-emerald-50 dark:bg-[#10B981]/15 border-emerald-300 dark:border-[#10B981]/40 text-emerald-700 dark:text-[#34D399]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Logged in Pipeline CRM</span>
+                </div>
+              ) : (
+                <HoldButton
+                  variant="blue"
+                  holdDuration={800}
+                  onHoldComplete={handleConfirmDispatched}
+                  holdingLabel="Logging to CRM..."
+                  completeLabel="Logged in Pipeline CRM"
+                  className="w-full h-10 text-xs font-semibold rounded-xl"
+                >
+                  Hold to Confirm Sent (Update Pipeline)
+                </HoldButton>
+              )}
             </div>
           </div>
         )}

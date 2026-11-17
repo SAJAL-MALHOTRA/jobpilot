@@ -13,6 +13,7 @@ import { ProfileVaultModal } from './components/ProfileVaultModal';
 import { PortfolioStudio } from './components/PortfolioStudio';
 import { WorkflowFAQ } from './components/WorkflowFAQ';
 import { CompanySwipeDeck } from './components/CompanySwipeDeck';
+import StatusIsland, { type IslandTask } from './components/kokonutui/status-island';
 import { 
   FileText, 
   Send, 
@@ -108,6 +109,16 @@ export function App() {
     return (saved === 'dark' || saved === 'light') ? saved : 'light';
   });
 
+  // Kokonut UI Dynamic Island Tasks
+  const [islandTasks, setIslandTasks] = useState<IslandTask[]>([
+    {
+      id: 'init-sync',
+      label: 'Opportunity Radar',
+      detail: '11 verified startup listings active',
+      status: 'done',
+    },
+  ]);
+
   useEffect(() => {
     localStorage.setItem('jobpilot_theme', theme);
     const root = document.documentElement;
@@ -171,6 +182,19 @@ export function App() {
       notes: 'Added to tracking board.',
     };
     setCards((prev) => [newCard, ...prev]);
+    setIslandTasks((prev) => [
+      ...prev,
+      {
+        id: `pipeline-${job.id}-${Date.now()}`,
+        label: job.company,
+        detail: 'Saved to Pipeline CRM',
+        status: 'done',
+        action: {
+          label: 'Undo',
+          onClick: () => handleRemoveCard(newCard.id),
+        },
+      },
+    ]);
   };
 
   const handleDirectApply = (job: JobListing) => {
@@ -228,6 +252,19 @@ export function App() {
 
   const handleLogOutreachSent = (job: JobListing, subject: string, body: string) => {
     setAppliedJobIds((prev) => new Set([...prev, job.id]));
+    setIslandTasks((prev) => [
+      ...prev,
+      {
+        id: `pitch-${job.id}-${Date.now()}`,
+        label: `Pitch sent to ${job.founderName || job.company}`,
+        detail: 'Pipeline status: Outreach Sent',
+        status: 'done',
+        action: {
+          label: 'View CRM',
+          onClick: () => setActiveTab('PIPELINE'),
+        },
+      },
+    ]);
     setCards((prev) => {
       const existing = prev.find((c) => c.job.id === job.id);
       if (existing) {
@@ -624,6 +661,15 @@ export function App() {
           onClose={() => setModalMode('NONE')}
         />
       )}
+
+      {/* Kokonut UI Dynamic Status Island */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+        <StatusIsland
+          tasks={islandTasks}
+          onDismiss={(id) => setIslandTasks((prev) => prev.filter((t) => t.id !== id))}
+          dismissAfter={4000}
+        />
+      </div>
     </div>
   );
 }

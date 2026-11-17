@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { ApplicationCard, KanbanStatus, JobListing } from '../types';
+import MetricCard from './kokonutui/metric-card';
 import { 
   Clock, 
   ChevronRight, 
@@ -15,7 +16,8 @@ import {
   X, 
   GripVertical, 
   Check, 
-  Briefcase 
+  Briefcase,
+  TrendingUp
 } from 'lucide-react';
 
 interface AutopilotTrackerProps {
@@ -74,6 +76,7 @@ export const AutopilotTracker: React.FC<AutopilotTrackerProps> = ({
 }) => {
   const [followUpCopiedId, setFollowUpCopiedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAnalyticsChart, setShowAnalyticsChart] = useState(false);
   
   // Drag and drop states
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
@@ -448,6 +451,18 @@ Arjun Mehta`;
         {/* Action Buttons */}
         <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
           <button
+            onClick={() => setShowAnalyticsChart(!showAnalyticsChart)}
+            className={`px-3 py-2 rounded-lg border font-mono font-medium flex items-center gap-1.5 text-xs transition-colors shadow-xs ${
+              showAnalyticsChart
+                ? 'bg-neutral-900 text-white dark:bg-white dark:text-black border-transparent'
+                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+            }`}
+          >
+            <TrendingUp className="w-3.5 h-3.5 text-indigo-500" />
+            <span>{showAnalyticsChart ? 'Hide Trends' : 'Velocity Chart'}</span>
+          </button>
+
+          <button
             onClick={() => setIsAddModalOpen(true)}
             className="px-3.5 py-2 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-[#EBF946] dark:text-black dark:hover:bg-[#d4e23f] font-semibold flex items-center gap-1.5 text-xs transition-colors shadow-xs"
           >
@@ -465,6 +480,18 @@ Arjun Mehta`;
           </button>
         </div>
       </div>
+
+      {/* Kokonut UI Metric Card Interactive Velocity Spline */}
+      {showAnalyticsChart && (
+        <div className="border border-neutral-200/80 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs bg-white dark:bg-[#121316]">
+          <MetricCard
+            label="Pipeline Conversion Velocity"
+            segments={['Sourced', 'Tailored', 'Dispatched', 'Interviews']}
+            format="number"
+            className="w-full"
+          />
+        </div>
+      )}
 
       {/* 3. Drag and Drop Kanban Board */}
       <div className="flex gap-3.5 overflow-x-auto pb-4 pt-1 items-start select-none">
