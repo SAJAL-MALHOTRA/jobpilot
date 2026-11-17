@@ -1,4 +1,4 @@
-import type { JobListing, CandidateProfile } from '../types';
+import type { JobListing, CandidateProfile, CompanyDossier, MultiFactorFitReport } from '../types';
 
 export const curatedJobs: JobListing[] = [
   {
@@ -375,6 +375,18 @@ export const curatedJobs: JobListing[] = [
   },
 ];
 
+// Distinct, restrained brand palettes (Linear/Ramp style)
+export function getCompanyBrandStyle(company: string): { bg: string; text: string; border: string } {
+  const c = company.toLowerCase();
+  if (c.includes('cognitive') || c.includes('prayog')) return { bg: 'bg-orange-950/30', text: 'text-orange-400', border: 'border-orange-800/40' };
+  if (c.includes('mosaic') || c.includes('kestrel')) return { bg: 'bg-indigo-950/30', text: 'text-indigo-400', border: 'border-indigo-800/40' };
+  if (c.includes('meridian') || c.includes('aarna')) return { bg: 'bg-rose-950/30', text: 'text-rose-400', border: 'border-rose-800/40' };
+  if (c.includes('vidyut')) return { bg: 'bg-amber-950/30', text: 'text-amber-400', border: 'border-amber-800/40' };
+  if (c.includes('willow') || c.includes('kavach')) return { bg: 'bg-emerald-950/30', text: 'text-emerald-400', border: 'border-emerald-800/40' };
+  if (c.includes('ironvale')) return { bg: 'bg-red-950/30', text: 'text-red-400', border: 'border-red-800/40' };
+  return { bg: 'bg-blue-950/30', text: 'text-blue-400', border: 'border-blue-800/40' };
+}
+
 export function calculateQuickMatchScore(candidate: CandidateProfile, job: JobListing): number {
   const candidateSkills = new Set(
     [...candidate.primarySkills, ...candidate.secondarySkills].map((s) => s.toLowerCase().trim())
@@ -383,4 +395,304 @@ export function calculateQuickMatchScore(candidate: CandidateProfile, job: JobLi
   if (requiredSkills.length === 0) return 0;
   const matches = requiredSkills.filter((skill) => candidateSkills.has(skill)).length;
   return Math.round((matches / requiredSkills.length) * 100);
+}
+
+const companyDossiers: Record<string, CompanyDossier> = {
+  'cognitivehq': {
+    problemSpace: 'Autonomous multi-agent orchestration engines for real-time supply chain observability and anomaly mitigation.',
+    backers: ['Y Combinator (W24)', 'Peak XV Surge', 'Soma Capital'],
+    stageRound: 'Seed · $2.3M Total Raised',
+    engineeringStack: ['Python 3.12', 'FastAPI', 'React 19', 'TypeScript', 'Docker', 'PostgreSQL', 'Ray Cluster'],
+    teamSize: '8 engineers · High agency',
+    architectureHighlights: [
+      'Event-driven actor system with sub-100ms agent execution loops',
+      'Dual LLM routing (local vLLM fallback for cost control + Claude 3.5 Sonnet)',
+      'Enterprise tenancy isolation with schema-level encryption',
+    ],
+    foundedYear: 2023,
+    glassdoorTrustRating: '4.9/5 · YC Verified',
+  },
+  'prayog ai': {
+    problemSpace: 'Open-weights agentic frameworks for automated legal reasoning, clause risk extraction, and statutory compliance.',
+    backers: ['Peak XV Surge', 'Together Fund', 'Angels from Sarvam AI'],
+    stageRound: 'Seed · $1.5M',
+    engineeringStack: ['PyTorch', 'Hugging Face Transformers', 'vLLM', 'FastAPI', 'Qdrant Vector DB', 'Docker'],
+    teamSize: '6 engineers & ML researchers',
+    architectureHighlights: [
+      'Custom fine-tuned Llama 3 8B on 4M+ Indian supreme court and commercial judgements',
+      'Hybrid dense-sparse retrieval with BM25 + ColBERT reranker',
+      'Deterministic structured JSON parsing via grammar-constrained sampling',
+    ],
+    foundedYear: 2024,
+    glassdoorTrustRating: 'Verified Early Stage',
+  },
+  'mosaic retail': {
+    problemSpace: 'Distributed real-time inventory telemetry and automated stock replenishment across 4,000+ omnichannel retail storefronts.',
+    backers: ['Accel India', 'Elevation Capital'],
+    stageRound: 'Series A · $18M',
+    engineeringStack: ['Apache Spark', 'Apache Kafka', 'ClickHouse', 'Python', 'AWS EKS', 'Terraform'],
+    teamSize: '24 engineers across data & platform',
+    architectureHighlights: [
+      'High-throughput Kafka streaming processing >10,000 POS events/sec',
+      'ClickHouse columnar cluster replacing legacy Redshift for sub-second aggregations',
+      'Automated inventory replenishment recommendation microservices',
+    ],
+    foundedYear: 2021,
+    glassdoorTrustRating: '4.6/5 · 62 reviews',
+  },
+  'meridian retail': {
+    problemSpace: 'Next-generation headless e-commerce store engines and ultra-low-latency checkout design systems.',
+    backers: ['Lightspeed Venture Partners', 'Matrix Partners India'],
+    stageRound: 'Series B · $32M',
+    engineeringStack: ['React', 'Next.js 15', 'TypeScript', 'Tailwind CSS', 'Turborepo', 'Cloudflare Workers'],
+    teamSize: '35 engineers',
+    architectureHighlights: [
+      'Edge-rendered React Server Components with global median TTFB under 40ms',
+      'Shared design system library consumed by 12 internal business units',
+      'Accessible WCAG 2.1 AA compliant UI component architecture',
+    ],
+    foundedYear: 2020,
+    glassdoorTrustRating: '4.7/5 · 110 reviews',
+  },
+  'neelam systems': {
+    problemSpace: 'Sub-millisecond core banking payment switches handling high-frequency UPI and card settlements with 99.999% SLA.',
+    backers: ['Bootstrapped & Profitable ($6M ARR)'],
+    stageRound: 'Profitable · Zero Outside Debt',
+    engineeringStack: ['Linux Kernel Tuning', 'Go', 'Kubernetes', 'Terraform', 'AWS GovCloud', 'Docker'],
+    teamSize: '15 systems & infra engineers',
+    architectureHighlights: [
+      'Custom kernel bypass networking and eBPF observability pipelines',
+      'Zero-downtime active-active multi-region failover cluster',
+      'PCI-DSS Level 1 certified payment processing pipelines',
+    ],
+    foundedYear: 2018,
+    glassdoorTrustRating: '4.8/5 · High Employee Retention',
+  },
+  'vidyut labs': {
+    problemSpace: 'Intelligent battery management operating systems and real-time degradation telemetry for commercial EV fleets.',
+    backers: ['Blume Ventures', 'Better Capital'],
+    stageRound: 'Seed · $2.2M',
+    engineeringStack: ['React', 'Node.js', 'TypeScript', 'PostgreSQL', 'TimescaleDB', 'MQTT / IoT Core'],
+    teamSize: '11 engineers (embedded + cloud)',
+    architectureHighlights: [
+      'TimescaleDB time-series database ingesting battery cell voltage telemetry every 2 seconds',
+      'Predictive thermal runaway early warning models with 99.4% precision',
+      'Fleet manager React dashboard with geospatial map clustering',
+    ],
+    foundedYear: 2022,
+    glassdoorTrustRating: 'Verified EV Tech Startup',
+  },
+  'willow payments': {
+    problemSpace: 'Automated instant UPI split settlements and escrow ledger infrastructure for gig platforms and marketplaces.',
+    backers: ['Peak XV Partners (Sequoia India)', 'Tiger Global'],
+    stageRound: 'Series A · $8M',
+    engineeringStack: ['Java 21', 'Spring Boot', 'PostgreSQL', 'Redis', 'Kafka', 'Kubernetes'],
+    teamSize: '20 engineers',
+    architectureHighlights: [
+      'Double-entry immutable accounting ledger with cryptographically signed balance snapshots',
+      'Idempotent webhook delivery engine processing 500k daily disbursements',
+      'Sub-50ms bank API integration proxy with circuit breakers',
+    ],
+    foundedYear: 2021,
+    glassdoorTrustRating: '4.5/5 · 45 reviews',
+  },
+  'ironvale security': {
+    problemSpace: 'Automated cloud infrastructure posture detection and real-time SIEM correlation engines for fintechs and neo-banks.',
+    backers: ['Kalaari Capital', 'Nexus Venture Partners'],
+    stageRound: 'Seed · $3.0M',
+    engineeringStack: ['Python', 'Linux eBPF', 'Wireshark', 'AWS CloudTrail', 'Docker', 'OpenSearch'],
+    teamSize: '9 security engineers',
+    architectureHighlights: [
+      'Kernel-level eBPF probes for zero-overhead runtime syscall monitoring',
+      'Real-time behavioral anomaly scoring on AWS VPC flow logs',
+      'Automated SOC2 compliance evidence generation engine',
+    ],
+    foundedYear: 2023,
+    glassdoorTrustRating: 'Verified Cybersecurity Seed',
+  },
+  'aarna health': {
+    problemSpace: 'Digital outpatient clinic operating system, electronic medical records (EMR), and unified patient booking.',
+    backers: ['Titan Capital', 'AngelList Syndicate'],
+    stageRound: 'Seed · $800k',
+    engineeringStack: ['React', 'JavaScript', 'CSS Modules', 'REST APIs', 'Git', 'Node.js'],
+    teamSize: '5 developers',
+    architectureHighlights: [
+      'Lightweight PWA capable of running offline on 3G clinic tablets',
+      'ABDM (Ayushman Bharat Digital Mission) compliance integration',
+      'Automated WhatsApp appointment confirmation and prescription delivery bot',
+    ],
+    foundedYear: 2023,
+    glassdoorTrustRating: 'Verified Healthcare Seed',
+  },
+  'kestrel ai': {
+    problemSpace: 'Low-power edge reasoning models and computer vision pipelines deployed on autonomous inspection drones.',
+    backers: ['Y Combinator (W24)', 'Pioneer Fund'],
+    stageRound: 'Seed · $1.5M Total',
+    engineeringStack: ['Python', 'ONNX Runtime', 'FastAPI', 'Docker', 'C++', 'TensorRT'],
+    teamSize: '7 researchers & engineers',
+    architectureHighlights: [
+      '8-bit quantized vision models executing at 30 FPS on Nvidia Jetson Orin Nano (15W envelope)',
+      'Sub-second mission telemetry sync via low-bandwidth satellite uplinks',
+      'Automated synthetic training data pipeline using Blender 3D',
+    ],
+    foundedYear: 2024,
+    glassdoorTrustRating: 'YC Verified W24',
+  },
+  'kavach security': {
+    problemSpace: 'End-to-end encrypted secret vaults and hardware-grade tokenization infrastructure for high-compliance fintechs.',
+    backers: ['100x.VC', 'Fintech Founders Syndicate'],
+    stageRound: 'Seed · $1.2M',
+    engineeringStack: ['TypeScript', 'Node.js', 'AWS KMS', 'Cryptography', 'Docker', 'PostgreSQL'],
+    teamSize: '6 security & backend engineers',
+    architectureHighlights: [
+      'Zero-knowledge client-side encryption using WebCrypto API and AES-256-GCM',
+      'Automated key rotation with multi-party threshold signatures',
+      'RBI data localization compliance with audit trails',
+    ],
+    foundedYear: 2023,
+    glassdoorTrustRating: 'Fintech Security Seed',
+  },
+};
+
+export function getCompanyDossier(companyName: string): CompanyDossier {
+  const key = companyName.toLowerCase().trim();
+  const matchedKey = Object.keys(companyDossiers).find((k) => key.includes(k) || k.includes(key));
+  if (matchedKey && companyDossiers[matchedKey]) {
+    return companyDossiers[matchedKey];
+  }
+
+  // Sensible default dossier
+  return {
+    problemSpace: `${companyName} operates an engineering-driven startup platform delivering high-reliability systems.`,
+    backers: ['Tier-1 Venture Capital', 'Angel Syndicate'],
+    stageRound: 'Early-Stage Venture',
+    engineeringStack: ['TypeScript', 'Python', 'React', 'Docker', 'Cloud Native'],
+    teamSize: '8–15 engineers',
+    architectureHighlights: [
+      'Modern microservices architecture on containerized cloud',
+      'CI/CD automated testing pipeline with high test coverage',
+      'Low latency API contracts with monitoring and alerting',
+    ],
+    foundedYear: 2022,
+    glassdoorTrustRating: 'Verified Startup Organization',
+  };
+}
+
+export function evaluateMultiFactorFit(candidate: CandidateProfile, job: JobListing): MultiFactorFitReport {
+  const candidateSkillsSet = new Set(
+    [...candidate.primarySkills, ...candidate.secondarySkills].map((s) => s.toLowerCase().trim())
+  );
+  const requiredSkills = job.requiredSkills.map((s) => s.toLowerCase().trim()).filter(Boolean);
+  
+  const matchedProficiencies = requiredSkills.filter((s) => candidateSkillsSet.has(s));
+  const missingRequirements = requiredSkills.filter((s) => !candidateSkillsSet.has(s));
+
+  // 1. Technical Fit Vector (50% weight)
+  const techScore = requiredSkills.length > 0 
+    ? Math.round((matchedProficiencies.length / requiredSkills.length) * 100) 
+    : 70;
+  
+  let techStatus: 'aligned' | 'partial' | 'gap' = 'partial';
+  let techSummary = '';
+  if (techScore >= 75) {
+    techStatus = 'aligned';
+    techSummary = `${matchedProficiencies.length} of ${requiredSkills.length} core proficiencies verified against your profile.`;
+  } else if (techScore >= 50) {
+    techStatus = 'partial';
+    techSummary = `${matchedProficiencies.length} proficiencies matched; ${missingRequirements.length} requirements bridgeable (${missingRequirements.slice(0, 2).join(', ')}).`;
+  } else {
+    techStatus = 'gap';
+    techSummary = `Stack divergence; requires rapid upskilling in ${missingRequirements.slice(0, 3).join(', ')}.`;
+  }
+
+  // 2. Experience Fit Vector (30% weight)
+  const candidateYoe = candidate.yearsOfExperience || 3.5;
+  const expLower = (job.experienceDisplay || '').toLowerCase();
+  
+  let expScore = 85;
+  let expStatus: 'aligned' | 'partial' | 'gap' = 'aligned';
+  let expSummary = '';
+
+  if (expLower.includes('intern')) {
+    expScore = 95;
+    expStatus = 'aligned';
+    expSummary = `Seniority advantage: ${candidateYoe}y proven experience exceeds base internship requirements.`;
+  } else if (expLower.includes('0–1') || expLower.includes('0–2') || expLower.includes('1–2')) {
+    expScore = 95;
+    expStatus = 'aligned';
+    expSummary = `Direct qualification: Candidate's ${candidateYoe}y career profile exceeds early career minimums.`;
+  } else if (expLower.includes('3–5') || expLower.includes('3–6')) {
+    expScore = 98;
+    expStatus = 'aligned';
+    expSummary = `Sweet spot seniority: ${candidateYoe}y experience directly aligns with target ${job.experienceDisplay} window.`;
+  } else if (expLower.includes('5–8') || expLower.includes('5–7')) {
+    expScore = 75;
+    expStatus = 'partial';
+    expSummary = `Growth opportunity: ${candidateYoe}y applying for senior ${job.experienceDisplay} mandate.`;
+  } else {
+    expScore = 85;
+    expStatus = 'aligned';
+    expSummary = `Tenure aligns with ${job.experienceDisplay || 'target seniority'}.`;
+  }
+
+  // 3. Location & Corridor Fit Vector (20% weight)
+  let locScore = 80;
+  let locStatus: 'aligned' | 'partial' | 'gap' = 'aligned';
+  let locSummary = '';
+
+  const candPref = (candidate.locationPreference || '').toLowerCase();
+  const isBangaloreCandidate = candPref.includes('bangalore') || (candidate.location || '').toLowerCase().includes('bengaluru') || (candidate.location || '').toLowerCase().includes('bangalore');
+
+  if (job.isRemote) {
+    locScore = 100;
+    locStatus = 'aligned';
+    locSummary = 'Remote-first structure; location agnostic with flexible timezone collaboration.';
+  } else if (isBangaloreCandidate && (job.location.toLowerCase().includes('bengaluru') || job.location.toLowerCase().includes('bangalore'))) {
+    locScore = 100;
+    locStatus = 'aligned';
+    locSummary = `Zero relocation friction: ${job.bangaloreCluster || 'Bengaluru tech corridor'} fits candidate preference.`;
+  } else if (job.location.toLowerCase().includes('pune') || job.location.toLowerCase().includes('mumbai') || job.location.toLowerCase().includes('chennai') || job.location.toLowerCase().includes('hyderabad')) {
+    locScore = 75;
+    locStatus = 'partial';
+    locSummary = `In-region on-site (${job.location}); notice buyout or relocation stipend applicable.`;
+  } else {
+    locScore = 85;
+    locStatus = 'aligned';
+    locSummary = `Location requirements: ${job.location} (${job.isRemote ? 'Remote' : 'In-Office'}).`;
+  }
+
+  const overallScore = Math.round(techScore * 0.5 + expScore * 0.3 + locScore * 0.2);
+  let alignmentTier: MultiFactorFitReport['alignmentTier'] = 'Strong Fit';
+  if (overallScore >= 88) alignmentTier = 'Exceptional Fit';
+  else if (overallScore >= 78) alignmentTier = 'Strong Fit';
+  else if (overallScore >= 65) alignmentTier = 'Partial Fit';
+  else alignmentTier = 'Reach Opportunity';
+
+  return {
+    overallScore,
+    alignmentTier,
+    technicalFit: {
+      label: 'Technical Proficiency Alignment',
+      score: techScore,
+      status: techStatus,
+      summary: techSummary,
+      details: matchedProficiencies,
+    },
+    experienceFit: {
+      label: 'Seniority & Experience Fit',
+      score: expScore,
+      status: expStatus,
+      summary: expSummary,
+      details: [`Candidate: ${candidateYoe} years`, `Role mandate: ${job.experienceDisplay || 'Standard'}`],
+    },
+    locationFit: {
+      label: 'Location & Ecosystem Alignment',
+      score: locScore,
+      status: locStatus,
+      summary: locSummary,
+      details: [job.location, job.bangaloreCluster || (job.isRemote ? 'Remote Friendly' : 'On-site')],
+    },
+    matchedProficiencies,
+    missingRequirements,
+  };
 }

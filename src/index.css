@@ -5,35 +5,35 @@
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     --font-mono: 'Geist Mono', 'JetBrains Mono', 'SF Mono', monospace;
 
-    /* Opportunity Intelligence Dark Palette (Strictly V2) */
-    --canvas-bg: #0F1117;
-    --surface-sidebar: #0F1117;
-    --surface-panel: #171A23;
-    --surface-row: #171A23;
-    --surface-hover: #1D2230;
-    --surface-active: #222838;
-    --surface-card: #171A23;
-    --surface-elevated: #1D2230;
+    /* Opportunity Intelligence Palette (Linear / Stripe / Ramp inspired) */
+    --canvas-bg: #101114;
+    --surface-sidebar: #101114;
+    --surface-panel: #17191E;
+    --surface-row: #17191E;
+    --surface-hover: #1F2228;
+    --surface-active: #262932;
+    --surface-card: #17191E;
+    --surface-elevated: #1F2228;
 
     /* Subtle Architectural Borders */
-    --border-color: #292E3B;
-    --border-subtle: #292E3B;
-    --border-muted: #292E3B;
-    --border-highlight: #3E4558;
+    --border-color: #292C33;
+    --border-subtle: #292C33;
+    --border-muted: #292C33;
+    --border-highlight: #3A3E47;
 
-    /* Primary Accent & Signal Palette */
-    --accent-indigo: #818CF8;
-    --accent-indigo-hover: #9FA8FF;
-    --accent-indigo-subtle: rgba(129, 140, 248, 0.12);
-    --signal-success: #34D399;
-    --signal-warning: #FBBF24;
-    --signal-danger: #F87171;
+    /* Restrained Primary Accent & Semantic Signals */
+    --accent-indigo: #6366F1;
+    --accent-indigo-hover: #818CF8;
+    --accent-indigo-subtle: rgba(99, 102, 241, 0.12);
+    --signal-success: #10B981;
+    --signal-warning: #F59E0B;
+    --signal-danger: #EF4444;
 
     /* Text Hierarchy */
     --text-primary: #F3F4F6;
-    --text-secondary: #A1A8B8;
-    --text-muted: #737C90;
-    --text-faint: #52596A;
+    --text-secondary: #969BA6;
+    --text-muted: #6B7280;
+    --text-faint: #4B5262;
   }
 
   html, body {

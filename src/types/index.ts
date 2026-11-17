@@ -80,6 +80,36 @@ export interface JobListing {
   verificationSource?: string;
   contactConfidence?: 'Verified Founder Inbox' | 'High' | 'Direct Founder' | 'Medium';
   tags?: string[];
+  dossier?: CompanyDossier;
+}
+
+export interface CompanyDossier {
+  problemSpace: string;
+  backers: string[];
+  stageRound: string;
+  engineeringStack: string[];
+  teamSize: string;
+  architectureHighlights: string[];
+  foundedYear?: number;
+  glassdoorTrustRating?: string;
+}
+
+export interface ExplainableFitVector {
+  label: string;
+  score: number; // 0 - 100
+  status: 'aligned' | 'partial' | 'gap';
+  summary: string;
+  details: string[];
+}
+
+export interface MultiFactorFitReport {
+  overallScore: number;
+  alignmentTier: 'Exceptional Fit' | 'Strong Fit' | 'Partial Fit' | 'Reach Opportunity';
+  technicalFit: ExplainableFitVector;
+  experienceFit: ExplainableFitVector;
+  locationFit: ExplainableFitVector;
+  matchedProficiencies: string[];
+  missingRequirements: string[];
 }
 
 export interface ATSMatchResult {
