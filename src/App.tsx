@@ -131,7 +131,9 @@ export function App() {
       localStorage.setItem('jobpilot_applied_ids', JSON.stringify(Array.from(appliedJobIds)));
       localStorage.setItem('jobpilot_candidate', JSON.stringify(candidate));
     } catch {
-      setStorageError(true);
+      queueMicrotask(() => {
+        setStorageError(true);
+      });
     }
   }, [cards, appliedJobIds, candidate]);
 

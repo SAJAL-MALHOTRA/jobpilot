@@ -10,7 +10,8 @@ import {
   FileText,
   ExternalLink,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Mail
 } from 'lucide-react';
 
 interface OutreachModalProps {
@@ -93,27 +94,27 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
     <Modal
       isOpen={true}
       onClose={onClose}
-      title="Direct Founder Pitch Composer"
+      title="Founder Pitch Composer"
       subtitle={`${job.founderName} (${job.founderRole}) at ${job.company}`}
-      icon={<span className="text-base">✉️</span>}
+      icon={<Mail className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />}
       maxWidth="max-w-2xl"
     >
-      <div className="space-y-5 text-[#EDEDED] font-sans">
+      <div className="space-y-5 text-neutral-900 dark:text-neutral-100 font-sans">
         {/* Template Selector Pills */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] text-[#A1A1A1] font-mono">
+          <div className="flex items-center justify-between text-[11px] text-neutral-500 dark:text-neutral-400 font-mono">
             <span>Template formula (Direct outreach playbook):</span>
-            <span className="text-emerald-400 font-semibold">Structured 4-Part Pitch</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Structured 4-Part Pitch</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {TEMPLATES.map((tmpl) => (
               <button
                 key={tmpl.id}
                 onClick={() => handleStyleChange(tmpl.id)}
-                className={`px-3 py-1 rounded-full text-xs transition-all font-mono border ${
+                className={`px-3 py-1 rounded-md text-xs transition-colors font-mono border ${
                   style === tmpl.id
-                    ? 'bg-white text-black border-white font-bold'
-                    : 'bg-[#141414] text-[#A1A1A1] border-[#262626] hover:text-white'
+                    ? 'bg-neutral-900 text-white dark:bg-white dark:text-black border-neutral-900 dark:border-white font-semibold'
+                    : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:text-neutral-900 dark:hover:text-white'
                 }`}
               >
                 {tmpl.label}
@@ -124,14 +125,14 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
 
         {/* Status Alert if external draft opened */}
         {draftOpened && !isMarkedSent && (
-          <div className="p-3 bg-[#111A15] border border-emerald-500/30 rounded-xl flex items-center justify-between gap-3 text-xs font-mono text-emerald-300">
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-500/30 rounded-lg flex items-center justify-between gap-3 text-xs font-mono text-emerald-800 dark:text-emerald-300">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Draft opened in external client. Did you send the pitch?</span>
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>Draft opened in external client. Did you dispatch the message?</span>
             </div>
             <button
               onClick={handleConfirmSent}
-              className="px-3 py-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-lg text-xs transition-colors shrink-0"
+              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md text-xs transition-colors shrink-0"
             >
               Confirm Sent
             </button>
@@ -139,29 +140,29 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
         )}
 
         {isMarkedSent && (
-          <div className="p-3 bg-[#0B2014] border border-emerald-500/50 rounded-xl flex items-center gap-2 text-xs font-mono text-emerald-200">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span>Outreach recorded in pipeline tracker! Closing composer...</span>
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-500/50 rounded-lg flex items-center gap-2 text-xs font-mono text-emerald-800 dark:text-emerald-200">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span>Outreach recorded in pipeline tracker. Closing composer...</span>
           </div>
         )}
 
         {/* Email Window */}
-        <div className="bg-[#050505] rounded-xl border border-[#222222] p-4 text-xs font-mono space-y-3 shadow-inner">
+        <div className="bg-neutral-50 dark:bg-[#0c0d10] rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 text-xs font-mono space-y-3">
           {/* Metadata Rows */}
-          <div className="space-y-2 pb-3 border-b border-[#1F1F1F]">
+          <div className="space-y-2 pb-3 border-b border-neutral-200 dark:border-neutral-800">
             <div className="flex items-center gap-2 text-[11px]">
-              <span className="text-[#737373] w-14 font-mono">To:</span>
-              <span className="font-semibold text-white">{job.founderName} at {job.company}</span>
-              <span className="text-[10px] text-[#A1A1A1] ml-auto font-mono">({job.founderEmail})</span>
+              <span className="text-neutral-500 dark:text-neutral-400 w-14 font-mono">To:</span>
+              <span className="font-semibold text-neutral-900 dark:text-white">{job.founderName} at {job.company}</span>
+              <span className="text-[10px] text-neutral-500 dark:text-neutral-400 ml-auto font-mono">({job.founderEmail})</span>
             </div>
 
             <div className="flex items-center gap-2 text-[11px]">
-              <span className="text-[#737373] w-14 font-mono">Subject:</span>
+              <span className="text-neutral-500 dark:text-neutral-400 w-14 font-mono">Subject:</span>
               <input
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="flex-1 bg-transparent border-b border-transparent hover:border-[#333333] focus:border-white text-white focus:outline-none text-[11px] font-mono"
+                className="flex-1 bg-transparent border-b border-transparent hover:border-neutral-300 dark:hover:border-neutral-700 focus:border-neutral-900 dark:focus:border-white text-neutral-900 dark:text-white focus:outline-none text-[11px] font-mono py-0.5"
               />
             </div>
           </div>
@@ -171,36 +172,36 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
             rows={10}
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            className="w-full bg-transparent text-[#D4D4D4] text-xs font-mono leading-relaxed focus:outline-none resize-none"
+            className="w-full bg-transparent text-neutral-800 dark:text-neutral-200 text-xs font-mono leading-relaxed focus:outline-none resize-none"
           />
 
-          {/* Truthful Attachment Note */}
-          <div className="pt-2 border-t border-[#1F1F1F] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#111111] border border-[#262626] text-[11px] text-[#A1A1A1] font-mono">
-              <FileText className="w-3.5 h-3.5 text-[#737373]" />
+          {/* Attachment Note */}
+          <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-[11px] text-neutral-600 dark:text-neutral-400 font-mono">
+              <FileText className="w-3.5 h-3.5 text-neutral-500 dark:text-neutral-400" />
               <span>Resume attachment:</span>
-              <span className="text-amber-400/90 text-[10px]">Attach manually in your email app</span>
+              <span className="text-neutral-700 dark:text-neutral-300 font-medium">Attach in your email app</span>
             </div>
-            <div className="text-[10px] text-[#737373] font-mono">
+            <div className="text-[10px] text-neutral-500 dark:text-neutral-400 font-mono tabular-nums">
               {body.trim().split(/\s+/).filter(Boolean).length} words
             </div>
           </div>
         </div>
 
         {/* Sender Disclosure */}
-        <div className="text-[11px] text-[#A1A1A1] font-mono flex items-center gap-1.5">
-          <AlertCircle className="w-3.5 h-3.5 text-[#737373]" />
+        <div className="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono flex items-center gap-1.5">
+          <AlertCircle className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
           <span>
-            Opening an external draft sends via your mail client account ({candidate.email}).
+            External drafts dispatch directly from your mail account ({candidate.email}).
           </span>
         </div>
 
         {/* Bottom Actions Bar */}
-        <div className="pt-3 border-t border-[#1F1F1F] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+        <div className="pt-3 border-t border-neutral-200/80 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
           <div className="flex items-center gap-2">
             <button
               onClick={handleOpenWhatsApp}
-              className="p-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#34D399] border border-[#262626] transition-colors"
+              className="p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-emerald-600 dark:text-emerald-400 border border-neutral-200 dark:border-neutral-700 transition-colors"
               title="Open WhatsApp Web Draft"
               aria-label="Open WhatsApp Draft"
             >
@@ -209,7 +210,7 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
 
             <button
               onClick={handleOpenTwitter}
-              className="p-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#38BDF8] border border-[#262626] transition-colors"
+              className="p-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-sky-600 dark:text-sky-400 border border-neutral-200 dark:border-neutral-700 transition-colors"
               title="Open X / Twitter DM Draft"
               aria-label="Open X DM Draft"
             >
@@ -220,9 +221,9 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
 
             <button
               onClick={handleCopy}
-              className="px-3 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#D4D4D4] border border-[#262626] text-xs font-medium transition-colors flex items-center gap-1"
+              className="px-3 py-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-200 dark:border-neutral-700 text-xs font-medium transition-colors flex items-center gap-1"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-neutral-500" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
@@ -230,22 +231,22 @@ export const OutreachModal: React.FC<OutreachModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-3 py-1.5 text-[#A1A1A1] hover:text-white transition-colors"
+              className="px-3 py-1.5 text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors"
             >
               Cancel
             </button>
 
             <button
               onClick={handleOpenEmailDraft}
-              className="px-3.5 py-1.5 bg-[#141414] hover:bg-[#1F1F1F] text-white border border-[#2E2E2E] font-medium rounded-lg transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-1.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 font-medium rounded-md transition-colors flex items-center gap-1.5"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-[#A1A1A1]" />
+              <ExternalLink className="w-3.5 h-3.5 text-neutral-500" />
               <span>Launch Mail Client</span>
             </button>
 
             <button
               onClick={handleConfirmSent}
-              className="px-4 py-1.5 bg-white hover:bg-neutral-200 text-black font-bold rounded-lg transition-all flex items-center gap-1.5 shadow-sm"
+              className="px-4 py-1.5 bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-[#EBF946] dark:text-black dark:hover:bg-[#d4e23f] font-semibold rounded-md transition-colors flex items-center gap-1.5 shadow-sm"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Mark as Sent</span>

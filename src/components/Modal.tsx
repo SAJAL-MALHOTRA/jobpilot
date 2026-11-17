@@ -99,7 +99,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-neutral-900/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -114,22 +114,22 @@ export const Modal: React.FC<ModalProps> = ({
         aria-describedby={descId}
         aria-label={ariaLabel || title}
         tabIndex={-1}
-        className={`skeuo-surface border border-[#27272E] rounded-2xl ${maxWidth} w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-7 space-y-5 text-[#EDEDED] font-sans focus:outline-none`}
+        className={`bg-white dark:bg-[#121316] border border-neutral-200 dark:border-neutral-800 rounded-xl ${maxWidth} w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-7 space-y-5 text-neutral-900 dark:text-neutral-100 font-sans focus:outline-none`}
       >
         {/* Header */}
-        <div className="flex items-start justify-between border-b border-[#1F1F1F] pb-4">
+        <div className="flex items-start justify-between border-b border-neutral-200/80 dark:border-neutral-800 pb-4">
           <div className="flex items-center gap-3">
             {icon && (
-              <div className="w-9 h-9 rounded-xl skeuo-well flex items-center justify-center text-white shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200/70 dark:border-neutral-700/50 flex items-center justify-center text-neutral-700 dark:text-neutral-300 shrink-0">
                 {icon}
               </div>
             )}
             <div>
-              <h2 id={titleId} className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <h2 id={titleId} className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-white tracking-tight">
                 {title}
               </h2>
               {subtitle && (
-                <p id={descId} className="text-xs text-[#A1A1A1] mt-0.5 font-mono">
+                <p id={descId} className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 font-mono">
                   {subtitle}
                 </p>
               )}
@@ -139,7 +139,7 @@ export const Modal: React.FC<ModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="skeuo-btn p-1.5 rounded-lg text-[#A1A1A1] hover:text-white transition-all active:translate-y-[2px] active:shadow-none"
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

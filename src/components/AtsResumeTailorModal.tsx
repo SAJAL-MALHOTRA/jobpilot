@@ -11,9 +11,9 @@ import {
   FileText, 
   Download, 
   Printer,
-  Sparkles,
   Terminal,
-  Edit3
+  Edit3,
+  CheckCheck
 } from 'lucide-react';
 
 interface AtsResumeTailorModalProps {
@@ -120,20 +120,22 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
     URL.revokeObjectURL(url);
   };
 
-  // Safe HTML print generation with full XSS escaping
   const handlePrintPdf = () => {
     const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    if (!printWindow) {
+      alert('Please allow popups to print/export your resume as a clean PDF.');
+      return;
+    }
 
     const experiencesHtml = candidate.experienceHistory && candidate.experienceHistory.length > 0
       ? candidate.experienceHistory.map((exp) => `
           <div class="job-header">
             <span>${escapeHtml(exp.company)}</span>
-            <span>${escapeHtml(exp.location || 'India')}</span>
+            <span>${escapeHtml(exp.period)}</span>
           </div>
           <div class="job-sub">
             <span>${escapeHtml(exp.role)}</span>
-            <span>${escapeHtml(exp.period)}</span>
+            <span>${escapeHtml(exp.location || 'India')}</span>
           </div>
           <ul>
             ${exp.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}
@@ -142,11 +144,11 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
       : `
           <div class="job-header">
             <span>${escapeHtml(candidate.currentCompany)}</span>
-            <span>${escapeHtml(candidate.location)}</span>
+            <span>Present</span>
           </div>
           <div class="job-sub">
-            <span>Software Engineer</span>
-            <span>Present</span>
+            <span>Senior Software Engineer</span>
+            <span>${escapeHtml(candidate.location)}</span>
           </div>
           <ul>
             ${tailoredBullets.map((b) => `<li>${escapeHtml(b.tailored)}</li>`).join('')}
@@ -248,46 +250,46 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
     <Modal
       isOpen={true}
       onClose={onClose}
-      title="ATS Resume Tailor Lab"
+      title="ATS Resume Tailoring"
       subtitle={`Targeting: ${job.title} at ${job.company}`}
-      icon={<Sparkles className="w-5 h-5 text-indigo-400" />}
+      icon={<FileText className="w-4 h-4 text-neutral-600 dark:text-neutral-300" />}
       maxWidth="max-w-4xl"
     >
-      <div className="space-y-6">
+      <div className="space-y-6 text-neutral-900 dark:text-neutral-100 font-sans">
         {/* ATS Score Meter & Analysis Banner */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <div className="md:col-span-4 bg-[#111111] p-5 rounded-xl border border-[#222222] flex flex-col justify-between">
+          <div className="md:col-span-4 bg-neutral-50 dark:bg-[#0c0d10] p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 flex flex-col justify-between">
             <div>
-              <span className="text-[11px] font-mono font-semibold text-[#A1A1A1] uppercase tracking-wider block">
-                ATS Confidence Score
+              <span className="text-[11px] font-mono text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
+                ATS Alignment Score
               </span>
-              <div className="text-4xl font-black font-mono text-emerald-400 mt-2">
+              <div className="text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
                 {atsResult.overallScore}%
               </div>
-              <span className="text-xs text-[#A1A1A1] block mt-1">
+              <span className="text-xs text-neutral-500 dark:text-neutral-400 block mt-1">
                 {atsResult.overallScore >= 80 ? 'Verified High Match' : 'Transferable Match'}
               </span>
             </div>
-            <div className="w-full bg-[#1A1A1A] h-2 rounded-full overflow-hidden mt-4">
+            <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-1.5 rounded-full overflow-hidden mt-4">
               <div
-                className="bg-emerald-400 h-full rounded-full transition-all duration-500"
+                className="bg-emerald-500 dark:bg-emerald-400 h-full rounded-full transition-all duration-300"
                 style={{ width: `${atsResult.overallScore}%` }}
               />
             </div>
           </div>
 
-          <div className="md:col-span-8 bg-[#111111] p-5 rounded-xl border border-[#222222] space-y-3">
+          <div className="md:col-span-8 bg-neutral-50 dark:bg-[#0c0d10] p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-3">
             <div>
-              <span className="text-xs font-bold text-[#EDEDED] block mb-1.5 font-mono">
-                Matched Verified Keywords:
+              <span className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 block mb-1.5 font-mono">
+                Matched Keywords ({atsResult.matchedKeywords.length})
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {atsResult.matchedKeywords.map((kw) => (
                   <span
                     key={kw}
-                    className="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-1"
+                    className="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 flex items-center gap-1"
                   >
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     {kw}
                   </span>
                 ))}
@@ -296,16 +298,16 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
 
             {atsResult.missingKeywords.length > 0 && (
               <div>
-                <span className="text-xs font-bold text-amber-400 block mb-1.5 font-mono">
+                <span className="text-xs font-semibold text-amber-700 dark:text-amber-400 block mb-1.5 font-mono">
                   Stack Keywords in Role Not in Profile:
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {atsResult.missingKeywords.map((kw) => (
                     <span
                       key={kw}
-                      className="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center gap-1"
+                      className="px-2 py-0.5 rounded text-[11px] font-mono font-medium bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center gap-1"
                     >
-                      <AlertTriangle className="w-3 h-3 text-amber-400" />
+                      <AlertTriangle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                       {kw}
                     </span>
                   ))}
@@ -316,33 +318,33 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
         </div>
 
         {/* View Tabs */}
-        <div className="flex items-center gap-2 border-b border-[#222222] pb-2">
+        <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-neutral-800 pb-2">
           <button
             onClick={() => setActiveTab('DIFF')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               activeTab === 'DIFF'
-                ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
-                : 'text-[#A1A1A1] hover:text-white'
+                ? 'bg-neutral-900 text-white dark:bg-white dark:text-black font-semibold'
+                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
             }`}
           >
             Verifiable Bullet Alignment
           </button>
           <button
             onClick={() => setActiveTab('PREVIEW')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               activeTab === 'PREVIEW'
-                ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
-                : 'text-[#A1A1A1] hover:text-white'
+                ? 'bg-neutral-900 text-white dark:bg-white dark:text-black font-semibold'
+                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
             }`}
           >
             Plaintext ATS View
           </button>
           <button
             onClick={() => setActiveTab('PARSER_VIEW')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               activeTab === 'PARSER_VIEW'
-                ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
-                : 'text-[#A1A1A1] hover:text-white'
+                ? 'bg-neutral-900 text-white dark:bg-white dark:text-black font-semibold'
+                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
             }`}
           >
             ATS Parser Inspection
@@ -353,30 +355,30 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
         {activeTab === 'DIFF' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-[#D4D4D4] font-mono uppercase tracking-wider flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#A1A1A1]" />
+              <h3 className="text-xs font-semibold text-neutral-700 dark:text-neutral-300 font-mono uppercase tracking-wider flex items-center gap-2">
+                <FileText className="w-4 h-4 text-neutral-500" />
                 <span>Candidate Experience Alignment</span>
               </h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleDownloadPlainText}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#EDEDED] text-xs font-mono font-medium transition-all border border-[#262626]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-mono font-medium transition-colors border border-neutral-200 dark:border-neutral-700"
                 >
-                  <Download className="w-3.5 h-3.5 text-[#A1A1A1]" />
+                  <Download className="w-3.5 h-3.5 text-neutral-500" />
                   <span>Download .txt</span>
                 </button>
                 <button
                   onClick={handlePrintPdf}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#EDEDED] text-xs font-mono font-medium transition-all border border-[#262626]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-mono font-medium transition-colors border border-neutral-200 dark:border-neutral-700"
                 >
-                  <Printer className="w-3.5 h-3.5 text-[#A1A1A1]" />
+                  <Printer className="w-3.5 h-3.5 text-neutral-500" />
                   <span>Print PDF</span>
                 </button>
                 <button
                   onClick={handleCopyMarkdown}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#EDEDED] text-xs font-mono font-medium transition-all border border-[#262626]"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 text-xs font-mono font-medium transition-colors border border-neutral-200 dark:border-neutral-700"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-neutral-500" />}
                   <span>{copied ? 'Copied' : 'Copy All'}</span>
                 </button>
               </div>
@@ -384,26 +386,26 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
 
             <div className="space-y-3">
               {tailoredBullets.map((bullet) => (
-                <div key={bullet.id} className="bg-[#111111] p-4 rounded-xl border border-[#222222] space-y-3">
+                <div key={bullet.id} className="bg-neutral-50 dark:bg-[#0c0d10] p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-3">
                   {/* Original */}
                   <div className="space-y-1">
-                    <span className="text-[10px] font-mono font-semibold text-[#737373] uppercase tracking-wider block">
+                    <span className="text-[10px] font-mono text-neutral-500 dark:text-neutral-400 uppercase tracking-wider block">
                       Candidate Original Bullet
                     </span>
-                    <p className="text-xs text-[#888888]">
+                    <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans">
                       {bullet.original}
                     </p>
                   </div>
 
                   {/* Tailored / Editable */}
-                  <div className="space-y-1 bg-[#161616] p-3 rounded-lg border border-[#262626]">
+                  <div className="space-y-1 bg-white dark:bg-neutral-900/60 p-3 rounded-lg border border-neutral-200 dark:border-neutral-800">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono font-semibold text-indigo-400 uppercase tracking-wider block flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" /> Tailored Phrasing (Verifiable)
+                      <span className="text-[10px] font-mono font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider block flex items-center gap-1">
+                        <CheckCheck className="w-3 h-3" /> Tailored Phrasing (Verifiable)
                       </span>
                       <button
                         onClick={() => setEditingBulletId(editingBulletId === bullet.id ? null : bullet.id)}
-                        className="text-[10px] text-[#A1A1A1] hover:text-white font-mono flex items-center gap-1"
+                        className="text-[10px] text-neutral-500 hover:text-neutral-900 dark:hover:text-white font-mono flex items-center gap-1"
                       >
                         <Edit3 className="w-3 h-3" />
                         <span>{editingBulletId === bullet.id ? 'Done' : 'Edit'}</span>
@@ -414,19 +416,20 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
                       <textarea
                         value={bullet.tailored}
                         onChange={(e) => handleUpdateBullet(bullet.id, e.target.value)}
-                        className="w-full mt-1 p-2 bg-[#0A0A0A] border border-[#333333] rounded-md text-xs font-mono text-white focus:outline-none focus:border-white"
+                        className="w-full mt-1 p-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-md text-xs font-mono text-neutral-900 dark:text-white focus:outline-none focus:border-neutral-900 dark:focus:border-white"
                         rows={3}
                       />
                     ) : (
-                      <p className="text-xs text-[#EDEDED] font-medium leading-relaxed mt-1">
+                      <p className="text-xs text-neutral-900 dark:text-neutral-100 font-medium leading-relaxed mt-1">
                         {bullet.tailored}
                       </p>
                     )}
                   </div>
 
                   {/* Reasoning */}
-                  <div className="text-[11px] text-[#A1A1A1] flex items-center gap-1.5 italic font-mono">
-                    <span>💡 {bullet.reasoning}</span>
+                  <div className="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1.5 font-mono">
+                    <span className="font-semibold text-neutral-700 dark:text-neutral-300">Rationale:</span>
+                    <span>{bullet.reasoning}</span>
                   </div>
                 </div>
               ))}
@@ -438,17 +441,17 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
         {activeTab === 'PREVIEW' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-[#A1A1A1]">
+              <span className="text-xs font-mono text-neutral-500 dark:text-neutral-400">
                 Single-column plaintext format matching real candidate profile and target requirements.
               </span>
               <button
                 onClick={handleDownloadPlainText}
-                className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-md bg-neutral-900 dark:bg-white text-white dark:text-black text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors flex items-center gap-1.5 shadow-sm"
               >
                 <Download className="w-3.5 h-3.5" /> Download (.txt)
               </button>
             </div>
-            <pre className="p-4 rounded-xl bg-[#050505] border border-[#222222] text-xs font-mono text-[#D4D4D4] whitespace-pre-wrap leading-relaxed max-h-[420px] overflow-y-auto">
+            <pre className="p-4 rounded-xl bg-neutral-50 dark:bg-[#0c0d10] border border-neutral-200 dark:border-neutral-800 text-xs font-mono text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed max-h-[420px] overflow-y-auto">
               {generateFormattedResumeText()}
             </pre>
           </div>
@@ -456,43 +459,43 @@ ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
 
         {/* Tab 3: Parser View */}
         {activeTab === 'PARSER_VIEW' && (
-          <div className="bg-[#111111] p-5 rounded-xl border border-[#222222] space-y-4">
-            <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
+          <div className="bg-neutral-50 dark:bg-[#0c0d10] p-5 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-4">
+            <div className="flex items-center gap-2 text-xs font-mono text-emerald-700 dark:text-emerald-400 font-semibold">
               <Terminal className="w-4 h-4" />
               <span>Verified ATS Extraction Output</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-              <div className="p-3 bg-[#161616] rounded-xl border border-[#262626] space-y-2">
-                <span className="text-[#737373] text-[10px] uppercase">Candidate Ingestion Profile</span>
-                <div>Name: <span className="text-white">{candidate.fullName}</span></div>
-                <div>Email: <span className="text-white">{candidate.email}</span></div>
-                <div>YOE: <span className="text-white">{candidate.yearsOfExperience} years</span></div>
-                <div>Location: <span className="text-white">{candidate.location}</span></div>
+              <div className="p-3 bg-white dark:bg-neutral-900/60 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-2">
+                <span className="text-neutral-500 dark:text-neutral-400 text-[10px] uppercase font-semibold">Candidate Ingestion Profile</span>
+                <div>Name: <span className="text-neutral-900 dark:text-white font-medium">{candidate.fullName}</span></div>
+                <div>Email: <span className="text-neutral-900 dark:text-white font-medium">{candidate.email}</span></div>
+                <div>YOE: <span className="text-neutral-900 dark:text-white font-medium">{candidate.yearsOfExperience} years</span></div>
+                <div>Location: <span className="text-neutral-900 dark:text-white font-medium">{candidate.location}</span></div>
               </div>
 
-              <div className="p-3 bg-[#161616] rounded-xl border border-[#262626] space-y-2">
-                <span className="text-[#737373] text-[10px] uppercase">Alignment Breakdown</span>
-                <div>Hard Skills Alignment: <span className="text-emerald-400">{atsResult.overallScore}%</span></div>
-                <div>Matched Keywords: <span className="text-white">{atsResult.matchedKeywords.length} verified</span></div>
-                <div>Layout Check: <span className="text-emerald-400">Pass (Standard ATS-compliant)</span></div>
+              <div className="p-3 bg-white dark:bg-neutral-900/60 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-2">
+                <span className="text-neutral-500 dark:text-neutral-400 text-[10px] uppercase font-semibold">Alignment Breakdown</span>
+                <div>Hard Skills Alignment: <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{atsResult.overallScore}%</span></div>
+                <div>Matched Keywords: <span className="text-neutral-900 dark:text-white font-medium">{atsResult.matchedKeywords.length} verified</span></div>
+                <div>Layout Check: <span className="text-emerald-600 dark:text-emerald-400 font-medium">Pass (Standard ATS-compliant)</span></div>
               </div>
             </div>
           </div>
         )}
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-[#222222]">
+        <div className="flex items-center justify-between pt-4 border-t border-neutral-200 dark:border-neutral-800">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-mono text-[#A1A1A1] hover:text-white"
+            className="px-3 py-1.5 text-xs font-mono text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors"
           >
             Close Lab
           </button>
 
           <button
             onClick={() => onProceedToOutreach(job)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-neutral-200 text-black text-xs font-bold transition-all shadow-md"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-[#EBF946] dark:text-black dark:hover:bg-[#d4e23f] text-xs font-semibold transition-colors shadow-sm"
           >
             <span>Proceed to Founder Outreach</span>
             <ArrowRight className="w-4 h-4" />
