@@ -5,6 +5,7 @@ import { curatedJobs } from './lib/jobRadarEngine';
 import { Navbar } from './components/Navbar';
 import { JobRadar } from './components/JobRadar';
 import { JobPilotFeatures } from './components/JobPilotFeatures';
+import { WorkflowFAQ } from './components/WorkflowFAQ';
 import { AtsResumeTailorModal } from './components/AtsResumeTailorModal';
 import { OutreachModal } from './components/OutreachModal';
 import { ProfileVaultModal } from './components/ProfileVaultModal';
@@ -14,30 +15,7 @@ import { PreFooterCTA } from './components/PreFooterCTA';
 import { Footer } from './components/Footer';
 import { ArrowDown, Mail, Code2 } from 'lucide-react';
 
-const INITIAL_CARDS: ApplicationCard[] = [
-  {
-    id: 'app-01',
-    job: curatedJobs[0],
-    status: 'OUTREACH_SENT',
-    atsScore: 82,
-    appliedDate: 'Yesterday',
-    notes: 'Pitch dispatched to Aarav Singhania (CEO).',
-  },
-  {
-    id: 'app-02',
-    job: curatedJobs[1],
-    status: 'TAILORED',
-    atsScore: 82,
-    notes: 'Resume tailored for Spark streaming and ClickHouse architecture.',
-  },
-  {
-    id: 'app-03',
-    job: curatedJobs[2],
-    status: 'INTERVIEW_SCHEDULED',
-    atsScore: 81,
-    notes: 'Technical screening booked with Maya Iyer for Thursday 4:00 PM.',
-  },
-];
+const INITIAL_CARDS: ApplicationCard[] = [];
 
 // --- Storage validation helpers ---
 const isRecord = (v: unknown): v is Record<string, unknown> =>
@@ -103,7 +81,7 @@ export function App() {
   );
 
   const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(() => {
-    const arr = readLocalJson('jobpilot_applied_ids', isStringArray, ['job-01', 'job-02', 'job-03']);
+    const arr = readLocalJson('jobpilot_applied_ids', isStringArray, []);
     return new Set(arr);
   });
 
@@ -217,6 +195,11 @@ export function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToFaq = () => {
+    const el = document.getElementById('faq');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-[#000000] text-[#EDEDED] flex flex-col font-sans selection:bg-white/20 selection:text-white">
       {/* 1. JobPilot Clean Navigation */}
@@ -233,6 +216,7 @@ export function App() {
         candidateName={candidate.fullName}
         candidateYoe={candidate.yearsOfExperience}
         applicationsCount={cards.length}
+        onOpenFaq={scrollToFaq}
       />
 
       {/* Storage Warning Banner */}
@@ -253,20 +237,20 @@ export function App() {
           {/* Eyebrow Pill */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A0A0A] border border-[#222222] text-xs font-mono text-[#888888]">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>Bangalore Tech Corridors · YC W24/S24 Startups</span>
+            <span>Example startup listings · Bangalore & YC</span>
             <span className="text-[#333333]">•</span>
-            <span className="text-white">Founder Contact Directory</span>
+            <span className="text-white">Sample data</span>
           </div>
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.1]">
-            Pitch founders directly. <br />
-            <span className="text-[#888888]">Skip the ATS void.</span>
+            Find your next role. <br />
+            <span className="text-[#888888]">Make your next move.</span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-sm sm:text-base text-[#888888] max-w-xl mx-auto font-sans leading-relaxed">
-            Index unadvertised seed roles across Indiranagar, Koramangala, and HSR Layout. Generate structured 4-part pitches with working Gmail links and real GitHub proof over generic CVs.
+            Explore example startup listings, compare required skills, draft founder outreach, and keep your application pipeline in one browser-based workspace.
           </p>
 
           {/* Action Buttons */}
@@ -275,7 +259,7 @@ export function App() {
               onClick={scrollToDashboard}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black font-semibold text-xs transition-colors shadow-sm"
             >
-              <span>Explore {jobs.length} Open Roles</span>
+              <span>Browse {jobs.length} Sample Roles</span>
               <ArrowDown className="w-3.5 h-3.5" />
             </button>
 
@@ -292,7 +276,7 @@ export function App() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#AAAAAA] hover:text-white font-medium text-xs transition-colors"
             >
               <Code2 className="w-3.5 h-3.5" />
-              <span>Import GitHub Proof</span>
+              <span>Import GitHub Profile</span>
             </button>
           </div>
         </section>
@@ -322,16 +306,24 @@ export function App() {
         {/* 4. Feature Bento Grid & Engineering Stories */}
         <section>
           <JobPilotFeatures
+            jobs={jobs}
+            trackedCount={cards.length}
             onOpenOutreachModal={() => setActiveModal('OUTREACH')}
             onOpenPortfolioModal={() => setActiveModal('PORTFOLIO')}
             onOpenApplicationsTab={() => setActiveModal('APPLICATIONS')}
-            onExploreCluster={() => scrollToDashboard()}
+            onExploreRoles={scrollToDashboard}
           />
         </section>
 
-        {/* 5. Pre-Footer Launchpad CTA */}
+        {/* 5. Clear Workflow FAQ */}
+        <section id="faq">
+          <WorkflowFAQ />
+        </section>
+
+        {/* 6. Pre-Footer Launchpad CTA */}
         <section>
           <PreFooterCTA
+            roleCount={jobs.length}
             onLaunchRadar={scrollToDashboard}
             onOpenOutreach={() => setActiveModal('OUTREACH')}
             onOpenPortfolio={() => setActiveModal('PORTFOLIO')}
@@ -440,6 +432,7 @@ export function App() {
         onOpenPortfolio={() => setActiveModal('PORTFOLIO')}
         onOpenAts={() => setActiveModal('ATS')}
         onOpenTracker={() => setActiveModal('APPLICATIONS')}
+        onLaunchRadar={scrollToDashboard}
         onScrollToTop={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       />
     </div>

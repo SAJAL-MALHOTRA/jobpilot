@@ -6,11 +6,13 @@ import {
   RotateCcw, 
   FileText, 
   MapPin, 
-  ShieldCheck, 
+  Mail,
   ExternalLink,
   Keyboard,
-  BookmarkPlus
+  BookmarkPlus,
+  Search,
 } from 'lucide-react';
+import { calculateQuickMatchScore } from '../lib/jobRadarEngine';
 
 interface SwipeHistoryEntry {
   index: number;
@@ -25,15 +27,18 @@ interface CompanySwipeDeckProps {
   onTailorAts: (job: JobListing) => void;
   onAddToPipeline: (job: JobListing) => void;
   onRemoveFromPipeline?: (jobId: string) => void;
+  onClearFilters: () => void;
   appliedJobIds: Set<string>;
 }
 
 export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
   jobs,
+  candidate,
   onPitch,
   onTailorAts,
   onAddToPipeline,
   onRemoveFromPipeline,
+  onClearFilters,
   appliedJobIds,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -236,7 +241,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
       </div>
 
       {/* Interactive Card Stage Container */}
-      <div className="relative h-[480px] w-full flex items-center justify-center">
+      <div className="relative h-[420px] w-full flex items-center justify-center sm:h-[440px]">
         {activeJob ? (
           <div className="relative w-full h-full">
             {/* Third Card in Stack (Bottom) */}
@@ -327,7 +332,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
                           className="text-[#A1A1A1] hover:text-white transition-colors"
-                          title="Open careers portal"
+                          title="Open source listing"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                         </a>
@@ -348,8 +353,11 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                   </div>
 
                   {/* Match Score Badge */}
-                  <div className="px-2.5 py-1 rounded-full bg-[#141414] border border-[#262626] text-xs font-mono font-bold text-white">
-                    {activeJob.atsMatchScore || 82}% ATS
+                  <div
+                    className="rounded-full border border-[#262626] bg-[#141414] px-2.5 py-1 text-xs font-mono font-bold text-white"
+                    title="Percentage of required skills found in your profile"
+                  >
+                    {calculateQuickMatchScore(candidate, activeJob)}% skills
                   </div>
                 </div>
 
@@ -387,7 +395,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                 </div>
               </div>
 
-              {/* Card Bottom: Verified Founder Bar */}
+              {/* Card Bottom: Contact Details */}
               <div className="pt-3 border-t border-[#1A1A1A] flex items-center justify-between text-xs font-mono text-[#A1A1A1]">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-400" />
@@ -395,12 +403,34 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                   <span className="text-[10px] text-[#A1A1A1]">({activeJob.founderRole})</span>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-[11px] text-[#A1A1A1]">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>{activeJob.contactConfidence || 'Verified Founder Inbox'}</span>
+                <div
+                  className="flex items-center gap-1.5 text-[11px] text-[#A1A1A1]"
+                  title="Contact details are part of the example listing. Verify them before outreach."
+                >
+                  <Mail className="h-3.5 w-3.5 text-[#737373]" />
+                  <span>Contact listed · verify first</span>
                 </div>
               </div>
             </div>
+          </div>
+        ) : filteredDeck.length === 0 ? (
+          <div className="max-w-sm space-y-3 rounded-2xl border border-dashed border-[#262626] p-8 text-center font-mono">
+            <Search className="mx-auto h-5 w-5 text-[#737373]" />
+            <h3 className="text-base font-bold text-white">No roles match these filters.</h3>
+            <p className="text-xs text-[#A1A1A1]">
+              Clear the search and role filters to return to the example directory.
+            </p>
+            <button
+              onClick={() => {
+                setClusterFilter('ALL');
+                setCurrentIndex(0);
+                setHistory([]);
+                onClearFilters();
+              }}
+              className="rounded-lg bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:bg-neutral-200"
+            >
+              Clear filters
+            </button>
           </div>
         ) : (
           <div className="text-center p-8 border border-dashed border-[#262626] rounded-2xl max-w-sm space-y-3 font-mono">

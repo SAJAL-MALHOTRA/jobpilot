@@ -376,14 +376,11 @@ export const curatedJobs: JobListing[] = [
 ];
 
 export function calculateQuickMatchScore(candidate: CandidateProfile, job: JobListing): number {
-  if (job.atsMatchScore) return job.atsMatchScore;
   const candidateSkills = new Set(
     [...candidate.primarySkills, ...candidate.secondarySkills].map((s) => s.toLowerCase().trim())
   );
-  let matches = 0;
-  job.requiredSkills.forEach((skill) => {
-    if (candidateSkills.has(skill.toLowerCase().trim())) matches++;
-  });
-  const ratio = matches / (job.requiredSkills.length || 1);
-  return Math.min(94, Math.max(68, Math.round(ratio * 30 + 65)));
+  const requiredSkills = job.requiredSkills.map((skill) => skill.toLowerCase().trim()).filter(Boolean);
+  if (requiredSkills.length === 0) return 0;
+  const matches = requiredSkills.filter((skill) => candidateSkills.has(skill)).length;
+  return Math.round((matches / requiredSkills.length) * 100);
 }

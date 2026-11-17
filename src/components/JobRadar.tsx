@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { JobListing, CandidateProfile } from '../types';
+import { calculateQuickMatchScore } from '../lib/jobRadarEngine';
 import { CompanySwipeDeck } from './CompanySwipeDeck';
 import { 
   Search, 
@@ -82,6 +83,10 @@ export const JobRadar: React.FC<JobRadarProps> = ({
 
     return matchesSearch && matchesRole;
   });
+  const sourceCounts = jobs.reduce<Record<string, number>>((counts, job) => {
+    counts[job.source] = (counts[job.source] || 0) + 1;
+    return counts;
+  }, {});
 
   return (
     <div className="space-y-12">
@@ -93,11 +98,11 @@ export const JobRadar: React.FC<JobRadarProps> = ({
             <span className="w-2.5 h-2.5 rounded-full bg-[#262626] inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#262626] inline-block" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#262626] inline-block" />
-            <span className="ml-2 font-mono text-[11px] text-[#A1A1A1]">Startup Roles Radar — Direct Founder Outreach</span>
+            <span className="ml-2 font-mono text-[11px] text-[#A1A1A1]">Startup Role Directory — Example Listings</span>
           </div>
-          <div className="flex items-center gap-2 text-[11px] font-mono text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>Bangalore & YC S24/W24 Feed</span>
+          <div className="flex items-center gap-2 text-[11px] font-mono text-[#A1A1A1]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#737373]" />
+            <span>Sample catalog · verify source links</span>
           </div>
         </div>
 
@@ -295,16 +300,48 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     onTailorAts={onSelectJobForATS}
                     onAddToPipeline={onAddToPipeline}
                     onRemoveFromPipeline={onRemoveFromPipeline}
+                    onClearFilters={() => {
+                      setSearchQuery('');
+                      setSelectedRole('All Roles');
+                    }}
                     appliedJobIds={appliedJobIds}
                   />
                 </div>
               ) : (
                 /* Table View */
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                  <table className="w-full min-w-[860px] text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-[#1F1F1F] text-[10px] font-mono uppercase tracking-wide text-[#737373]">
+                        <th scope="col" className="py-2 pr-4 pl-1 font-medium">Role</th>
+                        <th scope="col" className="px-3 py-2 font-medium">Location</th>
+                        <th scope="col" className="px-3 py-2 font-medium">Experience & pay</th>
+                        <th scope="col" className="px-3 py-2 font-medium">Skills</th>
+                        <th scope="col" className="px-3 py-2 font-medium">Skill overlap</th>
+                        <th scope="col" className="py-2 pl-3 pr-2 text-right font-medium">Actions</th>
+                      </tr>
+                    </thead>
                     <tbody>
+                      {filteredJobs.length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="py-14 text-center">
+                            <p className="text-sm font-medium text-white">No roles match those filters.</p>
+                            <p className="mt-1 text-xs text-[#888888]">Try another search or reset the role category.</p>
+                            <button
+                              onClick={() => {
+                                setSearchQuery('');
+                                setSelectedRole('All Roles');
+                              }}
+                              className="mt-4 rounded-lg border border-[#2A2A2A] bg-[#111111] px-3 py-2 text-xs text-white transition-colors hover:bg-[#1A1A1A]"
+                            >
+                              Clear filters
+                            </button>
+                          </td>
+                        </tr>
+                      )}
                       {filteredJobs.map((job) => {
                         const isApplied = appliedJobIds.has(job.id);
+                        const skillOverlap = calculateQuickMatchScore(candidate, job);
                         return (
                           <tr 
                             key={job.id} 
@@ -369,17 +406,17 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                               </div>
                             </td>
 
-                            {/* 5. Match Score Bar */}
+                            {/* 5. Required skills present in the profile */}
                             <td className="py-3.5 px-3 whitespace-nowrap">
                               <div className="flex items-center gap-2">
                                 <div className="w-16 bg-[#1A1A1A] h-1.5 rounded-full overflow-hidden">
                                   <div
                                     className="bg-white h-full rounded-full"
-                                    style={{ width: `${job.atsMatchScore || 80}%` }}
+                                    style={{ width: `${skillOverlap}%` }}
                                   />
                                 </div>
                                 <span className="font-mono font-bold text-xs text-white">
-                                  {job.atsMatchScore || 80}%
+                                  {skillOverlap}%
                                 </span>
                               </div>
                             </td>
@@ -393,7 +430,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                     onSelectJobForOutreach(job);
                                   }}
                                   className="px-2.5 py-1 bg-white hover:bg-neutral-200 text-black text-[11px] font-bold rounded-md shadow-sm transition-all flex items-center gap-1"
-                                  title="Draft Cold Email (80% formula)"
+                                  title="Draft outreach for this role"
                                 >
                                   <Send className="w-2.5 h-2.5" />
                                   <span>Pitch</span>
@@ -416,10 +453,10 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                     onSimulateApply(job);
                                   }}
                                   className="px-2.5 py-1 bg-[#141414] hover:bg-[#222222] text-[#D4D4D4] hover:text-white border border-[#262626] text-[11px] font-medium rounded-md transition-all flex items-center gap-1"
-                                  title="Search Careers / Open Portal"
+                                  title="Open the source listing"
                                 >
                                   <ExternalLink className="w-2.5 h-2.5" />
-                                  <span>Search Careers</span>
+                                  <span>Open listing</span>
                                 </button>
 
                                 <button
@@ -447,59 +484,41 @@ export const JobRadar: React.FC<JobRadarProps> = ({
 
             {/* Table Footer */}
             <div className="pt-3 border-t border-[#1F1F1F] flex items-center justify-between text-[11px] text-[#A1A1A1] font-mono">
-              <span>{viewMode === 'SWIPE' ? 'Swipe Mode: Keyboard ← (Pass) / → (Save) / Space (Pitch)' : `Showing 1–${filteredJobs.length} of ${jobs.length} open roles`}</span>
-              <span>Direct verified founder routing</span>
+              <span>{viewMode === 'SWIPE' ? 'Swipe Mode: Keyboard ← (Pass) / → (Save) / Space (Pitch)' : `Showing ${filteredJobs.length} of ${jobs.length} sample roles`}</span>
+              <span>Check listing and contact details before outreach</span>
             </div>
           </main>
         </div>
       </div>
 
-      {/* 2. Startup Clusters Funded By */}
-      <section className="text-center space-y-5 pt-4">
-        <h3 className="text-xs font-mono font-medium text-[#71788E] tracking-wide uppercase">
-          Startup clusters & portfolio companies backed by
+      {/* 2. Listing provenance */}
+      <section className="space-y-4 pt-2 text-center">
+        <h3 className="text-[11px] font-mono font-medium uppercase tracking-wide text-[#737373]">
+          Sources named in this example catalog
         </h3>
-
-        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-80 text-xs font-mono text-[#A3A8BD]">
-          <div className="flex items-center gap-1.5 font-bold tracking-tight text-sm text-white">
-            <span className="w-5 h-5 rounded bg-[#F97316] text-white flex items-center justify-center font-black text-xs font-mono">
-              Y
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {Object.entries(sourceCounts).map(([source, count]) => (
+            <span key={source} className="rounded-full border border-[#1F1F1F] bg-[#0A0A0A] px-3 py-1.5 font-mono text-[11px] text-[#A1A1A1]">
+              {source} <span className="text-[#737373]">· {count}</span>
             </span>
-            <span>Y Combinator</span>
-          </div>
-
-          <div className="font-bold tracking-wider text-xs text-white">
-            FOUNDERS FUND
-          </div>
-
-          <div className="flex items-center gap-1 font-semibold text-xs text-white">
-            <span className="text-red-500">🔥</span>
-            <span>lightspeed india</span>
-          </div>
-
-          <div className="font-mono text-xs text-white tracking-tight">
-            andreessen. horowitz
-          </div>
-
-          <div className="font-bold tracking-tight text-xs text-white">
-            PEAK XV SURGE
-          </div>
+          ))}
         </div>
+        <p className="text-xs text-[#737373]">Check each source link for current availability and contact details.</p>
       </section>
 
       {/* 3. Role Categories Pill Filter Section */}
       <section className="text-center space-y-6 pt-8 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#13151F] border border-[#1E2230] text-xs font-mono text-[#A3A8BD]">
+        <div className="inline-flex items-center gap-2 rounded-full border border-[#1F1F1F] bg-[#0A0A0A] px-3 py-1 text-xs font-mono text-[#A1A1A1]">
           <span>◈</span>
-          <span>Target Engineering Disciplines</span>
+          <span>Filter example roles</span>
         </div>
 
         <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Find high-conviction roles across startup tiers
+          Browse by engineering discipline
         </h2>
 
         <p className="text-sm text-[#8C93A8] leading-relaxed max-w-xl mx-auto font-sans">
-          From seed-stage founding engineers in Indiranagar to Series B scale-ups in HSR Layout.
+          Narrow the example directory to the roles you want to review.
         </p>
 
         {/* Role Pills */}
@@ -513,7 +532,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 border ${
                   isSelected
                     ? 'bg-white text-black border-white shadow-sm font-semibold'
-                    : 'bg-[#12141E] text-[#8C93A8] border-[#1E2230] hover:text-white hover:border-[#31374C]'
+                    : 'bg-[#0A0A0A] text-[#A1A1A1] border-[#1F1F1F] hover:text-white hover:border-[#3A3A3A]'
                 }`}
               >
                 {isSelected && <Check className="w-3.5 h-3.5 text-black" />}

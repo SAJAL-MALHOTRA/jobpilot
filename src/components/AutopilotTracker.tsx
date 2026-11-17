@@ -43,7 +43,7 @@ const COLUMNS: {
   },
   { 
     id: 'TAILORED', 
-    label: '2. ATS Ready / Applied', 
+    label: '2. Resume tailored',
     countColor: 'text-indigo-400 bg-indigo-950/40 border-indigo-900/50', 
     borderColor: 'border-indigo-950/40', 
     dotColor: 'bg-indigo-400' 
@@ -587,11 +587,6 @@ Arjun Mehta`;
                             <span className="bg-[#1C1C22] px-2 py-0.5 rounded border border-[#2B2B33] text-neutral-400 flex items-center gap-0.5">
                               <MapPin className="w-2.5 h-2.5" />
                               <span className="truncate max-w-[110px]">{card.job.location}</span>
-                            </span>
-                          )}
-                          {card.atsScore && (
-                            <span className="bg-[#1C1C22] px-2 py-0.5 rounded border border-[#2B2B33] text-indigo-400">
-                              {card.atsScore}% ATS
                             </span>
                           )}
                         </div>

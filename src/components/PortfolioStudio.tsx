@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { CandidateProfile } from '../types';
 import { 
   Copy, 
@@ -38,13 +38,21 @@ interface PortfolioStudioProps {
   onNavigateToOutreach: () => void;
 }
 
+function getGitHubUsername(profileUrl: string): string {
+  try {
+    const url = new URL(profileUrl);
+    if (url.hostname.toLowerCase() !== 'github.com' && url.hostname.toLowerCase() !== 'www.github.com') return '';
+    return url.pathname.split('/').filter(Boolean)[0] || '';
+  } catch {
+    return '';
+  }
+}
+
 export const PortfolioStudio: React.FC<PortfolioStudioProps> = ({
   candidate,
   onNavigateToOutreach,
 }) => {
-  const [githubUsername, setGithubUsername] = useState(() => 
-    candidate.githubUrl ? candidate.githubUrl.replace('https://github.com/', '').replace('/', '') : 'shadcn'
-  );
+  const [githubUsername, setGithubUsername] = useState(() => getGitHubUsername(candidate.githubUrl));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userData, setUserData] = useState<GitHubUser | null>(null);
@@ -78,11 +86,6 @@ export const PortfolioStudio: React.FC<PortfolioStudioProps> = ({
     }
   };
 
-  useEffect(() => {
-    fetchGitHubData(githubUsername);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleCopyPitchProof = () => {
     if (!userData) return;
     const repoLines = repos
@@ -104,10 +107,10 @@ export const PortfolioStudio: React.FC<PortfolioStudioProps> = ({
           <div>
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <Code className="w-4 h-4 text-white" />
-              <span>Real GitHub Proof-of-Work Fetcher</span>
+              <span>GitHub Profile Importer</span>
             </h2>
             <p className="text-xs text-[#888888] mt-0.5">
-              Enter any real GitHub username to pull live repositories, stars, and languages to embed in founder pitches.
+              Fetch public profile and repository details on request, then copy a short proof block into your pitch draft.
             </p>
           </div>
 
@@ -125,7 +128,7 @@ export const PortfolioStudio: React.FC<PortfolioStudioProps> = ({
               onClick={onNavigateToOutreach}
               className="px-3.5 py-1.5 bg-white hover:bg-neutral-200 text-black text-xs font-bold rounded-lg transition-colors"
             >
-              Attach to Pitch →
+              Open Pitch Composer →
             </button>
           </div>
         </div>
@@ -144,17 +147,17 @@ export const PortfolioStudio: React.FC<PortfolioStudioProps> = ({
               type="text"
               value={githubUsername}
               onChange={(e) => setGithubUsername(e.target.value)}
-              placeholder="e.g. shadcn, torvalds, or your username"
+              placeholder="GitHub username"
               className="w-full pl-9 pr-3 py-2 bg-[#000000] border border-[#262626] rounded-lg text-xs font-mono text-white placeholder-[#555555] focus:outline-none focus:border-[#444444]"
             />
           </div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !githubUsername.trim()}
             className="px-4 py-2 bg-[#1A1A1A] hover:bg-[#262626] border border-[#333333] text-xs font-mono text-white rounded-lg transition-colors flex items-center gap-2"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
-            <span>Fetch Real Data</span>
+            <span>Fetch profile</span>
           </button>
         </form>
 
@@ -162,6 +165,11 @@ export const PortfolioStudio: React.FC<PortfolioStudioProps> = ({
           <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-900/60 text-xs text-red-300 font-mono">
             {error}
           </div>
+        )}
+        {!userData && !error && !loading && (
+          <p className="text-xs text-[#737373]">
+            Nothing is fetched until you choose Fetch profile. GitHub’s public API may rate-limit requests.
+          </p>
         )}
       </div>
 
