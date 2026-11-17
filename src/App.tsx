@@ -95,34 +95,12 @@ export function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Inspector & Command Palette State
-  const [selectedJob, setSelectedJob] = useState<JobListing | null>(jobs[0] || null);
+  const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   // Standalone Modals
   const [modalMode, setModalMode] = useState<'NONE' | 'ATS_MODAL' | 'OUTREACH_MODAL' | 'PROFILE_MODAL'>('NONE');
-
-  // Theme State (Apple Light Mode by default)
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    const saved = localStorage.getItem('jobpilot_theme');
-    return (saved === 'dark' || saved === 'light') ? saved : 'light';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('jobpilot_theme', theme);
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
-      root.classList.add('light');
-      root.classList.remove('dark');
-    }
-  }, [theme]);
-
-  const handleToggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
 
   // Persistence to localStorage
   useEffect(() => {
@@ -262,7 +240,7 @@ export function App() {
   }, [cards, selectedJob]);
 
   return (
-    <div className={`flex h-screen w-screen overflow-hidden ${theme === 'dark' ? 'dark bg-[#0F1117] text-[#F3F4F6]' : 'light bg-[#F4F6F9] text-slate-900'} font-sans selection:bg-indigo-500/20 selection:text-indigo-900 dark:selection:text-white transition-colors duration-200`}>
+    <div className="flex h-screen w-screen overflow-hidden bg-[#0F1117] text-[#F3F4F6] font-sans selection:bg-[#818CF8]/30 selection:text-white">
       {/* 1. Left Workspace Sidebar (Desktop) */}
       <div className="hidden md:flex shrink-0">
         <WorkspaceSidebar
@@ -277,8 +255,6 @@ export function App() {
           onOpenProfile={() => setModalMode('PROFILE_MODAL')}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
-          theme={theme}
-          onToggleTheme={handleToggleTheme}
         />
       </div>
 
@@ -393,8 +369,6 @@ export function App() {
                 setSelectedJob(job);
                 setIsDrawerOpen(true);
               }}
-              theme={theme}
-              onToggleTheme={handleToggleTheme}
             />
           )}
 
