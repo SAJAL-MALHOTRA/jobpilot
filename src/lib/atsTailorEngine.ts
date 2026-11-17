@@ -5,14 +5,14 @@ export function runATSTailoring(candidate: CandidateProfile, job: JobListing): A
     [
       ...candidate.primarySkills,
       ...candidate.secondarySkills,
-      ...candidate.resumeBullets.flatMap(b => b.keywords)
-    ].map(s => s.toLowerCase().trim())
+      ...candidate.resumeBullets.flatMap((b) => b.keywords),
+    ].map((s) => s.toLowerCase().trim())
   );
 
   const matchedKeywords: string[] = [];
   const missingKeywords: string[] = [];
 
-  job.requiredSkills.forEach(reqSkill => {
+  job.requiredSkills.forEach((reqSkill) => {
     if (candidateSkillsSet.has(reqSkill.toLowerCase().trim())) {
       matchedKeywords.push(reqSkill);
     } else {
@@ -20,39 +20,40 @@ export function runATSTailoring(candidate: CandidateProfile, job: JobListing): A
     }
   });
 
-  // Score baseline
+  // Calculate truthful match score based on candidate skills vs role requirements
   const matchRatio = matchedKeywords.length / (job.requiredSkills.length || 1);
   const baselineScore = Math.round(matchRatio * 75);
   const expFactor = candidate.yearsOfExperience >= 3.5 ? 15 : 10;
   const overallScore = Math.min(96, Math.max(45, baselineScore + expFactor));
 
-  // Auto-tailor bullets to highlight the target company's stack
+  // Truthful bullet optimization: Never fabricate numbers, companies, or unverified claims.
+  // We refine action verbs and align genuine candidate skills with the role requirements.
   const tailoredBullets = candidate.resumeBullets.map((bullet) => {
     let tailoredText = bullet.text;
     const addedKeywords: string[] = [];
-    let reasoning = 'Aligned bullet point to highlight engineering impact and metric density.';
+    let reasoning = 'Aligned bullet point to highlight verified engineering impact and technical competencies.';
 
-    if (job.title.toLowerCase().includes('ai') || job.description.toLowerCase().includes('llm')) {
-      if (bullet.keywords.includes('Python')) {
-        tailoredText = `Architected end-to-end data & inference pipeline utilizing Python, FastAPI, and asynchronous Celery workers, achieving 99.99% uptime processing ₹40Cr daily transactions with integrated telemetry monitoring.`;
-        addedKeywords.push('FastAPI', 'Inference Telemetry');
-        reasoning = 'Rephrased to emphasize Python API architecture and high-reliability data serving matching AI platform requirements.';
-      } else if (bullet.keywords.includes('React')) {
-        tailoredText = `Engineered dynamic interactive web dashboard in React 18 & TypeScript with low-latency WebSockets, reducing state reconciliation overhead by 34% for live event telemetry.`;
-        addedKeywords.push('React 18', 'Low-Latency', 'Telemetry');
-        reasoning = 'Enhanced frontend bullet to emphasize high-frequency UI streaming matching AI canvas demands.';
-      }
-    } else if (job.title.toLowerCase().includes('systems') || job.description.toLowerCase().includes('kafka')) {
-      if (bullet.keywords.includes('Node.js')) {
-        tailoredText = `Designed and deployed distributed order dispatch engine handling 120k req/min with sub-45ms p99 latency leveraging Node.js, Redis clustering, and optimized PostgreSQL indexing under high concurrency.`;
-        addedKeywords.push('Distributed Systems', 'Redis Clustering', 'Concurrency');
-        reasoning = 'Emphasized distributed throughput and database concurrency to match systems engineer profile.';
-      }
-    } else {
-      // General tailoring: enhance action verbs and quantitative impact
-      tailoredText = bullet.text.replace('Built', 'Engineered & scaled').replace('Migrated', 'Architected zero-downtime migration of');
-      addedKeywords.push('Scalability', 'System Reliability');
-      reasoning = 'Sharpened leadership and architectural verbs following Google XYZ achievement guidelines.';
+    // Check if the bullet mentions any matched keywords for this specific job
+    const bulletKeywordsLower = bullet.keywords.map((k) => k.toLowerCase());
+    const matchedInBullet = matchedKeywords.filter((k) =>
+      bulletKeywordsLower.includes(k.toLowerCase()) || bullet.text.toLowerCase().includes(k.toLowerCase())
+    );
+
+    // Verifiable verb sharpening without altering candidate's original facts or numbers
+    if (tailoredText.startsWith('Built ')) {
+      tailoredText = tailoredText.replace(/^Built /, 'Engineered & deployed ');
+      reasoning = 'Sharpened opening action verb to emphasize deployment and end-to-end ownership.';
+    } else if (tailoredText.startsWith('Migrated ')) {
+      tailoredText = tailoredText.replace(/^Migrated /, 'Led migration of ');
+      reasoning = 'Highlighted technical initiative and architectural execution.';
+    } else if (tailoredText.startsWith('Worked on ')) {
+      tailoredText = tailoredText.replace(/^Worked on /, 'Architected ');
+      reasoning = 'Replaced passive phrasing with active ownership phrasing.';
+    }
+
+    if (matchedInBullet.length > 0) {
+      addedKeywords.push(...matchedInBullet);
+      reasoning += ` Aligned around verified candidate stack: ${matchedInBullet.join(', ')}.`;
     }
 
     return {
@@ -69,9 +70,11 @@ export function runATSTailoring(candidate: CandidateProfile, job: JobListing): A
     matchedKeywords,
     missingKeywords,
     tailoredBullets,
-    strengthAnalysis: `Candidate has strong proven production experience in ${matchedKeywords.slice(0, 4).join(', ')} directly addressing core infrastructure requirements.`,
-    weaknessAnalysis: missingKeywords.length > 0 
-      ? `Resume currently lacks explicit keyword presence for: ${missingKeywords.join(', ')}. JobPilot has optimized bullet context to emphasize transferable capabilities.`
+    strengthAnalysis: matchedKeywords.length > 0
+      ? `Candidate possesses verified production experience in ${matchedKeywords.slice(0, 4).join(', ')}, matching core role requirements.`
+      : 'Candidate background provides transferable software engineering foundations for this role.',
+    weaknessAnalysis: missingKeywords.length > 0
+      ? `Resume currently lacks verified presence for: ${missingKeywords.join(', ')}. Consider adding genuine project experience with these tools if applicable.`
       : 'Full alignment across all primary tech stack requirements.',
   };
 }

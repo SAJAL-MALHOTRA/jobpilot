@@ -127,33 +127,44 @@ export const AutopilotTracker: React.FC<AutopilotTrackerProps> = ({
     atsScore: 85,
   });
 
+  const sanitizeCsvCell = (val: string): string => {
+    let safe = (val || '').replace(/"/g, '""');
+    // Guard against spreadsheet formula injection (=, +, -, @, \t, \r)
+    if (/^[=+\-@\t\r]/.test(safe)) {
+      safe = `'${safe}`;
+    }
+    return `"${safe}"`;
+  };
+
   const handleExportCsv = () => {
     const headers = ['Company', 'Role', 'Status', 'Salary', 'Location', 'Tags', 'Job URL', 'Founder Name', 'Founder Email', 'Notes', 'Applied Date'];
     const rows = cards.map((c) => {
       const allTags = c.tags || c.job.tags || c.job.requiredSkills || [];
       return [
-        `"${c.job.company.replace(/"/g, '""')}"`,
-        `"${c.job.title.replace(/"/g, '""')}"`,
-        `"${c.status}"`,
-        `"${(c.job.salaryDisplay || `₹${c.job.minCtcLpa}–${c.job.maxCtcLpa}L`).replace(/"/g, '""')}"`,
-        `"${(c.job.location || '').replace(/"/g, '""')}"`,
-        `"${allTags.join(', ').replace(/"/g, '""')}"`,
-        `"${(c.jobUrl || c.job.jobUrl || '').replace(/"/g, '""')}"`,
-        `"${(c.job.founderName || '').replace(/"/g, '""')}"`,
-        `"${(c.job.founderEmail || '').replace(/"/g, '""')}"`,
-        `"${(c.notes || '').replace(/"/g, '""')}"`,
-        `"${c.appliedDate || ''}"`,
+        sanitizeCsvCell(c.job.company),
+        sanitizeCsvCell(c.job.title),
+        sanitizeCsvCell(c.status),
+        sanitizeCsvCell(c.job.salaryDisplay || (c.job.minCtcLpa ? `₹${c.job.minCtcLpa}–${c.job.maxCtcLpa}L` : '')),
+        sanitizeCsvCell(c.job.location || ''),
+        sanitizeCsvCell(allTags.join(', ')),
+        sanitizeCsvCell(c.jobUrl || c.job.jobUrl || ''),
+        sanitizeCsvCell(c.job.founderName || ''),
+        sanitizeCsvCell(c.job.founderEmail || ''),
+        sanitizeCsvCell(c.notes || ''),
+        sanitizeCsvCell(c.appliedDate || ''),
       ];
     });
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = '\uFEFF' + [headers.map(sanitizeCsvCell).join(','), ...rows.map(e => e.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.href = url;
     link.setAttribute('download', `jobpilot_applications_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleCopyFollowUp = (card: ApplicationCard) => {
@@ -232,7 +243,9 @@ Arjun Mehta`;
   // Add custom job handler
   const handleCreateCustomJob = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newJobForm.company || !newJobForm.title) return;
+    const company = newJobForm.company.trim();
+    const title = newJobForm.title.trim();
+    if (!company || !title) return;
 
     const parsedTags = newJobForm.tags
       .split(',')
@@ -241,25 +254,25 @@ Arjun Mehta`;
 
     const customJob: JobListing = {
       id: `custom-job-${Date.now()}`,
-      company: newJobForm.company,
-      title: newJobForm.title,
+      company,
+      title,
       logoColor: '#3B82F6',
-      location: newJobForm.location || 'Bangalore',
+      location: newJobForm.location.trim() || 'Bangalore, India',
       isRemote: newJobForm.location.toLowerCase().includes('remote'),
       source: 'LinkedIn',
-      minCtcLpa: 20,
-      maxCtcLpa: 35,
-      equityRange: '0.1% - 0.5%',
-      requiredSkills: parsedTags.length > 0 ? parsedTags : ['Full Stack', 'TypeScript'],
-      description: newJobForm.description || `Opportunity at ${newJobForm.company} for ${newJobForm.title}.`,
-      postedDate: 'Today',
-      founderName: newJobForm.founderName || 'Hiring Team',
-      founderRole: newJobForm.founderRole || 'Lead Recruiter',
-      founderEmail: newJobForm.founderEmail || '',
-      hiringUrgency: 'High',
-      atsMatchScore: 85,
-      salaryDisplay: newJobForm.salary || '₹20–35 LPA',
-      jobUrl: newJobForm.jobUrl,
+      minCtcLpa: 0,
+      maxCtcLpa: 0,
+      equityRange: '',
+      requiredSkills: parsedTags.length > 0 ? parsedTags : ['Full Stack'],
+      description: newJobForm.description.trim() || `Role at ${company} for ${title}.`,
+      postedDate: 'Custom Entry',
+      founderName: newJobForm.founderName.trim(),
+      founderRole: newJobForm.founderRole.trim() || 'Founder / Team',
+      founderEmail: newJobForm.founderEmail.trim(),
+      hiringUrgency: 'Normal',
+      atsMatchScore: 80,
+      salaryDisplay: newJobForm.salary.trim(),
+      jobUrl: newJobForm.jobUrl.trim(),
       tags: parsedTags,
     };
 
@@ -267,11 +280,11 @@ Arjun Mehta`;
       id: `app-${Date.now()}`,
       job: customJob,
       status: newJobForm.status,
-      atsScore: 85,
+      atsScore: 80,
       appliedDate: 'Just now',
-      notes: newJobForm.notes || 'Manually logged into tracker.',
+      notes: newJobForm.notes.trim() || 'Custom logged application.',
       tags: parsedTags,
-      jobUrl: newJobForm.jobUrl,
+      jobUrl: newJobForm.jobUrl.trim(),
     };
 
     if (onAddCustomCard) {
@@ -614,7 +627,7 @@ Arjun Mehta`;
                           <div className="p-2 bg-[#0C0C10] border border-amber-500/20 rounded-lg space-y-1">
                             <div className="flex items-center justify-between text-[9px] font-mono text-amber-400">
                               <span className="flex items-center gap-1">
-                                <Clock className="w-2.5 h-2.5" /> 3-Day Nudge Due
+                                <Clock className="w-2.5 h-2.5" /> 3-Day Follow-Up Template
                               </span>
                             </div>
                             <button

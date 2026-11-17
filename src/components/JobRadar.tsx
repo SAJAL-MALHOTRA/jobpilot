@@ -21,6 +21,7 @@ interface JobRadarProps {
   onSelectJobForATS: (job: JobListing) => void;
   onSelectJobForOutreach: (job: JobListing) => void;
   onAddToPipeline: (job: JobListing) => void;
+  onRemoveFromPipeline?: (jobId: string) => void;
   onSimulateApply: (job: JobListing) => void;
   appliedJobIds: Set<string>;
   onOpenPortfolio: () => void;
@@ -46,6 +47,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
   onSelectJobForATS,
   onSelectJobForOutreach,
   onAddToPipeline,
+  onRemoveFromPipeline,
   onSimulateApply,
   appliedJobIds,
   onOpenPortfolio,
@@ -271,29 +273,28 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                   </div>
                 </div>
 
-                {viewMode === 'TABLE' && (
-                  <div className="relative">
-                    <Search className="w-3.5 h-3.5 text-[#666666] absolute left-3 top-2.5" />
-                    <input
-                      type="text"
-                      placeholder="Search role, stack (React, Python)..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-8 pr-3 py-1.5 bg-[#0A0A0A] border border-[#262626] rounded-lg text-xs text-white placeholder-[#666666] focus:outline-none focus:border-white w-64 font-sans"
-                    />
-                  </div>
-                )}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-[#A1A1A1] absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder="Search role, stack (React, Python)..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 bg-[#0A0A0A] border border-[#262626] rounded-lg text-xs text-white placeholder-[#888888] focus:outline-none focus:border-white w-64 font-sans"
+                  />
+                </div>
               </div>
 
               {viewMode === 'SWIPE' ? (
                 /* Addictive Interactive Company Card Swipe Deck */
                 <div className="py-2">
                   <CompanySwipeDeck
-                    jobs={jobs}
+                    jobs={filteredJobs}
                     candidate={candidate}
                     onPitch={onSelectJobForOutreach}
                     onTailorAts={onSelectJobForATS}
                     onAddToPipeline={onAddToPipeline}
+                    onRemoveFromPipeline={onRemoveFromPipeline}
                     appliedJobIds={appliedJobIds}
                   />
                 </div>
@@ -414,11 +415,11 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                     e.stopPropagation();
                                     onSimulateApply(job);
                                   }}
-                                  className="px-2.5 py-1 bg-[#141414] hover:bg-[#222222] text-[#A1A1A1] hover:text-white border border-[#262626] text-[11px] font-medium rounded-md transition-all flex items-center gap-1"
-                                  title="Open Careers Page & Track"
+                                  className="px-2.5 py-1 bg-[#141414] hover:bg-[#222222] text-[#D4D4D4] hover:text-white border border-[#262626] text-[11px] font-medium rounded-md transition-all flex items-center gap-1"
+                                  title="Search Careers / Open Portal"
                                 >
                                   <ExternalLink className="w-2.5 h-2.5" />
-                                  <span>Apply</span>
+                                  <span>Search Careers</span>
                                 </button>
 
                                 <button
@@ -427,7 +428,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                                     onAddToPipeline(job);
                                   }}
                                   className={`px-2 py-1 text-[11px] font-medium rounded-md transition-all ${
-                                    isApplied ? 'bg-[#141414] text-[#666666]' : 'bg-[#141414] hover:bg-[#1F1F1F] text-[#A1A1A1] border border-[#262626]'
+                                    isApplied ? 'bg-[#141414] text-emerald-400 border border-emerald-950/40' : 'bg-[#141414] hover:bg-[#1F1F1F] text-[#A1A1A1] border border-[#262626]'
                                   }`}
                                   title={isApplied ? 'Tracked in Applications' : 'Track in Applications'}
                                 >
@@ -445,8 +446,8 @@ export const JobRadar: React.FC<JobRadarProps> = ({
             </div>
 
             {/* Table Footer */}
-            <div className="pt-3 border-t border-[#1F1F1F] flex items-center justify-between text-[11px] text-[#666666] font-mono">
-              <span>{viewMode === 'SWIPE' ? 'Swipe Mode: Keyboard ← (Pass) / → (Pitch)' : `Showing 1–${filteredJobs.length} of ${jobs.length} open roles`}</span>
+            <div className="pt-3 border-t border-[#1F1F1F] flex items-center justify-between text-[11px] text-[#A1A1A1] font-mono">
+              <span>{viewMode === 'SWIPE' ? 'Swipe Mode: Keyboard ← (Pass) / → (Save) / Space (Pitch)' : `Showing 1–${filteredJobs.length} of ${jobs.length} open roles`}</span>
               <span>Direct verified founder routing</span>
             </div>
           </main>

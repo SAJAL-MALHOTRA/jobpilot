@@ -39,48 +39,85 @@ const INITIAL_CARDS: ApplicationCard[] = [
   },
 ];
 
+// --- Storage validation helpers ---
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+
+const isStringArray = (v: unknown): v is string[] =>
+  Array.isArray(v) && v.every((i) => typeof i === 'string');
+
+const isApplicationCardList = (v: unknown): v is ApplicationCard[] =>
+  Array.isArray(v) &&
+  v.every(
+    (c) =>
+      isRecord(c) &&
+      typeof c.id === 'string' &&
+      isRecord(c.job) &&
+      typeof (c.job as Record<string, unknown>).id === 'string' &&
+      typeof (c.job as Record<string, unknown>).title === 'string' &&
+      typeof (c.job as Record<string, unknown>).company === 'string' &&
+      typeof c.notes === 'string' &&
+      typeof c.atsScore === 'number' &&
+      ['DISCOVERED', 'TAILORED', 'OUTREACH_SENT', 'INTERVIEW_SCHEDULED', 'OFFER', 'REJECTED'].includes(
+        String(c.status)
+      )
+  );
+
+const isCandidateProfile = (v: unknown): v is CandidateProfile =>
+  isRecord(v) &&
+  typeof v.id === 'string' &&
+  typeof v.fullName === 'string' &&
+  typeof v.email === 'string' &&
+  Array.isArray(v.primarySkills) &&
+  Array.isArray(v.resumeBullets);
+
+function readLocalJson<T>(key: string, isValid: (v: unknown) => v is T, fallback: T): T {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    const parsed: unknown = JSON.parse(raw);
+    if (isValid(parsed)) return parsed;
+  } catch { /* fall through */ }
+  // Backup corrupted data before discarding
+  if (raw !== null) {
+    try { localStorage.setItem(`${key}:invalid-backup`, raw); } catch { /* best-effort */ }
+  }
+  return fallback;
+}
+
 export function App() {
-  const [candidate, setCandidate] = useState<CandidateProfile>(() => {
-    try {
-      const saved = localStorage.getItem('jobpilot_candidate');
-      return saved ? JSON.parse(saved) : initialProfile;
-    } catch {
-      return initialProfile;
-    }
-  });
+  const [storageError, setStorageError] = useState(false);
+
+  const [candidate, setCandidate] = useState<CandidateProfile>(() =>
+    readLocalJson('jobpilot_candidate', isCandidateProfile, initialProfile)
+  );
 
   const [jobs] = useState<JobListing[]>(curatedJobs);
   const [activeModal, setActiveModal] = useState<'NONE' | 'ATS' | 'OUTREACH' | 'PROFILE' | 'APPLICATIONS' | 'PORTFOLIO'>('NONE');
   const [selectedJob, setSelectedJob] = useState<JobListing>(curatedJobs[0]);
 
-  // Load persistent application pipeline from localStorage
-  const [cards, setCards] = useState<ApplicationCard[]>(() => {
-    try {
-      const saved = localStorage.getItem('jobpilot_cards');
-      return saved ? JSON.parse(saved) : INITIAL_CARDS;
-    } catch {
-      return INITIAL_CARDS;
-    }
-  });
+  // Load persistent application pipeline from localStorage with shape validation
+  const [cards, setCards] = useState<ApplicationCard[]>(() =>
+    readLocalJson('jobpilot_cards', isApplicationCardList, INITIAL_CARDS)
+  );
 
   const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(() => {
-    try {
-      const saved = localStorage.getItem('jobpilot_applied_ids');
-      return saved ? new Set(JSON.parse(saved)) : new Set(['job-01', 'job-02', 'job-03']);
-    } catch {
-      return new Set(['job-01', 'job-02', 'job-03']);
-    }
+    const arr = readLocalJson('jobpilot_applied_ids', isStringArray, ['job-01', 'job-02', 'job-03']);
+    return new Set(arr);
   });
 
-  // Save changes to localStorage
+  // Save changes to localStorage with visible error reporting
   useEffect(() => {
-    try {
-      localStorage.setItem('jobpilot_cards', JSON.stringify(cards));
-      localStorage.setItem('jobpilot_applied_ids', JSON.stringify(Array.from(appliedJobIds)));
-      localStorage.setItem('jobpilot_candidate', JSON.stringify(candidate));
-    } catch {
-      // Storage unavailable or quota exceeded
-    }
+    let failed = false;
+    const tryWrite = (key: string, value: string) => {
+      try { localStorage.setItem(key, value); }
+      catch { failed = true; }
+    };
+    tryWrite('jobpilot_cards', JSON.stringify(cards));
+    tryWrite('jobpilot_applied_ids', JSON.stringify(Array.from(appliedJobIds)));
+    tryWrite('jobpilot_candidate', JSON.stringify(candidate));
+    setStorageError(failed);
   }, [cards, appliedJobIds, candidate]);
 
   const handleAddToPipeline = (job: JobListing) => {
@@ -97,25 +134,25 @@ export function App() {
   };
 
   const handleDirectApply = (job: JobListing) => {
-    // Real action: Open company careers / website URL and track in pipeline
-    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(job.company + ' ' + job.title + ' careers')}`;
-    window.open(searchUrl, '_blank');
+    // Open career search or direct job URL — does NOT falsely mark as applied
+    const destination = job.jobUrl || `https://www.google.com/search?q=${encodeURIComponent(job.company + ' ' + job.title + ' careers')}`;
+    window.open(destination, '_blank', 'noopener,noreferrer');
 
-    // Add to applied cards
-    setAppliedJobIds(new Set([...appliedJobIds, job.id]));
-    setCards((prev) => {
-      const exists = prev.find(c => c.job.id === job.id);
-      if (exists) {
-        return prev.map(c => c.job.id === job.id ? { ...c, status: 'OUTREACH_SENT', notes: 'Opened careers page.' } : c);
-      }
-      return [{
-        id: `app-${Date.now()}`,
-        job,
-        status: 'OUTREACH_SENT',
-        atsScore: job.atsMatchScore || 80,
-        notes: 'Opened company careers page.',
-      }, ...prev];
-    });
+    // Track in pipeline as DISCOVERED (not falsely as OUTREACH_SENT)
+    if (!appliedJobIds.has(job.id)) {
+      setAppliedJobIds(new Set([...appliedJobIds, job.id]));
+      setCards((prev) => {
+        const exists = prev.find(c => c.job.id === job.id);
+        if (exists) return prev;
+        return [{
+          id: `app-${Date.now()}`,
+          job,
+          status: 'DISCOVERED',
+          atsScore: job.atsMatchScore || 80,
+          notes: 'Opened careers page for review.',
+        }, ...prev];
+      });
+    }
   };
 
   const handleUpdateCardStatus = (cardId: string, nextStatus: KanbanStatus) => {
@@ -135,7 +172,18 @@ export function App() {
   };
 
   const handleRemoveCard = (cardId: string) => {
-    setCards((prev) => prev.filter((c) => c.id !== cardId));
+    setCards((prev) => {
+      const card = prev.find((c) => c.id === cardId);
+      if (card) {
+        // Clean up appliedJobIds so the job can be re-added later
+        setAppliedJobIds((ids) => {
+          const next = new Set(ids);
+          next.delete(card.job.id);
+          return next;
+        });
+      }
+      return prev.filter((c) => c.id !== cardId);
+    });
   };
 
   const handleLogOutreachSent = (job: JobListing, subject: string, body: string) => {
@@ -187,6 +235,17 @@ export function App() {
         applicationsCount={cards.length}
       />
 
+      {/* Storage Warning Banner */}
+      {storageError && (
+        <div
+          role="status"
+          className="bg-amber-950/60 border-b border-amber-900/60 text-amber-300 px-4 py-2 text-xs font-mono text-center flex items-center justify-center gap-2"
+        >
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
+          <span>Browser storage is unavailable or full; changes may not persist across sessions.</span>
+        </div>
+      )}
+
       {/* Main Container */}
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-16">
         {/* 2. Hero Section: Minimalist, Pure Black Engineering Aesthetic */}
@@ -196,7 +255,7 @@ export function App() {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span>Bangalore Tech Corridors · YC W24/S24 Startups</span>
             <span className="text-[#333333]">•</span>
-            <span className="text-white">Verified Founder Inboxes</span>
+            <span className="text-white">Founder Contact Directory</span>
           </div>
 
           {/* Headline */}
@@ -207,7 +266,7 @@ export function App() {
 
           {/* Subtitle */}
           <p className="text-sm sm:text-base text-[#888888] max-w-xl mx-auto font-sans leading-relaxed">
-            Index unadvertised seed roles across Indiranagar, Koramangala, and HSR Layout. Generate verified 4-part pitches with working Gmail links and real GitHub proof over generic CVs.
+            Index unadvertised seed roles across Indiranagar, Koramangala, and HSR Layout. Generate structured 4-part pitches with working Gmail links and real GitHub proof over generic CVs.
           </p>
 
           {/* Action Buttons */}
@@ -216,7 +275,7 @@ export function App() {
               onClick={scrollToDashboard}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black font-semibold text-xs transition-colors shadow-sm"
             >
-              <span>Explore 14 Verified Roles</span>
+              <span>Explore {jobs.length} Open Roles</span>
               <ArrowDown className="w-3.5 h-3.5" />
             </button>
 

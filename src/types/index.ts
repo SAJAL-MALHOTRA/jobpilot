@@ -1,3 +1,29 @@
+export interface ResumeBullet {
+  id: string;
+  role: string;
+  company: string;
+  text: string;
+  keywords: string[];
+}
+
+export interface ExperienceItem {
+  id: string;
+  company: string;
+  role: string;
+  location?: string;
+  period: string;
+  bullets: string[];
+}
+
+export interface EducationItem {
+  id: string;
+  institution: string;
+  degree: string;
+  field?: string;
+  score?: string;
+  period: string;
+}
+
 export interface CandidateProfile {
   id: string;
   fullName: string;
@@ -15,13 +41,9 @@ export interface CandidateProfile {
   githubUrl: string;
   linkedinUrl: string;
   portfolioUrl: string;
-  resumeBullets: {
-    id: string;
-    role: string;
-    company: string;
-    text: string;
-    keywords: string[];
-  }[];
+  resumeBullets: ResumeBullet[];
+  experienceHistory?: ExperienceItem[];
+  educationHistory?: EducationItem[];
 }
 
 export interface JobListing {
@@ -48,12 +70,15 @@ export interface JobListing {
   experienceDisplay?: string;
   salaryDisplay?: string;
   roleCategory?: string;
-  // Explee-grade prospecting & enrichment attributes
+  // Provenance & Enrichment attributes
   emailDeliverabilityPct?: number;
   fundingRound?: string;
   bangaloreCluster?: string;
   noticeBuyoutCovered?: boolean;
   jobUrl?: string;
+  lastVerified?: string;
+  verificationSource?: string;
+  contactConfidence?: 'Verified Founder Inbox' | 'High' | 'Direct Founder' | 'Medium';
   tags?: string[];
 }
 

@@ -80,6 +80,7 @@ export const PortfolioStudio: React.FC<PortfolioStudioProps> = ({
 
   useEffect(() => {
     fetchGitHubData(githubUsername);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCopyPitchProof = () => {

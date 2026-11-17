@@ -130,27 +130,27 @@ export const Footer: React.FC<FooterProps> = ({
             <ul className="space-y-2 text-xs text-[#7E869E]">
               <li>
                 <span className="hover:text-white transition-colors cursor-pointer">
-                  Zero-Data Gmail Privacy
+                  Local-First Browser Storage
                 </span>
               </li>
               <li>
                 <span className="hover:text-white transition-colors cursor-pointer">
-                  p99 Microservice Latency
+                  Client-Side Data Privacy
                 </span>
               </li>
               <li>
                 <span className="hover:text-white transition-colors cursor-pointer">
-                  Verified Founder Directory
+                  Curated Founder Directory
                 </span>
               </li>
               <li>
                 <span className="hover:text-white transition-colors cursor-pointer">
-                  SOC-2 Type II Certified
+                  Live GitHub REST Integration
                 </span>
               </li>
               <li>
                 <span className="hover:text-white transition-colors cursor-pointer">
-                  Playwright Headless Spec
+                  RFC 4180 CSV Export
                 </span>
               </li>
             </ul>

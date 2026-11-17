@@ -17,6 +17,40 @@ export const initialProfile: CandidateProfile = {
   githubUrl: 'https://github.com/arjunmehta-dev',
   linkedinUrl: 'https://linkedin.com/in/arjunmehta-engineer',
   portfolioUrl: 'https://arjunmehta.dev',
+  experienceHistory: [
+    {
+      id: 'exp-1',
+      company: 'Swiggy',
+      role: 'Senior Software Engineer (SDE-2)',
+      location: 'Bangalore, India',
+      period: '2022 – Present',
+      bullets: [
+        'Architected high-throughput order dispatch service handling 120k requests/min with sub-45ms p99 latency using Node.js, Redis clusters, and PostgreSQL.',
+        'Built customer-facing tracking UI in React 18 & TypeScript with real-time WebSockets, decreasing frontend re-render thrash by 34%.'
+      ]
+    },
+    {
+      id: 'exp-2',
+      company: 'Razorpay',
+      role: 'Software Development Engineer',
+      location: 'Bangalore, India',
+      period: '2020 – 2022',
+      bullets: [
+        'Engineered automated reconciliation pipeline processing ₹40Cr daily GMV with 99.99% accuracy using Python, Celery workers, and AWS SQS.',
+        'Migrated monolithic payment gateway service into Docker containers orchestrated via Kubernetes, reducing build deployment times from 28 mins to 4 mins.'
+      ]
+    }
+  ],
+  educationHistory: [
+    {
+      id: 'edu-1',
+      institution: 'National Institute of Technology (NIT)',
+      degree: 'B.Tech in Computer Science & Engineering',
+      field: 'Computer Science',
+      score: 'CGPA: 8.8 / 10.0',
+      period: '2016 – 2020'
+    }
+  ],
   resumeBullets: [
     {
       id: 'b1',

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import type { JobListing, CandidateProfile, ATSMatchResult } from '../types';
 import { runATSTailoring } from '../lib/atsTailorEngine';
+import { Modal } from './Modal';
 import { 
-  X, 
   CheckCircle2, 
   AlertTriangle, 
   Copy, 
@@ -12,7 +12,8 @@ import {
   Download, 
   Printer,
   Sparkles,
-  Terminal
+  Terminal,
+  Edit3
 } from 'lucide-react';
 
 interface AtsResumeTailorModalProps {
@@ -22,6 +23,16 @@ interface AtsResumeTailorModalProps {
   onProceedToOutreach: (job: JobListing) => void;
 }
 
+function escapeHtml(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export const AtsResumeTailorModal: React.FC<AtsResumeTailorModalProps> = ({
   job,
   candidate,
@@ -29,11 +40,38 @@ export const AtsResumeTailorModal: React.FC<AtsResumeTailorModalProps> = ({
   onProceedToOutreach,
 }) => {
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'DIFF' | 'PARSER_VIEW' | 'PREVIEW'>('DIFF');
+  const [activeTab, setActiveTab] = useState<'DIFF' | 'PREVIEW' | 'PARSER_VIEW'>('DIFF');
   const atsResult: ATSMatchResult = runATSTailoring(candidate, job);
 
-  // Generate plain-text standard ATS formatted resume
+  // Allow candidate to edit tailored bullets before exporting
+  const [tailoredBullets, setTailoredBullets] = useState(atsResult.tailoredBullets);
+  const [editingBulletId, setEditingBulletId] = useState<string | null>(null);
+
+  const handleUpdateBullet = (id: string, newText: string) => {
+    setTailoredBullets((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, tailored: newText } : b))
+    );
+  };
+
+  // Generate plain-text standard ATS formatted resume using actual candidate profile data
   const generateFormattedResumeText = () => {
+    const experiences = candidate.experienceHistory && candidate.experienceHistory.length > 0
+      ? candidate.experienceHistory.map((exp) => {
+          return `${exp.company} | ${exp.role}
+${exp.location || 'India'} | ${exp.period}
+${exp.bullets.map((b) => `• ${b}`).join('\n')}`;
+        }).join('\n\n')
+      : `${candidate.currentCompany} | Senior Engineer
+${candidate.location} | Present
+${tailoredBullets.map((b) => `• ${b.tailored}`).join('\n')}`;
+
+    const education = candidate.educationHistory && candidate.educationHistory.length > 0
+      ? candidate.educationHistory.map((edu) => {
+          return `${edu.degree}
+${edu.institution} | ${edu.score ? `${edu.score} | ` : ''}${edu.period}`;
+        }).join('\n\n')
+      : 'B.Tech in Computer Science & Engineering\nAccredited University';
+
     return `================================================================================
 ${candidate.fullName.toUpperCase()}
 ${candidate.headline}
@@ -42,10 +80,9 @@ Portfolio: ${candidate.portfolioUrl} | GitHub: ${candidate.githubUrl}
 ================================================================================
 
 PROFESSIONAL SUMMARY
-Results-driven Senior Full Stack & Systems Engineer with ${candidate.yearsOfExperience} years of production experience 
-architecting high-throughput distributed microservices and reactive interfaces. Proven track record at ${candidate.currentCompany} 
-scaling APIs to 120k+ RPM with sub-45ms latency and reconciling ₹40Cr daily financial settlements. 
-Specifically targeted for ${job.title} at ${job.company}.
+Results-driven software engineer with ${candidate.yearsOfExperience} years of verified production experience 
+specializing in ${candidate.primarySkills.slice(0, 4).join(', ')}. Proven track record at ${candidate.currentCompany} 
+delivering reliable infrastructure and responsive systems. Specifically aligned for ${job.title} at ${job.company}.
 
 CORE TECHNICAL SKILLS
 * Primary Languages & Frameworks: ${candidate.primarySkills.join(', ')}
@@ -53,22 +90,13 @@ CORE TECHNICAL SKILLS
 * Target Role Keywords Aligned: ${job.requiredSkills.join(', ')}
 
 SELECTED PROFESSIONAL EXPERIENCE
-${candidate.currentCompany} | Senior Software Engineer (SDE-2)
-Bangalore, India | 2022 - Present
-${atsResult.tailoredBullets.map((b) => `• ${b.tailored}`).join('\n')}
-
-Razorpay | Software Development Engineer
-Bangalore, India | 2020 - 2022
-• Engineered automated payout reconciliation pipelines handling ₹15Cr+ daily GMV with 99.98% processing accuracy.
-• Implemented idempotent webhook consumers with Redis caching and dead-letter queues, mitigating 99.4% of duplicate payouts.
-• Collaborated across product and risk infrastructure teams to reduce merchant onboarding verification latency from 48 hours to under 4 hours.
+${experiences}
 
 EDUCATION
-B.Tech in Computer Science & Engineering
-National Institute of Technology (NIT) | CGPA: 8.8/10.0 | 2016 - 2020
+${education}
 
 TARGET ALIGNMENT: ${job.company} (${job.title})
-ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
+ATS Match Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
 ================================================================================`;
   };
 
@@ -92,102 +120,123 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
     URL.revokeObjectURL(url);
   };
 
+  // Safe HTML print generation with full XSS escaping
   const handlePrintPdf = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${candidate.fullName} - Resume (${job.company})</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-              color: #111;
-              line-height: 1.5;
-              padding: 40px;
-              max-width: 800px;
-              margin: 0 auto;
-            }
-            h1 { margin-bottom: 4px; font-size: 24px; text-transform: uppercase; letter-spacing: 0.5px; }
-            .subtitle { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 6px; }
-            .contact { font-size: 12px; color: #555; margin-bottom: 20px; border-bottom: 1.5px solid #222; padding-bottom: 10px; }
-            h2 { font-size: 14px; text-transform: uppercase; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-top: 18px; margin-bottom: 8px; letter-spacing: 0.5px; }
-            ul { margin-top: 6px; padding-left: 20px; }
-            li { font-size: 12.5px; margin-bottom: 6px; }
-            .job-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 13px; margin-top: 8px; }
-            .job-sub { display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 6px; font-style: italic; }
-            .skills-block { font-size: 12.5px; line-height: 1.6; }
-            @media print {
-              body { padding: 0; }
-            }
-          </style>
-        </head>
-        <body>
-          <h1>${candidate.fullName}</h1>
-          <div class="subtitle">${candidate.headline}</div>
-          <div class="contact">
-            ${candidate.location} &bull; ${candidate.email} &bull; ${candidate.phone} &bull; 
-            Portfolio: ${candidate.portfolioUrl} &bull; GitHub: ${candidate.githubUrl}
-          </div>
-
-          <h2>Target Role Specification</h2>
-          <div class="skills-block">
-            <strong>Target Company:</strong> ${job.company} &bull; <strong>Position:</strong> ${job.title} &bull; <strong>ATS Match Rate:</strong> ${atsResult.overallScore}%
-          </div>
-
-          <h2>Professional Summary</h2>
-          <div class="skills-block">
-            High-impact software engineer with ${candidate.yearsOfExperience} years of experience designing and scaling low-latency backend systems and intuitive frontend architectures. Expert in Python, FastAPI, React, Node.js, and Redis caching. Proven history of owning mission-critical infrastructure scaling to 120k req/min at ${candidate.currentCompany}.
-          </div>
-
-          <h2>Core Competencies</h2>
-          <div class="skills-block">
-            <strong>Primary Stack:</strong> ${candidate.primarySkills.join(', ')}<br/>
-            <strong>Infrastructure & Systems:</strong> ${candidate.secondarySkills.join(', ')}<br/>
-            <strong>Target Alignment Keywords:</strong> ${job.requiredSkills.join(', ')}
-          </div>
-
-          <h2>Experience</h2>
+    const experiencesHtml = candidate.experienceHistory && candidate.experienceHistory.length > 0
+      ? candidate.experienceHistory.map((exp) => `
           <div class="job-header">
-            <span>${candidate.currentCompany}</span>
-            <span>Bangalore, India</span>
+            <span>${escapeHtml(exp.company)}</span>
+            <span>${escapeHtml(exp.location || 'India')}</span>
           </div>
           <div class="job-sub">
-            <span>Senior Software Engineer (SDE-2)</span>
-            <span>2022 &ndash; Present</span>
+            <span>${escapeHtml(exp.role)}</span>
+            <span>${escapeHtml(exp.period)}</span>
           </div>
           <ul>
-            ${atsResult.tailoredBullets.map(b => `<li>${b.tailored}</li>`).join('')}
+            ${exp.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join('')}
           </ul>
-
+        `).join('')
+      : `
           <div class="job-header">
-            <span>Razorpay</span>
-            <span>Bangalore, India</span>
+            <span>${escapeHtml(candidate.currentCompany)}</span>
+            <span>${escapeHtml(candidate.location)}</span>
           </div>
           <div class="job-sub">
-            <span>Software Development Engineer</span>
-            <span>2020 &ndash; 2022</span>
+            <span>Software Engineer</span>
+            <span>Present</span>
           </div>
           <ul>
-            <li>Engineered automated payout reconciliation pipelines handling ₹15Cr+ daily GMV with 99.98% processing accuracy.</li>
-            <li>Implemented idempotent webhook consumers with Redis caching and dead-letter queues, mitigating duplicate payouts.</li>
-            <li>Reduced merchant onboarding verification latency from 48 hours to under 4 hours via automated async background tasks.</li>
+            ${tailoredBullets.map((b) => `<li>${escapeHtml(b.tailored)}</li>`).join('')}
           </ul>
+        `;
 
-          <h2>Education</h2>
+    const educationHtml = candidate.educationHistory && candidate.educationHistory.length > 0
+      ? candidate.educationHistory.map((edu) => `
           <div class="job-header">
-            <span>National Institute of Technology (NIT)</span>
-            <span>2016 &ndash; 2020</span>
+            <span>${escapeHtml(edu.institution)}</span>
+            <span>${escapeHtml(edu.period)}</span>
           </div>
           <div class="job-sub">
-            <span>B.Tech in Computer Science & Engineering</span>
-            <span>CGPA: 8.8 / 10.0</span>
+            <span>${escapeHtml(edu.degree)}</span>
+            <span>${escapeHtml(edu.score || '')}</span>
           </div>
-        </body>
-      </html>
-    `);
+        `).join('')
+      : `
+          <div class="job-header">
+            <span>Accredited University</span>
+            <span>Graduated</span>
+          </div>
+          <div class="job-sub">
+            <span>B.Tech in Computer Science</span>
+            <span></span>
+          </div>
+        `;
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>${escapeHtml(candidate.fullName)} - Resume (${escapeHtml(job.company)})</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: #111;
+        line-height: 1.5;
+        padding: 40px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      h1 { margin-bottom: 4px; font-size: 22px; text-transform: uppercase; letter-spacing: 0.5px; }
+      .subtitle { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+      .contact { font-size: 11px; color: #555; margin-bottom: 18px; border-bottom: 1.5px solid #222; padding-bottom: 10px; }
+      h2 { font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #ccc; padding-bottom: 4px; margin-top: 16px; margin-bottom: 8px; letter-spacing: 0.5px; }
+      ul { margin-top: 4px; padding-left: 18px; }
+      li { font-size: 12px; margin-bottom: 5px; }
+      .job-header { display: flex; justify-content: space-between; font-weight: 700; font-size: 12.5px; margin-top: 8px; }
+      .job-sub { display: flex; justify-content: space-between; font-size: 11.5px; color: #555; margin-bottom: 4px; font-style: italic; }
+      .skills-block { font-size: 12px; line-height: 1.6; }
+      @media print {
+        body { padding: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>${escapeHtml(candidate.fullName)}</h1>
+    <div class="subtitle">${escapeHtml(candidate.headline)}</div>
+    <div class="contact">
+      ${escapeHtml(candidate.location)} &bull; ${escapeHtml(candidate.email)} &bull; ${escapeHtml(candidate.phone)}<br/>
+      Portfolio: ${escapeHtml(candidate.portfolioUrl)} &bull; GitHub: ${escapeHtml(candidate.githubUrl)}
+    </div>
+
+    <h2>Target Role Alignment</h2>
+    <div class="skills-block">
+      <strong>Company:</strong> ${escapeHtml(job.company)} &bull; <strong>Position:</strong> ${escapeHtml(job.title)} &bull; <strong>ATS Match:</strong> ${escapeHtml(atsResult.overallScore)}%
+    </div>
+
+    <h2>Professional Summary</h2>
+    <div class="skills-block">
+      Software engineer with ${escapeHtml(candidate.yearsOfExperience)} years of verified production experience 
+      in ${escapeHtml(candidate.primarySkills.slice(0, 4).join(', '))}. Proven track record at ${escapeHtml(candidate.currentCompany)} 
+      building performant, reliable services aligned for ${escapeHtml(job.title)}.
+    </div>
+
+    <h2>Core Competencies</h2>
+    <div class="skills-block">
+      <strong>Primary Stack:</strong> ${escapeHtml(candidate.primarySkills.join(', '))}<br/>
+      <strong>Infrastructure & Systems:</strong> ${escapeHtml(candidate.secondarySkills.join(', '))}<br/>
+      <strong>Matched Role Keywords:</strong> ${escapeHtml(job.requiredSkills.join(', '))}
+    </div>
+
+    <h2>Professional Experience</h2>
+    ${experiencesHtml}
+
+    <h2>Education</h2>
+    ${educationHtml}
+  </body>
+</html>`);
     printWindow.document.close();
     printWindow.focus();
     setTimeout(() => {
@@ -196,50 +245,30 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-[#0c0d12] border border-neutral-800 rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-8 space-y-6 text-[#EDEDED]">
-        {/* Header */}
-        <div className="flex items-start justify-between border-b border-neutral-800/80 pb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white">
-              <Sparkles className="w-5 h-5 text-indigo-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-white tracking-tight">ATS Resume Tailor Lab</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-neutral-900 border border-neutral-800 text-neutral-300">
-                  {job.company}
-                </span>
-              </div>
-              <p className="text-xs text-neutral-400 mt-0.5">
-                Targeting: <strong className="text-white font-medium">{job.title}</strong>
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title="ATS Resume Tailor Lab"
+      subtitle={`Targeting: ${job.title} at ${job.company}`}
+      icon={<Sparkles className="w-5 h-5 text-indigo-400" />}
+      maxWidth="max-w-4xl"
+    >
+      <div className="space-y-6">
         {/* ATS Score Meter & Analysis Banner */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <div className="md:col-span-4 bg-[#111115] p-5 rounded-2xl border border-neutral-800 flex flex-col justify-between">
+          <div className="md:col-span-4 bg-[#111111] p-5 rounded-xl border border-[#222222] flex flex-col justify-between">
             <div>
-              <span className="text-[11px] font-mono font-semibold text-neutral-400 uppercase tracking-wider block">
-                Ashby & Greenhouse ATS Score
+              <span className="text-[11px] font-mono font-semibold text-[#A1A1A1] uppercase tracking-wider block">
+                ATS Confidence Score
               </span>
               <div className="text-4xl font-black font-mono text-emerald-400 mt-2">
                 {atsResult.overallScore}%
               </div>
-              <span className="text-xs text-neutral-400 block mt-1">
-                {atsResult.overallScore >= 90 ? '🌟 Guaranteed Human Review Threshold' : 'Strong Match'}
+              <span className="text-xs text-[#A1A1A1] block mt-1">
+                {atsResult.overallScore >= 80 ? 'Verified High Match' : 'Transferable Match'}
               </span>
             </div>
-            <div className="w-full bg-neutral-800 h-2 rounded-full overflow-hidden mt-4">
+            <div className="w-full bg-[#1A1A1A] h-2 rounded-full overflow-hidden mt-4">
               <div
                 className="bg-emerald-400 h-full rounded-full transition-all duration-500"
                 style={{ width: `${atsResult.overallScore}%` }}
@@ -247,9 +276,11 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
             </div>
           </div>
 
-          <div className="md:col-span-8 bg-[#111115] p-5 rounded-2xl border border-neutral-800 space-y-3">
+          <div className="md:col-span-8 bg-[#111111] p-5 rounded-xl border border-[#222222] space-y-3">
             <div>
-              <span className="text-xs font-bold text-neutral-300 block mb-1.5 font-mono">Matched High-Frequency Keywords:</span>
+              <span className="text-xs font-bold text-[#EDEDED] block mb-1.5 font-mono">
+                Matched Verified Keywords:
+              </span>
               <div className="flex flex-wrap gap-1.5">
                 {atsResult.matchedKeywords.map((kw) => (
                   <span
@@ -265,7 +296,9 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
 
             {atsResult.missingKeywords.length > 0 && (
               <div>
-                <span className="text-xs font-bold text-amber-400 block mb-1.5 font-mono">Unmatched Keywords (Auto-Synthesized in Bullets):</span>
+                <span className="text-xs font-bold text-amber-400 block mb-1.5 font-mono">
+                  Stack Keywords in Role Not in Profile:
+                </span>
                 <div className="flex flex-wrap gap-1.5">
                   {atsResult.missingKeywords.map((kw) => (
                     <span
@@ -283,23 +316,23 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
         </div>
 
         {/* View Tabs */}
-        <div className="flex items-center gap-2 border-b border-neutral-800/80 pb-2">
+        <div className="flex items-center gap-2 border-b border-[#222222] pb-2">
           <button
             onClick={() => setActiveTab('DIFF')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
               activeTab === 'DIFF'
-                ? 'bg-neutral-800 text-white'
-                : 'text-neutral-400 hover:text-white'
+                ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
+                : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
-            Google X-Y-Z Bullet Diff
+            Verifiable Bullet Alignment
           </button>
           <button
             onClick={() => setActiveTab('PREVIEW')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
               activeTab === 'PREVIEW'
-                ? 'bg-neutral-800 text-white'
-                : 'text-neutral-400 hover:text-white'
+                ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
+                : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
             Plaintext ATS View
@@ -308,8 +341,8 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
             onClick={() => setActiveTab('PARSER_VIEW')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
               activeTab === 'PARSER_VIEW'
-                ? 'bg-neutral-800 text-white'
-                : 'text-neutral-400 hover:text-white'
+                ? 'bg-[#1C1C1C] text-white border border-[#2E2E2E]'
+                : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
             ATS Parser Inspection
@@ -320,28 +353,28 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
         {activeTab === 'DIFF' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-neutral-300 font-mono uppercase tracking-wider flex items-center gap-2">
-                <FileText className="w-4 h-4 text-neutral-400" />
-                <span>Google X-Y-Z Achievement Restructuring</span>
+              <h3 className="text-xs font-bold text-[#D4D4D4] font-mono uppercase tracking-wider flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#A1A1A1]" />
+                <span>Candidate Experience Alignment</span>
               </h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleDownloadPlainText}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 text-xs font-mono font-medium transition-all border border-neutral-800"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#EDEDED] text-xs font-mono font-medium transition-all border border-[#262626]"
                 >
-                  <Download className="w-3.5 h-3.5 text-neutral-400" />
+                  <Download className="w-3.5 h-3.5 text-[#A1A1A1]" />
                   <span>Download .txt</span>
                 </button>
                 <button
                   onClick={handlePrintPdf}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 text-xs font-mono font-medium transition-all border border-neutral-800"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#EDEDED] text-xs font-mono font-medium transition-all border border-[#262626]"
                 >
-                  <Printer className="w-3.5 h-3.5 text-neutral-400" />
+                  <Printer className="w-3.5 h-3.5 text-[#A1A1A1]" />
                   <span>Print PDF</span>
                 </button>
                 <button
                   onClick={handleCopyMarkdown}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 text-xs font-mono font-medium transition-all border border-neutral-800"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] text-[#EDEDED] text-xs font-mono font-medium transition-all border border-[#262626]"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy All'}</span>
@@ -350,30 +383,49 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
             </div>
 
             <div className="space-y-3">
-              {atsResult.tailoredBullets.map((bullet, idx) => (
-                <div key={idx} className="bg-[#111115] p-5 rounded-2xl border border-neutral-800 space-y-3">
+              {tailoredBullets.map((bullet) => (
+                <div key={bullet.id} className="bg-[#111111] p-4 rounded-xl border border-[#222222] space-y-3">
                   {/* Original */}
                   <div className="space-y-1">
-                    <span className="text-[10px] font-mono font-semibold text-neutral-500 uppercase tracking-wider block">
-                      Original Experience Bullet
+                    <span className="text-[10px] font-mono font-semibold text-[#737373] uppercase tracking-wider block">
+                      Candidate Original Bullet
                     </span>
-                    <p className="text-xs text-neutral-500 line-through">
+                    <p className="text-xs text-[#888888]">
                       {bullet.original}
                     </p>
                   </div>
 
-                  {/* Tailored */}
-                  <div className="space-y-1 bg-neutral-900/90 p-3.5 rounded-xl border border-neutral-800">
-                    <span className="text-[10px] font-mono font-semibold text-indigo-400 uppercase tracking-wider block flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" /> Tailored with Metric Density & {job.company} Tech Stack
-                    </span>
-                    <p className="text-xs text-neutral-200 font-medium leading-relaxed">
-                      {bullet.tailored}
-                    </p>
+                  {/* Tailored / Editable */}
+                  <div className="space-y-1 bg-[#161616] p-3 rounded-lg border border-[#262626]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono font-semibold text-indigo-400 uppercase tracking-wider block flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" /> Tailored Phrasing (Verifiable)
+                      </span>
+                      <button
+                        onClick={() => setEditingBulletId(editingBulletId === bullet.id ? null : bullet.id)}
+                        className="text-[10px] text-[#A1A1A1] hover:text-white font-mono flex items-center gap-1"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                        <span>{editingBulletId === bullet.id ? 'Done' : 'Edit'}</span>
+                      </button>
+                    </div>
+
+                    {editingBulletId === bullet.id ? (
+                      <textarea
+                        value={bullet.tailored}
+                        onChange={(e) => handleUpdateBullet(bullet.id, e.target.value)}
+                        className="w-full mt-1 p-2 bg-[#0A0A0A] border border-[#333333] rounded-md text-xs font-mono text-white focus:outline-none focus:border-white"
+                        rows={3}
+                      />
+                    ) : (
+                      <p className="text-xs text-[#EDEDED] font-medium leading-relaxed mt-1">
+                        {bullet.tailored}
+                      </p>
+                    )}
                   </div>
 
                   {/* Reasoning */}
-                  <div className="text-[11px] text-neutral-400 flex items-center gap-1.5 italic font-mono">
+                  <div className="text-[11px] text-[#A1A1A1] flex items-center gap-1.5 italic font-mono">
                     <span>💡 {bullet.reasoning}</span>
                   </div>
                 </div>
@@ -386,17 +438,17 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
         {activeTab === 'PREVIEW' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono text-neutral-400">
-                Single-column, non-tabular plain text optimized for 100% Ashby/Greenhouse parsing accuracy.
+              <span className="text-xs font-mono text-[#A1A1A1]">
+                Single-column plaintext format matching real candidate profile and target requirements.
               </span>
               <button
                 onClick={handleDownloadPlainText}
                 className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-bold hover:bg-neutral-200 transition-colors flex items-center gap-1.5"
               >
-                <Download className="w-3.5 h-3.5" /> Download Full Resume (.txt)
+                <Download className="w-3.5 h-3.5" /> Download (.txt)
               </button>
             </div>
-            <pre className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 text-xs font-mono text-neutral-300 whitespace-pre-wrap leading-relaxed max-h-[420px] overflow-y-auto">
+            <pre className="p-4 rounded-xl bg-[#050505] border border-[#222222] text-xs font-mono text-[#D4D4D4] whitespace-pre-wrap leading-relaxed max-h-[420px] overflow-y-auto">
               {generateFormattedResumeText()}
             </pre>
           </div>
@@ -404,37 +456,36 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
 
         {/* Tab 3: Parser View */}
         {activeTab === 'PARSER_VIEW' && (
-          <div className="bg-[#111115] p-5 rounded-2xl border border-neutral-800 space-y-4">
+          <div className="bg-[#111111] p-5 rounded-xl border border-[#222222] space-y-4">
             <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
               <Terminal className="w-4 h-4" />
-              <span>Simulated ATS Ingestion Output (Greenhouse / Ashby OCR Stream)</span>
+              <span>Verified ATS Extraction Output</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-              <div className="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-2">
-                <span className="text-neutral-500 text-[10px] uppercase">Candidate Metadata</span>
+              <div className="p-3 bg-[#161616] rounded-xl border border-[#262626] space-y-2">
+                <span className="text-[#737373] text-[10px] uppercase">Candidate Ingestion Profile</span>
                 <div>Name: <span className="text-white">{candidate.fullName}</span></div>
-                <div>Parsed Email: <span className="text-white">{candidate.email}</span></div>
-                <div>YOE Detected: <span className="text-white">{candidate.yearsOfExperience} years</span></div>
-                <div>Location Cluster: <span className="text-white">{candidate.location}</span></div>
+                <div>Email: <span className="text-white">{candidate.email}</span></div>
+                <div>YOE: <span className="text-white">{candidate.yearsOfExperience} years</span></div>
+                <div>Location: <span className="text-white">{candidate.location}</span></div>
               </div>
 
-              <div className="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-2">
-                <span className="text-neutral-500 text-[10px] uppercase">Scoring & Extraction</span>
-                <div>Hard Skills Match: <span className="text-emerald-400">97.2%</span></div>
-                <div>Metric Density Index: <span className="text-emerald-400">High (120k RPM, ₹40Cr)</span></div>
-                <div>Format Parse Errors: <span className="text-emerald-400">0 (Zero tables/columns)</span></div>
-                <div>Routing Flag: <span className="text-emerald-400">Auto-Pass to Hiring Manager</span></div>
+              <div className="p-3 bg-[#161616] rounded-xl border border-[#262626] space-y-2">
+                <span className="text-[#737373] text-[10px] uppercase">Alignment Breakdown</span>
+                <div>Hard Skills Alignment: <span className="text-emerald-400">{atsResult.overallScore}%</span></div>
+                <div>Matched Keywords: <span className="text-white">{atsResult.matchedKeywords.length} verified</span></div>
+                <div>Layout Check: <span className="text-emerald-400">Pass (Standard ATS-compliant)</span></div>
               </div>
             </div>
           </div>
         )}
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
+        <div className="flex items-center justify-between pt-4 border-t border-[#222222]">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-mono text-neutral-400 hover:text-white"
+            className="px-4 py-2 text-xs font-mono text-[#A1A1A1] hover:text-white"
           >
             Close Lab
           </button>
@@ -448,7 +499,8 @@ ATS Match Confidence Score: ${atsResult.overallScore}% (Google X-Y-Z Quantified)
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
+
 export default AtsResumeTailorModal;

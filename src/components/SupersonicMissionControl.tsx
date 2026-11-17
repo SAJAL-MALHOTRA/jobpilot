@@ -69,7 +69,6 @@ export const SupersonicMissionControl: React.FC<{ onExploreCluster?: (clusterNam
   onExploreCluster,
 }) => {
   const [selectedCluster, setSelectedCluster] = useState<ClusterNode>(STARTUP_CLUSTERS[0]);
-  const [telemetryTick, setTelemetryTick] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Background animated particle radar canvas
@@ -170,14 +169,6 @@ export const SupersonicMissionControl: React.FC<{ onExploreCluster?: (clusterNam
     };
   }, []);
 
-  // Real-time telemetry ticker
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTelemetryTick((prev) => prev + 1);
-    }, 2400);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <div className="rounded-xl border border-[#1F1F1F] bg-[#0A0A0A] overflow-hidden shadow-xl relative">
       {/* Background Radar Canvas */}
@@ -200,12 +191,12 @@ export const SupersonicMissionControl: React.FC<{ onExploreCluster?: (clusterNam
         <div className="flex items-center gap-4 text-xs font-mono text-[#888888]">
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-white font-medium">Direct Founder Inboxes</span>
+            <span className="text-white font-medium">Founder Directory</span>
           </div>
           <span className="text-[#333333]">•</span>
           <div className="flex items-center gap-1.5 text-[#888888]">
             <Activity className="w-3.5 h-3.5 text-[#888888]" />
-            <span>Telemetry Ping: {22 + (telemetryTick % 5)}ms</span>
+            <span>Interactive Simulator</span>
           </div>
         </div>
       </div>

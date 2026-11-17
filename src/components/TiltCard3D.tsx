@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 interface TiltCard3DProps {
   children: React.ReactNode;
@@ -14,9 +14,8 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
   onClick,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [transform, setTransform] = useState('perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)');
-  const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50, opacity: 0 });
-  const [isHovered, setIsHovered] = useState(false);
+  const glareRef = useRef<HTMLDivElement>(null);
+  const rafId = useRef<number | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -27,22 +26,33 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
     const rotX = (y - 0.5) * -maxTilt * 2;
     const rotY = (x - 0.5) * maxTilt * 2;
 
-    setTransform(`perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(8px) scale3d(1.01, 1.01, 1.01)`);
-    setGlarePosition({
-      x: x * 100,
-      y: y * 100,
-      opacity: 0.15,
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+    rafId.current = requestAnimationFrame(() => {
+      if (cardRef.current) {
+        cardRef.current.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(8px) scale3d(1.01, 1.01, 1.01)`;
+      }
+      if (glareRef.current) {
+        glareRef.current.style.opacity = '0.15';
+        glareRef.current.style.background = `radial-gradient(circle at ${(x * 100).toFixed(1)}% ${(y * 100).toFixed(1)}%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 65%)`;
+      }
     });
   };
 
   const handleMouseEnter = () => {
-    setIsHovered(true);
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'transform 0.08s ease-out';
+    }
   };
 
   const handleMouseLeave = () => {
-    setIsHovered(false);
-    setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)');
-    setGlarePosition(prev => ({ ...prev, opacity: 0 }));
+    if (rafId.current) cancelAnimationFrame(rafId.current);
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      cardRef.current.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)';
+    }
+    if (glareRef.current) {
+      glareRef.current.style.opacity = '0';
+    }
   };
 
   return (
@@ -53,19 +63,14 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
-        transform,
-        transition: isHovered ? 'transform 0.08s ease-out' : 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         transformStyle: 'preserve-3d',
       }}
       className={`relative will-change-transform ${className}`}
     >
-      {/* Dynamic Specular Sheen / Reflection Overlay */}
+      {/* Specular Sheen / Reflection Overlay updated via DOM ref */}
       <div
-        className="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-300 z-10"
-        style={{
-          opacity: glarePosition.opacity,
-          background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 65%)`,
-        }}
+        ref={glareRef}
+        className="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-300 z-10 opacity-0"
       />
       {children}
     </div>

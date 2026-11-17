@@ -8,8 +8,15 @@ import {
   MapPin, 
   ShieldCheck, 
   ExternalLink,
-  Keyboard
+  Keyboard,
+  BookmarkPlus
 } from 'lucide-react';
+
+interface SwipeHistoryEntry {
+  index: number;
+  direction: 'LEFT' | 'RIGHT';
+  job: JobListing;
+}
 
 interface CompanySwipeDeckProps {
   jobs: JobListing[];
@@ -17,6 +24,7 @@ interface CompanySwipeDeckProps {
   onPitch: (job: JobListing) => void;
   onTailorAts: (job: JobListing) => void;
   onAddToPipeline: (job: JobListing) => void;
+  onRemoveFromPipeline?: (jobId: string) => void;
   appliedJobIds: Set<string>;
 }
 
@@ -25,10 +33,11 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
   onPitch,
   onTailorAts,
   onAddToPipeline,
+  onRemoveFromPipeline,
   appliedJobIds,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [history, setHistory] = useState<number[]>([]);
+  const [history, setHistory] = useState<SwipeHistoryEntry[]>([]);
   const [swipeDirection, setSwipeDirection] = useState<'LEFT' | 'RIGHT' | null>(null);
   const [streak, setStreak] = useState(0);
   const [clusterFilter, setClusterFilter] = useState<'ALL' | 'BLR' | 'YC' | 'NOTICE'>('ALL');
@@ -47,6 +56,13 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
     return true;
   });
 
+  // Clamp index when filteredDeck changes
+  useEffect(() => {
+    if (currentIndex >= filteredDeck.length && filteredDeck.length > 0) {
+      setCurrentIndex(0);
+    }
+  }, [jobs, filteredDeck.length, currentIndex]);
+
   const activeJob = filteredDeck[currentIndex];
   const nextJob = filteredDeck[currentIndex + 1];
   const thirdJob = filteredDeck[currentIndex + 2];
@@ -63,28 +79,44 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
       setStreak(0);
     }
 
+    const currentEntry: SwipeHistoryEntry = {
+      index: currentIndex,
+      direction,
+      job: activeJob,
+    };
+
     setTimeout(() => {
-      setHistory((prev) => [...prev, currentIndex]);
+      setHistory((prev) => [...prev, currentEntry]);
       setCurrentIndex((prev) => prev + 1);
       setSwipeDirection(null);
       setDragOffset({ x: 0, y: 0 });
     }, 220);
   }, [activeJob, currentIndex, onAddToPipeline]);
 
-  const handleUndo = () => {
+  // True undo: restores card index AND reverses pipeline / applied ID change
+  const handleUndo = useCallback(() => {
     if (history.length === 0) return;
-    const lastIndex = history[history.length - 1];
+    const lastEntry = history[history.length - 1];
     setHistory((prev) => prev.slice(0, -1));
-    setCurrentIndex(lastIndex);
+    setCurrentIndex(lastEntry.index);
     setDragOffset({ x: 0, y: 0 });
     setSwipeDirection(null);
-  };
 
-  // Keyboard controls
+    // If undone action added card to pipeline, remove it
+    if (lastEntry.direction === 'RIGHT' && onRemoveFromPipeline) {
+      onRemoveFromPipeline(lastEntry.job.id);
+      setStreak((prev) => Math.max(0, prev - 1));
+    }
+  }, [history, onRemoveFromPipeline]);
+
+  // Keyboard controls with modal boundary protection
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      // Don't trigger if user is typing in an input, textarea, or select
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes((e.target as HTMLElement)?.tagName)) return;
+
+      // Don't trigger if any accessible modal dialog is open
+      if (document.querySelector('[role="dialog"]')) return;
 
       if (e.key === 'ArrowRight' || e.key === 'l' || e.key === 'L') {
         e.preventDefault();
@@ -103,7 +135,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleSwipe, activeJob, onPitch]);
+  }, [handleSwipe, handleUndo, activeJob, onPitch]);
 
   // Pointer drag event handlers
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -133,6 +165,12 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
     }
   };
 
+  // Safe cancel gesture: resets card position without committing a swipe
+  const handlePointerCancel = () => {
+    setIsDragging(false);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
   const rotation = dragOffset.x * 0.08;
   const isRightVote = dragOffset.x > 40;
   const isLeftVote = dragOffset.x < -40;
@@ -146,9 +184,9 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
             <span>⚡</span>
             <span>Discovery Deck</span>
           </span>
-          <span className="text-xs text-[#444444]">•</span>
-          <span className="text-xs font-mono text-[#888888]">
-            Card {Math.min(currentIndex + 1, filteredDeck.length)} of {filteredDeck.length}
+          <span className="text-xs text-[#555555]">•</span>
+          <span className="text-xs font-mono text-[#A1A1A1]">
+            Card {filteredDeck.length > 0 ? Math.min(currentIndex + 1, filteredDeck.length) : 0} of {filteredDeck.length}
           </span>
         </div>
 
@@ -157,7 +195,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
           <button
             onClick={() => { setClusterFilter('ALL'); setCurrentIndex(0); }}
             className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'ALL' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#888888] hover:text-white border border-[#222222]'
+              clusterFilter === 'ALL' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
             }`}
           >
             All
@@ -165,7 +203,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
           <button
             onClick={() => { setClusterFilter('BLR'); setCurrentIndex(0); }}
             className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'BLR' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#888888] hover:text-white border border-[#222222]'
+              clusterFilter === 'BLR' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
             }`}
           >
             Bangalore
@@ -173,7 +211,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
           <button
             onClick={() => { setClusterFilter('YC'); setCurrentIndex(0); }}
             className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'YC' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#888888] hover:text-white border border-[#222222]'
+              clusterFilter === 'YC' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
             }`}
           >
             YC
@@ -181,7 +219,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
           <button
             onClick={() => { setClusterFilter('NOTICE'); setCurrentIndex(0); }}
             className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'NOTICE' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#888888] hover:text-white border border-[#222222]'
+              clusterFilter === 'NOTICE' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
             }`}
           >
             Buyout
@@ -219,29 +257,29 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                 className="absolute inset-0 rounded-2xl bg-[#0A0A0A] border border-[#1E1E1E] pointer-events-none transition-transform duration-300 p-6 flex flex-col justify-between"
                 style={{
                   transform: 'scale(0.95) translateY(12px)',
-                  opacity: 0.85,
+                  opacity: 0.8,
                   zIndex: 2,
                 }}
               >
-                <div className="flex items-center justify-between text-xs font-mono text-[#666666]">
-                  <span className="font-bold text-white">{nextJob.company}</span>
-                  <span>{nextJob.location}</span>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl ${nextJob.logoColor} text-white font-bold flex items-center justify-center font-mono opacity-60`}>
+                    {nextJob.company.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white opacity-70">{nextJob.company}</h3>
+                    <p className="text-xs text-[#888888] font-mono">{nextJob.title}</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <h4 className="text-lg font-bold text-[#AAAAAA]">{nextJob.title}</h4>
-                  <p className="text-xs text-[#666666] font-mono mt-1">{nextJob.salaryDisplay || `₹${nextJob.minCtcLpa}-${nextJob.maxCtcLpa} LPA`}</p>
-                </div>
-                <div className="h-6" />
               </div>
             )}
 
-            {/* Active Card (Top) with Drag Physics */}
+            {/* Top Interactive Card */}
             <div
               ref={activeCardRef}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
               className={`absolute inset-0 rounded-2xl bg-[#0A0A0A] border border-[#262626] shadow-2xl p-6 flex flex-col justify-between cursor-grab active:cursor-grabbing transition-transform ${
                 isDragging ? 'duration-0' : 'duration-300 ease-out'
               }`}
@@ -261,7 +299,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                   className="absolute top-6 left-6 px-4 py-1.5 rounded-lg border-2 border-emerald-400 text-emerald-400 font-black text-sm tracking-widest uppercase rotate-[-12deg] pointer-events-none z-20 bg-emerald-950/40"
                   style={{ opacity: Math.min(1, Math.abs(dragOffset.x) / 80) }}
                 >
-                  PITCH / SAVE
+                  SAVE TO PIPELINE
                 </div>
               )}
               {isLeftVote && (
@@ -284,24 +322,25 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                       <div className="flex items-center gap-2">
                         <h3 className="font-extrabold text-base text-white">{activeJob.company}</h3>
                         <a
-                          href={`https://www.google.com/search?q=${encodeURIComponent(activeJob.company + ' careers')}`}
+                          href={activeJob.jobUrl || `https://www.google.com/search?q=${encodeURIComponent(activeJob.company + ' careers')}`}
                           target="_blank"
                           rel="noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-[#666666] hover:text-white transition-colors"
+                          className="text-[#A1A1A1] hover:text-white transition-colors"
+                          title="Open careers portal"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
                         </a>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-[#888888] font-mono mt-0.5">
+                      <div className="flex items-center gap-2 text-xs text-[#A1A1A1] font-mono mt-0.5">
                         <span className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-[#666666]" />
+                          <MapPin className="w-3 h-3 text-[#A1A1A1]" />
                           {activeJob.location}
                         </span>
                         {activeJob.fundingRound && (
                           <>
                             <span>•</span>
-                            <span className="text-[#AAAAAA]">{activeJob.fundingRound}</span>
+                            <span className="text-[#D4D4D4]">{activeJob.fundingRound}</span>
                           </>
                         )}
                       </div>
@@ -319,27 +358,19 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                   <h2 className="text-xl font-black text-white tracking-tight leading-snug">
                     {activeJob.title}
                   </h2>
-
-                  <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-                    <span className="px-2.5 py-1 rounded bg-[#141414] text-white font-bold border border-[#262626]">
+                  <div className="flex items-center gap-3 text-xs font-mono text-white">
+                    <span className="font-bold text-emerald-400">
                       {activeJob.salaryDisplay || `₹${activeJob.minCtcLpa}L–₹${activeJob.maxCtcLpa}L`}
                     </span>
-                    {activeJob.equityRange && (
-                      <span className="px-2 py-1 rounded bg-[#141414] text-[#888888] border border-[#222222]">
-                        {activeJob.equityRange}
-                      </span>
-                    )}
-                    {activeJob.noticeBuyoutCovered && (
-                      <span className="px-2 py-1 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-900/60 font-semibold flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3" />
-                        <span>Notice Buyout Covered</span>
-                      </span>
-                    )}
+                    <span className="text-[#555555]">•</span>
+                    <span className="text-[#A1A1A1]">{activeJob.experienceDisplay || '2-4 YOE'}</span>
+                    <span className="text-[#555555]">•</span>
+                    <span className="text-[#A1A1A1]">{activeJob.equityRange}</span>
                   </div>
                 </div>
 
-                {/* Description */}
-                <p className="text-xs text-[#AAAAAA] leading-relaxed line-clamp-3 font-sans">
+                {/* Description Snippet */}
+                <p className="text-xs text-[#D4D4D4] font-sans line-clamp-3 leading-relaxed">
                   {activeJob.description}
                 </p>
 
@@ -348,7 +379,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                   {activeJob.requiredSkills.map((skill) => (
                     <span
                       key={skill}
-                      className="px-2 py-0.5 rounded bg-[#111111] border border-[#222222] text-[11px] font-mono text-[#D4D4D4]"
+                      className="px-2.5 py-1 rounded-lg bg-[#141414] border border-[#222222] text-[#D4D4D4] text-[11px] font-mono"
                     >
                       {skill}
                     </span>
@@ -356,57 +387,50 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                 </div>
               </div>
 
-              {/* Card Bottom: Verified Founder Hook */}
-              <div className="pt-3 border-t border-[#1A1A1A] flex items-center justify-between text-xs font-mono">
-                <div>
-                  <span className="text-[10px] text-[#666666] block">Direct Founder Inbox:</span>
-                  <span className="text-white font-bold">{activeJob.founderName}</span>
-                  <span className="text-[#888888] ml-1">({activeJob.founderRole})</span>
+              {/* Card Bottom: Verified Founder Bar */}
+              <div className="pt-3 border-t border-[#1A1A1A] flex items-center justify-between text-xs font-mono text-[#A1A1A1]">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="text-white font-medium">{activeJob.founderName}</span>
+                  <span className="text-[10px] text-[#A1A1A1]">({activeJob.founderRole})</span>
                 </div>
 
-                <div className="text-right">
-                  <span className="text-[10px] text-[#666666] block">Status:</span>
-                  <span className={appliedJobIds.has(activeJob.id) ? 'text-emerald-400 font-bold' : 'text-[#888888]'}>
-                    {appliedJobIds.has(activeJob.id) ? '✓ In Pipeline' : 'Unreached'}
-                  </span>
+                <div className="flex items-center gap-1.5 text-[11px] text-[#A1A1A1]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>{activeJob.contactConfidence || 'Verified Founder Inbox'}</span>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          /* Empty Deck State */
-          <div className="w-full h-full rounded-2xl bg-[#0A0A0A] border border-[#1F1F1F] p-8 flex flex-col items-center justify-center text-center space-y-4">
-            <div className="w-12 h-12 rounded-full bg-[#141414] border border-[#262626] flex items-center justify-center text-xl">
-              🎯
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-white">Deck Completed!</h3>
-              <p className="text-xs text-[#888888] max-w-sm">
-                You've reviewed all curated startup roles for this category. Check your applications pipeline to track dispatched pitches.
-              </p>
-            </div>
+          <div className="text-center p-8 border border-dashed border-[#262626] rounded-2xl max-w-sm space-y-3 font-mono">
+            <span className="text-3xl">🎉</span>
+            <h3 className="font-bold text-white text-base">You've reached the end of the deck!</h3>
+            <p className="text-xs text-[#A1A1A1]">
+              All roles in this filter have been reviewed. Switch filters or reset the deck to review again.
+            </p>
             <button
               onClick={() => {
                 setCurrentIndex(0);
                 setHistory([]);
               }}
-              className="px-4 py-2 bg-white hover:bg-neutral-200 text-black font-bold text-xs rounded-lg transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 bg-white text-black text-xs font-bold rounded-lg hover:bg-neutral-200 transition-colors"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Deck</span>
+              Reset Deck
             </button>
           </div>
         )}
       </div>
 
       {/* Floating Action Controls Bar */}
-      <div className="flex items-center justify-center gap-4 pt-2">
+      <div className="flex items-center justify-center gap-3 pt-2">
         {/* Pass Button (Swipe Left) */}
         <button
           onClick={() => handleSwipe('LEFT')}
           disabled={!activeJob}
-          className="w-12 h-12 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#888888] hover:text-red-400 flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40"
-          title="Pass (Left Arrow)"
+          className="w-12 h-12 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#A1A1A1] hover:text-red-400 flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40"
+          title="Pass (Left Arrow or H)"
+          aria-label="Pass card"
         >
           <X className="w-5 h-5" />
         </button>
@@ -415,8 +439,9 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <button
           onClick={handleUndo}
           disabled={history.length === 0}
-          className="w-10 h-10 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#888888] hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-30"
-          title="Undo Last Swipe (Z)"
+          className="w-10 h-10 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#A1A1A1] hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-30"
+          title="Undo Last Swipe & Reverse (Z)"
+          aria-label="Undo last action"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -425,41 +450,59 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <button
           onClick={() => activeJob && onTailorAts(activeJob)}
           disabled={!activeJob}
-          className="w-10 h-10 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#888888] hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40"
+          className="w-10 h-10 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#A1A1A1] hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40"
           title="Tailor ATS Resume"
+          aria-label="Tailor ATS resume"
         >
           <FileText className="w-4 h-4" />
         </button>
 
-        {/* Pitch Founder / Swipe Right Button */}
+        {/* Save to Pipeline (Swipe Right) */}
+        <button
+          onClick={() => handleSwipe('RIGHT')}
+          disabled={!activeJob || appliedJobIds.has(activeJob.id)}
+          className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40 border ${
+            activeJob && appliedJobIds.has(activeJob.id)
+              ? 'bg-[#141414] text-emerald-400 border-emerald-500/30'
+              : 'bg-[#111111] hover:bg-[#1A1A1A] text-[#A1A1A1] hover:text-emerald-400 border-[#262626]'
+          }`}
+          title="Save to Pipeline (Right Arrow or L)"
+          aria-label="Save role to pipeline"
+        >
+          <BookmarkPlus className="w-5 h-5" />
+        </button>
+
+        {/* Pitch Founder Direct Action */}
         <button
           onClick={() => {
             if (!activeJob) return;
-            handleSwipe('RIGHT');
             onPitch(activeJob);
           }}
           disabled={!activeJob}
-          className="w-14 h-14 rounded-full bg-white hover:bg-neutral-200 text-black flex items-center justify-center transition-all shadow-lg active:scale-95 disabled:opacity-40"
-          title="Pitch Founder (Right Arrow)"
+          className="w-12 h-12 rounded-full bg-white hover:bg-neutral-200 text-black flex items-center justify-center transition-all shadow-lg active:scale-95 disabled:opacity-40"
+          title="Compose Founder Pitch (Space or Enter)"
+          aria-label="Compose founder pitch"
         >
-          <Send className="w-6 h-6 ml-0.5" />
+          <Send className="w-5 h-5 ml-0.5" />
         </button>
       </div>
 
-      {/* Keyboard Hint */}
-      <div className="flex items-center justify-center gap-4 text-[11px] font-mono text-[#666666] pt-1">
+      {/* Keyboard Controls Hint */}
+      <div className="flex items-center justify-center gap-3 text-[11px] font-mono text-[#A1A1A1] pt-1">
         <span className="flex items-center gap-1">
           <Keyboard className="w-3 h-3" />
           <span>← Pass</span>
         </span>
         <span>•</span>
-        <span>→ Pitch Founder</span>
+        <span>→ Save</span>
         <span>•</span>
-        <span>Z Undo</span>
+        <span>Space: Pitch</span>
+        <span>•</span>
+        <span>Z: Undo</span>
         {streak > 1 && (
           <>
             <span>•</span>
-            <span className="text-emerald-400 font-bold">🔥 {streak} Streak</span>
+            <span className="text-emerald-400 font-bold">🔥 {streak} Saved</span>
           </>
         )}
       </div>
