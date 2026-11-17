@@ -105,17 +105,17 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
   };
 
   return (
-    <div className="fixed inset-y-0 right-0 z-40 w-full max-w-lg bg-[#14151D] border-l border-[#242634] shadow-2xl flex flex-col text-[#EDEDED] font-sans animate-slide-in-right">
+    <div className="fixed inset-y-0 right-0 z-40 w-full max-w-lg bg-[#171A23] border-l border-[#292E3B] shadow-2xl flex flex-col text-[#F3F4F6] font-sans animate-slide-in-right">
       {/* Drawer Top Header */}
-      <div className="p-4 border-b border-[#212330] bg-[#171822] flex items-center justify-between">
+      <div className="p-4 border-b border-[#292E3B] bg-[#171A23] flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-[#1C1E2A] border border-[#2B2E40] flex items-center justify-center font-bold text-[#EDEDED] text-base shadow-sm shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-[#1D2230] border border-[#292E3B] flex items-center justify-center font-bold text-[#F3F4F6] text-base shadow-sm shrink-0">
             {job.company.charAt(0)}
           </div>
           <div className="min-w-0">
-            <h2 className="font-semibold text-sm text-white truncate leading-tight">{job.title}</h2>
-            <div className="flex items-center gap-2 text-xs text-[#8E909F] mt-0.5">
-              <span className="font-medium text-[#EDEDED] truncate">{job.company}</span>
+            <h2 className="font-semibold text-sm text-[#F3F4F6] truncate leading-tight">{job.title}</h2>
+            <div className="flex items-center gap-2 text-xs text-[#A1A8B8] mt-0.5">
+              <span className="font-medium text-[#F3F4F6] truncate">{job.company}</span>
               <span>·</span>
               <span className="truncate">{job.location}</span>
             </div>
@@ -124,7 +124,7 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
 
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg text-[#7C7E8D] hover:text-white hover:bg-[#202230] transition-colors"
+          className="p-1.5 rounded-lg text-[#737C90] hover:text-[#F3F4F6] hover:bg-[#1D2230] transition-colors"
           title="Close drawer (ESC)"
         >
           <X className="w-4 h-4" />
@@ -132,13 +132,13 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-[#212330] bg-[#121319] px-2 text-xs font-medium">
+      <div className="flex border-b border-[#292E3B] bg-[#0F1117] px-2 text-xs font-medium">
         <button
           onClick={() => setActiveTab('OVERVIEW')}
           className={`px-3 py-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
             activeTab === 'OVERVIEW'
-              ? 'border-[#5E6AD2] text-white font-semibold'
-              : 'border-transparent text-[#7C7E8D] hover:text-[#EDEDED]'
+              ? 'border-[#818CF8] text-[#F3F4F6] font-semibold'
+              : 'border-transparent text-[#737C90] hover:text-[#F3F4F6]'
           }`}
         >
           <Briefcase className="w-3.5 h-3.5" />
@@ -149,26 +149,26 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
           onClick={() => setActiveTab('PITCH')}
           className={`px-3 py-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
             activeTab === 'PITCH'
-              ? 'border-[#5E6AD2] text-white font-semibold'
-              : 'border-transparent text-[#7C7E8D] hover:text-[#EDEDED]'
+              ? 'border-[#818CF8] text-[#F3F4F6] font-semibold'
+              : 'border-transparent text-[#737C90] hover:text-[#F3F4F6]'
           }`}
         >
           <Send className="w-3.5 h-3.5" />
           <span>Pitch Founder</span>
-          {outreachLogged && <CheckCircle2 className="w-3 h-3 text-emerald-400" />}
+          {outreachLogged && <CheckCircle2 className="w-3 h-3 text-[#34D399]" />}
         </button>
 
         <button
           onClick={() => setActiveTab('ATS')}
           className={`px-3 py-2.5 transition-colors border-b-2 flex items-center gap-1.5 ${
             activeTab === 'ATS'
-              ? 'border-[#5E6AD2] text-white font-semibold'
-              : 'border-transparent text-[#7C7E8D] hover:text-[#EDEDED]'
+              ? 'border-[#818CF8] text-[#F3F4F6] font-semibold'
+              : 'border-transparent text-[#737C90] hover:text-[#F3F4F6]'
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
           <span>ATS Match</span>
-          <span className="text-[10px] font-mono px-1 rounded bg-[#1E202B] text-emerald-400">
+          <span className="text-[10px] font-mono px-1 rounded bg-[#1D2230] text-[#34D399]">
             {atsResult.overallScore}%
           </span>
         </button>
@@ -504,10 +504,10 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
       </div>
 
       {/* Drawer Bottom Action Bar */}
-      <div className="p-3 border-t border-[#212330] bg-[#121319] flex items-center gap-2">
+      <div className="p-3 border-t border-[#292E3B] bg-[#171A23] flex items-center gap-2">
         <button
           onClick={() => setActiveTab('PITCH')}
-          className="flex-1 py-2 px-3 rounded-lg bg-[#5E6AD2] hover:bg-[#6E7BEA] text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+          className="flex-1 py-2 px-3 rounded-lg bg-[#818CF8] hover:bg-[#9FA8FF] text-[#0F1117] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm"
         >
           <Send className="w-3.5 h-3.5" />
           <span>Contact Founder</span>
@@ -517,8 +517,8 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
           onClick={() => onAddToPipeline(job)}
           className={`flex-1 py-2 px-3 rounded-lg border text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
             isApplied
-              ? 'bg-[#1A1C26] border-[#2D3042] text-indigo-300'
-              : 'bg-[#1C1E29] hover:bg-[#242636] border-[#2E3144] text-white'
+              ? 'bg-[#1D2230] border-[#818CF8] text-[#818CF8]'
+              : 'bg-[#1D2230] hover:bg-[#222838] border-[#292E3B] text-[#F3F4F6]'
           }`}
         >
           <BookmarkPlus className="w-3.5 h-3.5" />
@@ -527,7 +527,7 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
 
         <button
           onClick={() => onDirectApply(job)}
-          className="p-2 rounded-lg bg-[#1C1E29] hover:bg-[#242636] border border-[#2E3144] text-[#8E92A8] hover:text-white transition-colors"
+          className="p-2 rounded-lg bg-[#1D2230] hover:bg-[#222838] border border-[#292E3B] text-[#737C90] hover:text-[#F3F4F6] transition-colors"
           title="Open career page or Google search"
         >
           <ExternalLink className="w-4 h-4" />

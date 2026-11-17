@@ -1,15 +1,13 @@
 import React from 'react';
 import type { JobListing, CandidateProfile } from '../types';
 import { 
-  Sparkles, 
   MapPin, 
   Send, 
   BookmarkPlus, 
-  Flame, 
-  ShieldCheck, 
   ArrowRight,
-  CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  Check
 } from 'lucide-react';
 
 interface OpportunityCardProps {
@@ -33,175 +31,202 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
   onOpenPitch,
   onDirectApply,
 }) => {
-  // Compute matching skills for transparency & trust
+  // Deterministic matching against candidate skills
   const candidateSkillsSet = new Set(
     [...candidate.primarySkills, ...candidate.secondarySkills].map((s) => s.toLowerCase().trim())
   );
+  
   const matchedSkills = job.requiredSkills.filter((skill) =>
     candidateSkillsSet.has(skill.toLowerCase().trim())
   );
-  const missingSkills = job.requiredSkills.filter(
-    (skill) => !candidateSkillsSet.has(skill.toLowerCase().trim())
-  );
+  
+  // Show 2 or 3 strongest matching skills
+  const topMatchedSkills = matchedSkills.slice(0, 3);
+  const remainingSkillsCount = matchedSkills.length > 3 ? matchedSkills.length - 3 : 0;
+
+  // Verified stage or YC batch
+  const isYcVerified = job.source.includes('YC');
+  const stageDisplay = isYcVerified 
+    ? job.source 
+    : (job.fundingRound && job.fundingRound !== 'Undisclosed' ? job.fundingRound : null);
+
+  // Consolidated compensation & equity
+  const compensationDisplay = job.salaryDisplay || (job.minCtcLpa && job.maxCtcLpa ? `₹${job.minCtcLpa}–${job.maxCtcLpa} LPA` : 'Undisclosed');
+  const hasEquity = job.equityRange && !job.equityRange.toLowerCase().includes('none');
+
+  // Handle keyboard activation for accessibility
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect(job);
+    }
+  };
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(job)}
-      className={`rounded-2xl border p-5 transition-all duration-200 cursor-pointer flex flex-col justify-between gap-4 ${
+      onKeyDown={handleKeyDown}
+      className={`group rounded-xl border p-4 text-left transition-all duration-150 flex flex-col justify-between gap-3 cursor-pointer outline-none ${
         isSelected
-          ? 'bg-[#181B26] border-[#5E6AD2] shadow-lg shadow-[#5E6AD2]/10 ring-1 ring-[#5E6AD2]/40'
-          : 'bg-[#13151F] border-[#222534] hover:border-[#353950] hover:bg-[#161824]'
+          ? 'bg-[#1D2230] border-[#818CF8] ring-1 ring-[#818CF8]/40 shadow-md'
+          : 'bg-[#171A23] border-[#292E3B] hover:bg-[#1D2230] hover:border-[#3E4558]'
       }`}
     >
-      {/* 1. Header: Company Brand & Opportunity Badges */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3.5 min-w-0">
-          <div className="w-11 h-11 rounded-xl bg-[#1D202E] border border-[#2E334A] flex items-center justify-center font-bold text-white text-sm shadow-sm shrink-0">
-            {job.company.charAt(0)}
-          </div>
-          <div className="min-w-0">
-            <h3 className="font-semibold text-base text-white tracking-tight leading-snug truncate group-hover:text-indigo-300">
-              {job.title}
-            </h3>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#8E92A8] mt-0.5">
-              <span className="font-medium text-[#EDEDED]">{job.company}</span>
-              <span>·</span>
-              <span className="flex items-center gap-1 truncate">
-                <MapPin className="w-3 h-3 text-[#71758A] shrink-0" />
-                <span>{job.bangaloreCluster || job.location}</span>
-              </span>
-              <span>·</span>
-              <span className="text-[#71758A]">{job.isRemote ? 'Remote Friendly' : 'In-Office'}</span>
+      <div className="space-y-2.5">
+        {/* 1. Role title and company */}
+        <div className="flex items-start justify-between gap-2.5">
+          <div className="flex items-start gap-2.5 min-w-0">
+            <div 
+              className="w-8 h-8 rounded-lg bg-[#1D2230] border border-[#292E3B] flex items-center justify-center font-bold text-xs text-[#F3F4F6] shrink-0 group-hover:border-[#3E4558] transition-colors"
+              title={`${job.company} logo`}
+            >
+              {job.company.charAt(0)}
+            </div>
+            <div className="min-w-0">
+              {/* Never truncate role titles */}
+              <h3 className="font-semibold text-sm sm:text-[15px] text-[#F3F4F6] leading-snug break-words">
+                {job.title}
+              </h3>
+              <p className="text-xs font-medium text-[#A1A8B8] mt-0.5">
+                {job.company}
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Opportunity Badges */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {job.atsMatchScore && job.atsMatchScore >= 80 && (
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-700/60 text-emerald-300 text-[11px] font-medium flex items-center gap-1 shadow-sm font-mono">
-              <Sparkles className="w-3 h-3 text-emerald-400" />
-              <span>{job.atsMatchScore}% Match</span>
-            </span>
-          )}
-          {job.source.includes('YC') && (
-            <span className="px-2 py-0.5 rounded-full bg-amber-950/40 border border-amber-700/50 text-amber-300 text-[11px] font-medium flex items-center gap-1 font-mono">
-              <Flame className="w-3 h-3 text-amber-400" />
-              <span>{job.source}</span>
-            </span>
-          )}
-          {job.noticeBuyoutCovered && (
-            <span className="px-2 py-0.5 rounded-full bg-purple-950/40 border border-purple-700/50 text-purple-300 text-[11px] font-medium font-mono">
-              Notice Buyout
+          {/* 2. Company stage or YC batch (when verified) */}
+          {stageDisplay && (
+            <span 
+              className={`px-2 py-0.5 rounded text-[11px] font-mono shrink-0 border ${
+                isYcVerified
+                  ? 'bg-[#FBBF24]/10 border-[#FBBF24]/30 text-[#FBBF24]'
+                  : 'bg-[#1D2230] border-[#292E3B] text-[#A1A8B8]'
+              }`}
+              title={isYcVerified ? 'Verified Y Combinator Batch' : 'Verified Funding Stage'}
+            >
+              {stageDisplay}
             </span>
           )}
         </div>
-      </div>
 
-      {/* 2. Middle: Compensation & Match Explanation (Trust & Intelligence) */}
-      <div className="space-y-3 pt-1">
-        {/* Compensation & Stage Row */}
-        <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-[#161824] border border-[#222638]">
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-wider text-[#686C80] font-medium">Compensation:</span>
-            <span className="font-semibold text-sm text-[#F0F2F8] font-mono">
-              {job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa} LPA`}
-            </span>
-            {job.equityRange && !job.equityRange.includes('None') && (
-              <span className="text-xs text-[#8E92A8] font-sans">
-                ({job.equityRange} Equity)
+        {/* 3. Location and working arrangement */}
+        <div className="flex items-center gap-1.5 text-xs text-[#737C90]">
+          <MapPin className="w-3.5 h-3.5 text-[#737C90] shrink-0" />
+          <span className="truncate">{job.bangaloreCluster || job.location}</span>
+          <span className="text-[#737C90]/60">·</span>
+          <span className="shrink-0">{job.isRemote ? 'Remote Friendly' : 'In-Office'}</span>
+        </div>
+
+        {/* 4. Compensation and equity (Consolidated compact row) */}
+        <div className="flex items-center gap-2 text-xs">
+          <span className="font-mono font-semibold text-[#F3F4F6]">
+            {compensationDisplay}
+          </span>
+          {hasEquity && (
+            <>
+              <span className="text-[#737C90]">·</span>
+              <span className="font-mono text-[#A1A8B8]">
+                {job.equityRange} Equity
               </span>
-            )}
-          </div>
-          <span className="text-xs text-[#8E92A8] font-medium">
-            {job.fundingRound}
+            </>
+          )}
+        </div>
+
+        {/* 5. Candidate match score with explanation */}
+        <div className="flex items-center gap-2 text-xs">
+          <span 
+            className="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-[#34D399]/10 border border-[#34D399]/30 text-[#34D399]"
+            title="Deterministic ATS skill match score"
+          >
+            {job.atsMatchScore || 70}% match
+          </span>
+          <span className="text-[11px] text-[#737C90] truncate">
+            {matchedSkills.length} of {job.requiredSkills.length} required skills matched
           </span>
         </div>
 
-        {/* Why Candidate Matches (Transparent Explanation) */}
-        <div className="p-3 rounded-xl bg-[#151722]/60 border border-[#202334] space-y-2">
-          <div className="flex items-center justify-between text-[11px]">
-            <span className="font-medium text-[#9CA0B6] flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Why you match:</span>
-            </span>
-            <span className="text-[#6D7185] font-mono">
-              {matchedSkills.length} of {job.requiredSkills.length} skills in your profile
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-1.5">
-            {matchedSkills.map((skill) => (
+        {/* 6. Two or three strongest matching skills as lightweight chips */}
+        {topMatchedSkills.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            {topMatchedSkills.map((skill) => (
               <span
                 key={skill}
-                className="px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-800/50 text-emerald-300 text-[11px] font-mono flex items-center gap-1"
+                className="px-2 py-0.5 rounded text-[11px] font-mono text-[#34D399] bg-[#34D399]/10 border border-[#34D399]/20 flex items-center gap-1"
               >
-                <span>✓</span>
+                <Check className="w-2.5 h-2.5" />
                 <span>{skill}</span>
               </span>
             ))}
-            {missingSkills.map((skill) => (
-              <span
-                key={skill}
-                className="px-2 py-0.5 rounded-md bg-[#1B1D28] border border-[#292D3E] text-[#787D94] text-[11px] font-mono"
-              >
-                {skill}
+            {remainingSkillsCount > 0 && (
+              <span className="text-[11px] font-mono text-[#737C90] px-1">
+                +{remainingSkillsCount} more
               </span>
-            ))}
+            )}
           </div>
-        </div>
+        )}
 
-        {/* Founder Verification Contact Note */}
-        <div className="flex items-center justify-between text-xs text-[#7B8096] pt-0.5">
-          <span className="flex items-center gap-1.5 truncate">
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span className="truncate">Direct Founder Reach: <strong className="text-[#EDEDED] font-normal">{job.founderName}</strong> ({job.founderRole})</span>
-          </span>
-          <span className="text-[11px] font-mono text-[#5E6377] shrink-0">
-            {job.postedDate}
-          </span>
+        {/* 7. Founder contact availability */}
+        <div className="flex items-center justify-between gap-2 text-xs text-[#737C90] pt-0.5">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#818CF8] shrink-0" />
+            <span className="truncate">
+              Direct Reach: <strong className="font-medium text-[#F3F4F6]">{job.founderName || 'Founding Team'}</strong> ({job.founderRole || 'Direct Channel'})
+            </span>
+          </div>
+          {job.contactConfidence && (
+            <span 
+              className="text-[10px] font-mono text-[#34D399] shrink-0 hidden sm:inline"
+              title="Verified outreach channel"
+            >
+              Verified
+            </span>
+          )}
         </div>
       </div>
 
-      {/* 3. Footer: Clear Human Action Buttons */}
+      {/* 8. Save, Contact and Details actions */}
       <div 
-        className="pt-3 border-t border-[#202334] flex items-center justify-between gap-2"
+        className="pt-2.5 border-t border-[#292E3B] flex items-center justify-between gap-2 mt-1"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2">
           <button
             onClick={() => onOpenPitch(job)}
-            className="px-3.5 py-1.5 rounded-lg bg-[#5E6AD2] hover:bg-[#6E7BEA] text-white text-xs font-medium flex items-center gap-1.5 transition-colors shadow-sm"
+            className="px-3 py-1.5 rounded-lg bg-[#818CF8] hover:bg-[#9FA8FF] text-[#0F1117] text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+            title="Compose direct pitch to founder"
           >
             <Send className="w-3.5 h-3.5" />
-            <span>Contact Founder</span>
+            <span>Contact</span>
           </button>
 
           <button
             onClick={() => onAddToPipeline(job)}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
+            className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
               isTracked
-                ? 'bg-indigo-950/40 border-indigo-800/60 text-indigo-300'
-                : 'bg-[#181A24] hover:bg-[#202332] border-[#292D3E] text-[#D0D3E2]'
+                ? 'bg-[#1D2230] border-[#818CF8] text-[#818CF8]'
+                : 'bg-[#171A23] hover:bg-[#1D2230] border-[#292E3B] text-[#A1A8B8] hover:text-[#F3F4F6]'
             }`}
+            title={isTracked ? 'Tracked in your pipeline CRM' : 'Save to pipeline'}
           >
             <BookmarkPlus className="w-3.5 h-3.5" />
-            <span>{isTracked ? 'Saved in Pipeline' : '+ Save'}</span>
+            <span>{isTracked ? 'Saved' : '+ Save'}</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => onDirectApply(job)}
-            className="p-1.5 rounded-lg text-[#8E92A8] hover:text-white hover:bg-[#1E2130] transition-colors"
-            title="Open direct job posting or company careers"
+            className="p-1.5 rounded-lg text-[#737C90] hover:text-[#F3F4F6] hover:bg-[#1D2230] transition-colors"
+            title="Open company application or careers page"
           >
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-3.5 h-3.5" />
           </button>
 
           <button
             onClick={() => onSelect(job)}
-            className="text-xs font-medium text-[#8E92A8] hover:text-white flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-[#1E2130]"
+            className="text-xs font-medium text-[#A1A8B8] hover:text-[#F3F4F6] flex items-center gap-1 transition-colors px-2 py-1 rounded-md hover:bg-[#1D2230]"
+            title="Open opportunity inspector drawer"
           >
             <span>Details</span>
             <ArrowRight className="w-3.5 h-3.5" />

@@ -5,12 +5,13 @@ import {
   Search, 
   MapPin, 
   Flame, 
-  ShieldCheck, 
   Table as TableIcon, 
   LayoutGrid, 
   BookmarkPlus, 
   ExternalLink,
-  Briefcase
+  Briefcase,
+  SlidersHorizontal,
+  ShieldCheck
 } from 'lucide-react';
 import type { CorridorFilter } from './WorkspaceSidebar';
 
@@ -57,10 +58,10 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
   const [viewMode, setViewMode] = useState<'CARDS' | 'TABLE'>('CARDS');
   const [sortBy, setSortBy] = useState<'MATCH' | 'SALARY' | 'RECENT'>('MATCH');
 
-  // Filter and sort opportunities
+  // Filter and sort opportunities deterministically
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
-      // 1. Search Query
+      // 1. Search Query across title, company, location, and skills
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -69,7 +70,7 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
         job.location.toLowerCase().includes(q) ||
         job.requiredSkills.some((s) => s.toLowerCase().includes(q));
 
-      // 2. Discipline
+      // 2. Discipline / Role Category
       const matchesDiscipline =
         selectedDiscipline === 'All Roles' ||
         job.roleCategory === selectedDiscipline ||
@@ -80,7 +81,7 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
         (selectedDiscipline === 'DevOps & SRE' && (job.title.toLowerCase().includes('devops') || job.title.toLowerCase().includes('reliability'))) ||
         (selectedDiscipline === 'Mobile' && job.title.toLowerCase().includes('mobile'));
 
-      // 3. Corridor Filter
+      // 3. Corridor / Opportunity Filter
       let matchesCorridor = true;
       if (corridorFilter === 'BLR') {
         matchesCorridor = job.location.toLowerCase().includes('bangalore') || job.location.toLowerCase().includes('bengaluru');
@@ -100,199 +101,240 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
     });
   }, [jobs, searchQuery, selectedDiscipline, corridorFilter, sortBy]);
 
-  // High-signal intelligence metrics
+  // Genuine application metrics from loaded data
   const highFitCount = jobs.filter((j) => (j.atsMatchScore || 0) >= 80).length;
-  const foundingCount = jobs.filter((j) => j.equityRange && j.equityRange.includes('%')).length;
+  const highEquityCount = jobs.filter((j) => j.equityRange && j.equityRange.includes('%') && !j.equityRange.includes('0.1%')).length;
+  const isAnyFilterActive = selectedDiscipline !== 'All Roles' || corridorFilter !== 'ALL' || searchQuery.trim().length > 0;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#0C0D13] text-[#EDEDED] overflow-y-auto selection:bg-[#5E6AD2]/30 selection:text-white">
-      <div className="max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6">
-        {/* 1. Header & Metric Highlights (Ramp & Mercury Style) */}
-        <div className="space-y-5">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-sans">
-                Discover opportunities
-              </h1>
-              <p className="text-sm text-[#8E92A8] mt-1 max-w-2xl">
-                Curated high-conviction startup roles across Bangalore & YC networks, matched to your engineering background.
-              </p>
-            </div>
-
-            {/* Quick Action Badges */}
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-[#181A26] border border-[#262A3C] text-xs text-[#9CA0B6] font-mono">
-                Candidate: <strong className="text-white font-medium">{candidate.fullName}</strong> ({candidate.yearsOfExperience}y)
-              </span>
-            </div>
+    <div className="flex-1 flex flex-col h-full bg-[#0F1117] text-[#F3F4F6] overflow-y-auto">
+      <div className="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-4">
+        
+        {/* 1. Page Header (Discover Opportunities + Unobtrusive Candidate Identity) */}
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F3F4F6] font-sans">
+              Discover Opportunities
+            </h1>
+            <p className="text-xs text-[#A1A8B8] mt-0.5">
+              Verified high-conviction startup roles matched deterministically to your engineering profile.
+            </p>
           </div>
 
-          {/* Ramp-style Intelligence Metric Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl bg-[#141622] border border-[#222538] flex flex-col justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-[#6F7388]">High Skill Match</span>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xl font-bold text-emerald-400 font-mono">{highFitCount} Roles</span>
-                <span className="text-[11px] text-[#8E92A8]">≥ 80% Fit</span>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-[#141622] border border-[#222538] flex flex-col justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-[#6F7388]">High Equity Roles</span>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xl font-bold text-indigo-300 font-mono">{foundingCount} Startups</span>
-                <span className="text-[11px] text-[#8E92A8]">Up to 1.5% Eq</span>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-[#141622] border border-[#222538] flex flex-col justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-[#6F7388]">Direct Reach</span>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xl font-bold text-white font-mono">100%</span>
-                <span className="text-[11px] text-emerald-400">Verified Inboxes</span>
-              </div>
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-[#141622] border border-[#222538] flex flex-col justify-between">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-[#6F7388]">Your Pipeline</span>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xl font-bold text-[#E0E2EC] font-mono">{cards.length} Tracked</span>
-                <span className="text-[11px] text-[#8E92A8]">In active CRM</span>
-              </div>
-            </div>
+          <div className="text-xs text-[#737C90] shrink-0 font-mono">
+            Candidate: <span className="text-[#A1A8B8] font-medium">{candidate.fullName}</span> · {candidate.yearsOfExperience}y exp
           </div>
         </div>
 
-        {/* 2. Ashby-style Filter & Search Command Bar */}
-        <div className="p-3 sm:p-4 rounded-2xl bg-[#13151F] border border-[#222536] space-y-3">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        {/* 2. Compact Horizontal Statistics Strip */}
+        <div className="flex flex-wrap items-center divide-y sm:divide-y-0 sm:divide-x divide-[#292E3B] rounded-xl bg-[#171A23] border border-[#292E3B] text-xs py-1 px-1">
+          <div className="flex items-center gap-2 px-3 py-1.5 w-full sm:w-auto">
+            <span className="text-[#737C90]">High Fit:</span>
+            <span className="font-mono font-semibold text-[#34D399]">{highFitCount} Roles</span>
+            <span className="text-[11px] text-[#737C90]">(≥80% match)</span>
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 w-full sm:w-auto">
+            <span className="text-[#737C90]">High Equity:</span>
+            <span className="font-mono font-semibold text-[#818CF8]">{highEquityCount} Startups</span>
+            <span className="text-[11px] text-[#737C90]">(≥1.0%)</span>
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 w-full sm:w-auto">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#818CF8] shrink-0" />
+            <span className="text-[#737C90]">Verified Inboxes:</span>
+            <span className="font-mono font-semibold text-[#F3F4F6]">100%</span>
+            <span className="text-[11px] text-[#34D399]">Direct Reach</span>
+          </div>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 w-full sm:w-auto">
+            <span className="text-[#737C90]">Pipeline:</span>
+            <span className="font-mono font-semibold text-[#F3F4F6]">{cards.length} Tracked</span>
+          </div>
+        </div>
+
+        {/* 3. Discovery Controls: Search, Sort, View, and Clean Filter Groups */}
+        <div className="rounded-xl bg-[#171A23] border border-[#292E3B] p-3 sm:p-4 space-y-3">
+          {/* Row A: Prominent Search + Sort + View Switcher */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5">
             {/* Search Input */}
             <div className="relative w-full sm:max-w-md">
-              <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#757990]" />
+              <Search className="absolute left-3 top-2.5 w-4 h-4 text-[#737C90]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by role title, startup name, or tech stack..."
-                className="w-full pl-10 pr-9 py-2 rounded-xl bg-[#181B28] border border-[#282C40] hover:border-[#3D425E] focus:border-[#5E6AD2] text-xs text-[#EDEDED] placeholder-[#757990] outline-none transition-colors"
+                className="w-full pl-9 pr-8 py-1.5 rounded-lg bg-[#0F1117] border border-[#292E3B] hover:border-[#3E4558] focus:border-[#818CF8] text-xs text-[#F3F4F6] placeholder-[#737C90] outline-none transition-colors"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-2.5 text-xs text-[#757990] hover:text-white"
+                  className="absolute right-2.5 top-2 text-xs text-[#737C90] hover:text-[#F3F4F6]"
+                  title="Clear search"
+                  aria-label="Clear search"
                 >
                   ✕
                 </button>
               )}
             </div>
 
-            {/* Sort & View Controls */}
+            {/* Sort & View Mode */}
             <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'MATCH' | 'SALARY' | 'RECENT')}
-                className="px-3 py-2 rounded-xl bg-[#181B28] border border-[#282C40] text-xs text-[#9CA0B6] outline-none hover:text-white transition-colors cursor-pointer"
-              >
-                <option value="MATCH">Sort: Highest Match</option>
-                <option value="SALARY">Sort: Compensation</option>
-                <option value="RECENT">Sort: Most Recent</option>
-              </select>
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'MATCH' | 'SALARY' | 'RECENT')}
+                  className="appearance-none pl-3 pr-8 py-1.5 rounded-lg bg-[#0F1117] border border-[#292E3B] text-xs text-[#A1A8B8] hover:text-[#F3F4F6] hover:border-[#3E4558] outline-none transition-colors cursor-pointer"
+                  title="Sort opportunities"
+                >
+                  <option value="MATCH">Sort: Highest Match</option>
+                  <option value="SALARY">Sort: Compensation</option>
+                  <option value="RECENT">Sort: Most Recent</option>
+                </select>
+                <SlidersHorizontal className="absolute right-2.5 top-2.5 w-3 h-3 text-[#737C90] pointer-events-none" />
+              </div>
 
-              {/* View Mode Toggle */}
-              <div className="flex items-center p-0.5 rounded-xl bg-[#181B28] border border-[#282C40]">
+              {/* View Toggle */}
+              <div className="flex items-center p-0.5 rounded-lg bg-[#0F1117] border border-[#292E3B]">
                 <button
                   onClick={() => setViewMode('CARDS')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${
                     viewMode === 'CARDS'
-                      ? 'bg-[#5E6AD2] text-white shadow-sm'
-                      : 'text-[#8E92A8] hover:text-white'
+                      ? 'bg-[#1D2230] text-[#F3F4F6] border border-[#3E4558]'
+                      : 'text-[#737C90] hover:text-[#A1A8B8]'
                   }`}
-                  title="Opportunity Cards"
+                  title="Grid view"
                 >
                   <LayoutGrid className="w-3.5 h-3.5" />
-                  <span>Cards</span>
+                  <span className="hidden sm:inline">Cards</span>
                 </button>
 
                 <button
                   onClick={() => setViewMode('TABLE')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all ${
                     viewMode === 'TABLE'
-                      ? 'bg-[#5E6AD2] text-white shadow-sm'
-                      : 'text-[#8E92A8] hover:text-white'
+                      ? 'bg-[#1D2230] text-[#F3F4F6] border border-[#3E4558]'
+                      : 'text-[#737C90] hover:text-[#A1A8B8]'
                   }`}
-                  title="Structured Table"
+                  title="Structured table view"
                 >
                   <TableIcon className="w-3.5 h-3.5" />
-                  <span>Table</span>
+                  <span className="hidden sm:inline">Table</span>
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Contextual Filter Pills (Ashby Style) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none pt-1">
-            {DISCIPLINES.map((discipline) => (
+          {/* Row B: Cleanly Grouped Filters */}
+          <div className="space-y-2 pt-2 border-t border-[#292E3B]">
+            {/* Group 1: Role Discipline Filters */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none">
+              <span className="text-[11px] font-medium text-[#737C90] uppercase tracking-wider shrink-0 mr-1">Role:</span>
+              {DISCIPLINES.map((discipline) => {
+                const isActive = selectedDiscipline === discipline;
+                return (
+                  <button
+                    key={discipline}
+                    onClick={() => setSelectedDiscipline(isActive && discipline !== 'All Roles' ? 'All Roles' : discipline)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-all ${
+                      isActive
+                        ? 'bg-[#1D2230] border border-[#818CF8] text-[#F3F4F6] shadow-sm'
+                        : 'bg-[#0F1117] border border-[#292E3B] text-[#737C90] hover:text-[#A1A8B8] hover:border-[#3E4558]'
+                    }`}
+                  >
+                    {discipline}
+                    {isActive && discipline !== 'All Roles' && (
+                      <span className="ml-1.5 text-[10px] text-[#A1A8B8] hover:text-white">✕</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Group 2: Corridor & Special Opportunity Filters */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none">
+              <span className="text-[11px] font-medium text-[#737C90] uppercase tracking-wider shrink-0 mr-1">Corridor:</span>
+
+              {/* Bangalore Corridors */}
               <button
-                key={discipline}
-                onClick={() => setSelectedDiscipline(discipline)}
-                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                  selectedDiscipline === discipline
-                    ? 'bg-[#5E6AD2] text-white shadow-sm'
-                    : 'bg-[#181A26] border border-[#25283A] text-[#8E92A8] hover:text-white hover:bg-[#202334]'
+                onClick={() => onSelectCorridorFilter(corridorFilter === 'BLR' ? 'ALL' : 'BLR')}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                  corridorFilter === 'BLR'
+                    ? 'bg-[#1D2230] border border-[#818CF8] text-[#F3F4F6]'
+                    : 'bg-[#0F1117] border border-[#292E3B] text-[#737C90] hover:text-[#A1A8B8]'
                 }`}
               >
-                {discipline}
+                <MapPin className="w-3 h-3 text-[#34D399]" />
+                <span>Bangalore Tech</span>
+                {corridorFilter === 'BLR' && <span className="ml-1 text-[10px] text-[#A1A8B8]">✕</span>}
               </button>
-            ))}
 
-            <div className="h-4 w-[1px] bg-[#282C40] mx-1 shrink-0" />
+              {/* YC Backed */}
+              <button
+                onClick={() => onSelectCorridorFilter(corridorFilter === 'YC' ? 'ALL' : 'YC')}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                  corridorFilter === 'YC'
+                    ? 'bg-[#1D2230] border border-[#818CF8] text-[#F3F4F6]'
+                    : 'bg-[#0F1117] border border-[#292E3B] text-[#737C90] hover:text-[#A1A8B8]'
+                }`}
+              >
+                <Flame className="w-3 h-3 text-[#FBBF24]" />
+                <span>YC Backed</span>
+                {corridorFilter === 'YC' && <span className="ml-1 text-[10px] text-[#A1A8B8]">✕</span>}
+              </button>
 
-            {/* Curated Corridor Shortcut Pills */}
-            <button
-              onClick={() => onSelectCorridorFilter(corridorFilter === 'BLR' ? 'ALL' : 'BLR')}
-              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1 transition-all ${
-                corridorFilter === 'BLR'
-                  ? 'bg-emerald-950/70 border border-emerald-600 text-emerald-300'
-                  : 'bg-[#181A26] border border-[#25283A] text-[#8E92A8] hover:text-white'
-              }`}
-            >
-              <MapPin className="w-3 h-3 text-emerald-400" />
-              <span>Bangalore Corridors</span>
-            </button>
+              {/* Remote Friendly */}
+              <button
+                onClick={() => onSelectCorridorFilter(corridorFilter === 'REMOTE' ? 'ALL' : 'REMOTE')}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                  corridorFilter === 'REMOTE'
+                    ? 'bg-[#1D2230] border border-[#818CF8] text-[#F3F4F6]'
+                    : 'bg-[#0F1117] border border-[#292E3B] text-[#737C90] hover:text-[#A1A8B8]'
+                }`}
+              >
+                <span>Remote Friendly</span>
+                {corridorFilter === 'REMOTE' && <span className="ml-1 text-[10px] text-[#A1A8B8]">✕</span>}
+              </button>
 
-            <button
-              onClick={() => onSelectCorridorFilter(corridorFilter === 'YC' ? 'ALL' : 'YC')}
-              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1 transition-all ${
-                corridorFilter === 'YC'
-                  ? 'bg-amber-950/70 border border-amber-600 text-amber-300'
-                  : 'bg-[#181A26] border border-[#25283A] text-[#8E92A8] hover:text-white'
-              }`}
-            >
-              <Flame className="w-3 h-3 text-amber-400" />
-              <span>YC Founders</span>
-            </button>
+              {/* Notice Buyout */}
+              <button
+                onClick={() => onSelectCorridorFilter(corridorFilter === 'NOTICE' ? 'ALL' : 'NOTICE')}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap flex items-center gap-1.5 transition-all ${
+                  corridorFilter === 'NOTICE'
+                    ? 'bg-[#1D2230] border border-[#818CF8] text-[#F3F4F6]'
+                    : 'bg-[#0F1117] border border-[#292E3B] text-[#737C90] hover:text-[#A1A8B8]'
+                }`}
+              >
+                <span>Notice Buyout</span>
+                {corridorFilter === 'NOTICE' && <span className="ml-1 text-[10px] text-[#A1A8B8]">✕</span>}
+              </button>
 
-            <button
-              onClick={() => onSelectCorridorFilter(corridorFilter === 'NOTICE' ? 'ALL' : 'NOTICE')}
-              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap flex items-center gap-1 transition-all ${
-                corridorFilter === 'NOTICE'
-                  ? 'bg-purple-950/70 border border-purple-600 text-purple-300'
-                  : 'bg-[#181A26] border border-[#25283A] text-[#8E92A8] hover:text-white'
-              }`}
-            >
-              <ShieldCheck className="w-3 h-3 text-purple-400" />
-              <span>Notice Buyout</span>
-            </button>
+              {/* Reset all active filters shortcut */}
+              {isAnyFilterActive && (
+                <button
+                  onClick={() => {
+                    setSelectedDiscipline('All Roles');
+                    onSelectCorridorFilter('ALL');
+                    setSearchQuery('');
+                  }}
+                  className="ml-auto text-[11px] text-[#737C90] hover:text-[#F3F4F6] underline decoration-dotted whitespace-nowrap"
+                  title="Clear all active filters and search"
+                >
+                  Reset filters
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* 3. Opportunities Presentation Area */}
+        {/* 4. Opportunities Presentation Area */}
         {filteredJobs.length === 0 ? (
-          <div className="py-24 text-center space-y-3 rounded-2xl bg-[#13151F] border border-[#222534] p-8">
-            <Briefcase className="w-8 h-8 text-[#5E6377] mx-auto" />
-            <h3 className="text-base font-semibold text-white">No matching opportunities found</h3>
-            <p className="text-xs text-[#8E92A8] max-w-sm mx-auto">
-              Try resetting your search query or discipline filter to see all active startup roles.
+          <div className="py-20 text-center space-y-3 rounded-xl bg-[#171A23] border border-[#292E3B] p-8">
+            <Briefcase className="w-8 h-8 text-[#737C90] mx-auto" />
+            <h3 className="text-sm font-semibold text-[#F3F4F6]">No matching opportunities found</h3>
+            <p className="text-xs text-[#737C90] max-w-sm mx-auto">
+              Try adjusting your search query, corridor, or discipline filter to view active roles.
             </p>
             <button
               onClick={() => {
@@ -300,16 +342,16 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
                 setSelectedDiscipline('All Roles');
                 onSelectCorridorFilter('ALL');
               }}
-              className="px-4 py-2 rounded-lg bg-[#5E6AD2] hover:bg-[#6E7BEA] text-white text-xs font-medium transition-colors"
+              className="px-3.5 py-1.5 rounded-lg bg-[#818CF8] hover:bg-[#9FA8FF] text-[#0F1117] text-xs font-semibold transition-colors"
             >
-              Reset Filters
+              Reset All Filters
             </button>
           </div>
         ) : (
           <>
-            {/* VIEW MODE A: ASHBY-STYLE OPPORTUNITY CARDS */}
+            {/* VIEW MODE A: COMPACT OPPORTUNITY CARDS (3 columns on xl, 2 on md, 1 on sm) */}
             {viewMode === 'CARDS' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
                 {filteredJobs.map((job) => (
                   <OpportunityCard
                     key={job.id}
@@ -326,12 +368,12 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
               </div>
             )}
 
-            {/* VIEW MODE B: REFINED LINEAR TABLE */}
+            {/* VIEW MODE B: REFINED STRUCTURED TABLE */}
             {viewMode === 'TABLE' && (
-              <div className="rounded-2xl border border-[#222536] bg-[#13151F] overflow-hidden shadow-lg">
+              <div className="rounded-xl border border-[#292E3B] bg-[#171A23] overflow-hidden shadow-sm">
                 <div className="min-w-[760px]">
                   {/* Table Header */}
-                  <div className="grid grid-cols-[minmax(240px,2fr)_minmax(140px,1.2fr)_minmax(180px,1.5fr)_minmax(130px,1fr)_100px_160px] px-5 py-3 text-xs font-medium uppercase tracking-wider text-[#6F7388] border-b border-[#222536] bg-[#161824]/60">
+                  <div className="grid grid-cols-[minmax(220px,2fr)_minmax(130px,1.2fr)_minmax(180px,1.5fr)_minmax(130px,1fr)_90px_150px] px-4 py-2.5 text-xs font-medium uppercase tracking-wider text-[#737C90] border-b border-[#292E3B] bg-[#1D2230]/70">
                     <div>Opportunity & Startup</div>
                     <div>Location</div>
                     <div>Why You Match</div>
@@ -341,7 +383,7 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
                   </div>
 
                   {/* Table Rows */}
-                  <div className="divide-y divide-[#1D202E]">
+                  <div className="divide-y divide-[#292E3B]">
                     {filteredJobs.map((job) => {
                       const isSelected = job.id === selectedJobId;
                       const isTracked = appliedJobIds.has(job.id);
@@ -349,39 +391,39 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
                         <div
                           key={job.id}
                           onClick={() => onSelectJob(job)}
-                          className={`grid grid-cols-[minmax(240px,2fr)_minmax(140px,1.2fr)_minmax(180px,1.5fr)_minmax(130px,1fr)_100px_160px] items-center px-5 py-3.5 cursor-pointer text-xs transition-colors duration-150 ${
+                          className={`grid grid-cols-[minmax(220px,2fr)_minmax(130px,1.2fr)_minmax(180px,1.5fr)_minmax(130px,1fr)_90px_150px] items-center px-4 py-3 cursor-pointer text-xs transition-colors duration-150 ${
                             isSelected
-                              ? 'bg-[#181B26] border-l-[3px] border-[#5E6AD2]'
-                              : 'hover:bg-[#161824]'
+                              ? 'bg-[#1D2230] border-l-[3px] border-[#818CF8]'
+                              : 'hover:bg-[#1D2230]'
                           }`}
                         >
                           {/* Role & Company */}
-                          <div className="flex items-center gap-3 min-w-0 pr-3">
-                            <div className="w-9 h-9 rounded-xl bg-[#1C1F2E] border border-[#2C3146] flex items-center justify-center font-bold text-white text-xs shrink-0 shadow-sm">
+                          <div className="flex items-center gap-2.5 min-w-0 pr-3">
+                            <div className="w-8 h-8 rounded-lg bg-[#1D2230] border border-[#292E3B] flex items-center justify-center font-bold text-[#F3F4F6] text-xs shrink-0">
                               {job.company.charAt(0)}
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-semibold text-white truncate hover:underline">{job.title}</span>
+                                <span className="font-semibold text-[#F3F4F6] truncate">{job.title}</span>
                                 {job.source.includes('YC') && (
-                                  <span className="px-1.5 py-0.2 rounded bg-amber-950/60 border border-amber-800/60 text-amber-300 text-[10px] font-mono shrink-0">
+                                  <span className="px-1.5 py-0.2 rounded bg-[#FBBF24]/10 border border-[#FBBF24]/30 text-[#FBBF24] text-[10px] font-mono shrink-0">
                                     YC
                                   </span>
                                 )}
                               </div>
-                              <div className="text-xs text-[#8E92A8] truncate mt-0.5">
-                                {job.company} · <span className="text-[#686C80]">{job.fundingRound}</span>
+                              <div className="text-xs text-[#A1A8B8] truncate mt-0.5">
+                                {job.company} {job.fundingRound ? `· ${job.fundingRound}` : ''}
                               </div>
                             </div>
                           </div>
 
                           {/* Location */}
-                          <div className="text-[#C0C3D4] min-w-0 pr-2">
+                          <div className="text-[#A1A8B8] min-w-0 pr-2">
                             <div className="truncate flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-[#6D7185] shrink-0" />
+                              <MapPin className="w-3 h-3 text-[#737C90] shrink-0" />
                               <span>{job.bangaloreCluster || job.location}</span>
                             </div>
-                            <span className="text-[11px] text-[#6D7185] block mt-0.5">
+                            <span className="text-[11px] text-[#737C90] block mt-0.5">
                               {job.isRemote ? 'Remote Friendly' : 'In-Office'}
                             </span>
                           </div>
@@ -391,27 +433,29 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
                             {job.requiredSkills.slice(0, 3).map((s) => (
                               <span
                                 key={s}
-                                className="px-2 py-0.5 rounded-md bg-[#181A26] border border-[#262A3C] text-[11px] text-[#A6AABF] font-mono"
+                                className="px-1.5 py-0.5 rounded text-[10px] font-mono text-[#34D399] bg-[#34D399]/10 border border-[#34D399]/20"
                               >
                                 {s}
                               </span>
                             ))}
                             {job.requiredSkills.length > 3 && (
-                              <span className="px-1.5 py-0.5 rounded bg-[#161824] border border-[#222536] text-[10px] text-[#6D7185] font-mono">
+                              <span className="text-[10px] text-[#737C90] font-mono">
                                 +{job.requiredSkills.length - 3}
                               </span>
                             )}
                           </div>
 
                           {/* Compensation */}
-                          <div className="font-mono text-xs text-[#EDEDED] pr-2">
+                          <div className="font-mono text-xs text-[#F3F4F6] pr-2">
                             <span className="font-semibold">{job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa} LPA`}</span>
-                            <span className="block text-[11px] text-[#71758A] font-sans">{job.equityRange}</span>
+                            {job.equityRange && !job.equityRange.toLowerCase().includes('none') && (
+                              <span className="block text-[11px] text-[#737C90] font-sans">{job.equityRange}</span>
+                            )}
                           </div>
 
                           {/* Match */}
                           <div>
-                            <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-emerald-950/50 border border-emerald-700/60 text-emerald-300 font-medium">
+                            <span className="font-mono text-xs px-2 py-0.5 rounded bg-[#34D399]/10 border border-[#34D399]/30 text-[#34D399] font-medium">
                               {job.atsMatchScore}%
                             </span>
                           </div>
@@ -420,17 +464,18 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
                           <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
                             <button
                               onClick={() => onOpenPitch(job)}
-                              className="px-2.5 py-1 rounded-lg bg-[#5E6AD2] hover:bg-[#6E7BEA] text-white text-xs font-medium transition-colors"
+                              className="px-2.5 py-1 rounded-md bg-[#818CF8] hover:bg-[#9FA8FF] text-[#0F1117] text-xs font-semibold transition-colors"
+                              title="Compose cold email to founder"
                             >
                               Pitch
                             </button>
 
                             <button
                               onClick={() => onAddToPipeline(job)}
-                              className={`p-1.5 rounded-lg border transition-colors ${
+                              className={`p-1.5 rounded-md border transition-colors ${
                                 isTracked
-                                  ? 'bg-indigo-950/40 border-indigo-800 text-indigo-300'
-                                  : 'bg-[#181A26] hover:bg-[#202334] border-[#282C40] text-[#8E92A8] hover:text-white'
+                                  ? 'bg-[#1D2230] border-[#818CF8] text-[#818CF8]'
+                                  : 'bg-[#171A23] hover:bg-[#1D2230] border-[#292E3B] text-[#737C90] hover:text-[#F3F4F6]'
                               }`}
                               title={isTracked ? 'Saved in Pipeline' : 'Save to Pipeline'}
                             >
@@ -439,8 +484,8 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
 
                             <button
                               onClick={() => onDirectApply(job)}
-                              className="p-1.5 rounded-lg hover:bg-[#202334] text-[#8E92A8] hover:text-white transition-colors"
-                              title="Direct Apply URL"
+                              className="p-1.5 rounded-md text-[#737C90] hover:text-[#F3F4F6] hover:bg-[#1D2230] transition-colors"
+                              title="Open application link"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                             </button>
