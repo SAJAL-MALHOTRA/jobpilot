@@ -111,6 +111,319 @@
   }
 }
 
+/* ==========================================================================
+   Tactile Dark Skeuomorphism System (Neo-Skeuomorphic Hardware Styling)
+   ========================================================================== */
+
+/* Physical extruded metallic/dark surface with top specular highlight */
+.skeuo-surface {
+  background: linear-gradient(180deg, #18181B 0%, #0C0C0E 100%);
+  border: 1px solid #27272A;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 10px 25px -5px rgba(0, 0, 0, 0.8),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Deep recessed chassis tray/well */
+.skeuo-well {
+  background: #08080A;
+  border: 1px solid #18181B;
+  box-shadow: 
+    inset 0 2px 5px 0 rgba(0, 0, 0, 0.85),
+    inset 0 1px 1px 0 rgba(0, 0, 0, 0.95),
+    0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Mechanical dark push-button with 3D bevel and active click depth */
+.skeuo-btn {
+  background: linear-gradient(180deg, #222226 0%, #121215 100%);
+  border: 1px solid #2E2E34;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
+    0 2px 0 0 #000000,
+    0 4px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.skeuo-btn:hover {
+  background: linear-gradient(180deg, #28282E 0%, #161619 100%);
+  border-color: #3B3B42;
+}
+
+.skeuo-btn:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 0 0 #000000;
+}
+
+/* Machined aluminum / pearl white primary tactile button */
+.skeuo-btn-primary {
+  background: linear-gradient(180deg, #FFFFFF 0%, #D4D4D8 100%);
+  color: #09090B;
+  border: 1px solid #E4E4E7;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 2px 0 0 #71717A,
+    0 5px 12px rgba(0, 0, 0, 0.6);
+  font-weight: 600;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.skeuo-btn-primary:hover {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E4E4E7 100%);
+}
+
+.skeuo-btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 0 0 0 #71717A;
+}
+
+/* Tactile executive smart card / physical deck card */
+.skeuo-card {
+  background: linear-gradient(165deg, #18181C 0%, #0D0D10 60%, #08080A 100%);
+  border: 1px solid #27272E;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 24px 48px -12px rgba(0, 0, 0, 0.9),
+    0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Embossed tactile pill/badge */
+.skeuo-badge {
+  background: linear-gradient(180deg, #1C1C20 0%, #101013 100%);
+  border: 1px solid #28282F;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Physical convex glass jewel LED indicators */
+.skeuo-led-green {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #86EFAC 0%, #22C55E 45%, #15803D 100%);
+  box-shadow: 
+    0 0 8px 1px rgba(34, 197, 94, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.skeuo-led-amber {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #FDE68A 0%, #F59E0B 45%, #B45309 100%);
+  box-shadow: 
+    0 0 8px 1px rgba(245, 158, 11, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.skeuo-led-blue {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #93C5FD 0%, #3B82F6 45%, #1D4ED8 100%);
+  box-shadow: 
+    0 0 8px 1px rgba(59, 130, 246, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.skeuo-led-red {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #FCA5A5 0%, #EF4444 45%, #B91C1C 100%);
+  box-shadow: 
+    0 0 8px 1px rgba(239, 68, 68, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+/* Metallic cyan hardware primary push-button */
+.skeuo-btn-cyan {
+  background: linear-gradient(180deg, #5AD4F5 0%, #38B8E0 100%);
+  color: #031117;
+  border: 1px solid #75DCF8;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8),
+    0 2px 0 0 #0284C7,
+    0 5px 12px rgba(0, 0, 0, 0.6);
+  font-weight: 600;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.skeuo-btn-cyan:hover {
+  background: linear-gradient(180deg, #6EE0FD 0%, #40C2EB 100%);
+}
+
+.skeuo-btn-cyan:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 0 0 0 #0284C7;
+}
+
+/* Mechanical hardware keycap action buttons */
+.skeuo-keycap {
+  background: linear-gradient(180deg, #24242A 0%, #121215 100%);
+  border: 1px solid #303038;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
+    0 2px 0 0 #000000,
+    0 4px 8px rgba(0, 0, 0, 0.6);
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.skeuo-keycap:hover {
+  background: linear-gradient(180deg, #2C2C33 0%, #17171C 100%);
+  border-color: #3D3D48;
+}
+
+.skeuo-keycap:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.75),
+    0 0 0 0 #000000;
+}
+
+.skeuo-keycap-primary {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E2E8 100%);
+  border: 1px solid #EFEFF3;
+  color: #09090B;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 2px 0 0 #52525B,
+    0 6px 14px rgba(0, 0, 0, 0.6);
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.skeuo-keycap-primary:hover {
+  background: linear-gradient(180deg, #FFFFFF 0%, #EDEDF2 100%);
+}
+
+.skeuo-keycap-primary:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 0 0 #52525B;
+}
+
+/* Recessed equipment slot for Kanban columns */
+.skeuo-slot {
+  background: linear-gradient(180deg, #0A0A0E 0%, #060608 100%);
+  border: 1px solid #1C1C22;
+  box-shadow: 
+    inset 0 2px 6px 0 rgba(0, 0, 0, 0.9),
+    inset 0 1px 1px 0 rgba(0, 0, 0, 0.95),
+    0 1px 0 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Tactile index cards */
+.skeuo-index-card {
+  background: linear-gradient(175deg, #18181D 0%, #111115 65%, #0E0E12 100%);
+  border: 1px solid #27272F;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 2px 0 0 #000000,
+    0 4px 10px rgba(0, 0, 0, 0.45);
+  transition: all 0.15s ease;
+}
+
+.skeuo-index-card:hover {
+  border-color: #383844;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
+    0 3px 0 0 #000000,
+    0 6px 14px rgba(0, 0, 0, 0.6);
+}
+
+/* Physical tag badge */
+.skeuo-tag {
+  background: linear-gradient(180deg, #1E1E24 0%, #131317 100%);
+  border: 1px solid #2C2C35;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Hardware countersunk screw detail */
+.skeuo-screw {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #3F3F46 0%, #18181B 75%, #09090B 100%);
+  box-shadow: 
+    inset 0 1px 1.5px rgba(0, 0, 0, 0.95),
+    0 1px 0 rgba(255, 255, 255, 0.15);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeuo-screw::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.85);
+  box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.15);
+}
+
+.skeuo-screw::after {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.85);
+  box-shadow: 0.5px 0 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Physical rubber ink stamp look */
+.skeuo-stamp-save {
+  border: 3px solid #10B981;
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 
+    0 0 16px rgba(16, 185, 129, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  border-radius: 8px;
+}
+
+.skeuo-stamp-pass {
+  border: 3px solid #EF4444;
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.1);
+  box-shadow: 
+    0 0 16px rgba(239, 68, 68, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  border-radius: 8px;
+}
+
 /* Print stylesheet for ATS Resume printing */
 @media print {
   body {

@@ -68,19 +68,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={() => handleNavClick('RADAR')}
-              className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white rounded-lg"
+              className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white rounded-lg active:translate-y-[1px]"
               aria-label="JobPilot Home"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xs font-black text-black transition-transform group-hover:scale-105">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg skeuo-btn-primary text-xs font-black text-black transition-transform group-hover:scale-105 active:translate-y-[2px] active:shadow-none">
                 JP
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <span className="text-base font-extrabold tracking-tight text-white">
                     JobPilot
                   </span>
-                  <span className="rounded border border-[#262626] bg-[#141414] px-1.5 py-0.5 font-mono text-[10px] font-medium text-[#888888]">
-                    WORKSPACE
+                  <span className="inline-flex items-center gap-1.5 skeuo-badge rounded-md px-2 py-0.5 font-mono text-[10px] font-medium text-[#D4D4D4]">
+                    <span className="skeuo-led-green" />
+                    <span>WORKSPACE</span>
                   </span>
                 </div>
               </div>
@@ -90,14 +91,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Desktop Navigation Pills */}
           <nav 
             aria-label="Main Navigation" 
-            className="hidden md:flex items-center gap-1 rounded-full border border-[#222222] bg-[#0A0A0A] p-1 text-xs font-medium"
+            className="hidden md:flex items-center gap-1 rounded-full skeuo-well p-1 text-xs font-medium"
           >
             <button
               onClick={() => handleNavClick('RADAR')}
               className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
                 activeTab === 'RADAR'
-                  ? 'bg-white font-semibold text-black shadow-sm'
-                  : 'text-[#888888] hover:text-white'
+                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
               }`}
             >
               Sample Roles
@@ -107,8 +108,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleNavClick('OUTREACH')}
               className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
                 activeTab === 'OUTREACH'
-                  ? 'bg-white font-semibold text-black shadow-sm'
-                  : 'text-[#888888] hover:text-white'
+                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
               }`}
             >
               Founder Pitches
@@ -118,8 +119,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleNavClick('ATS_LAB')}
               className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
                 activeTab === 'ATS_LAB'
-                  ? 'bg-white font-semibold text-black shadow-sm'
-                  : 'text-[#888888] hover:text-white'
+                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
               }`}
             >
               ATS Resume
@@ -129,8 +130,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleNavClick('PORTFOLIO')}
               className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
                 activeTab === 'PORTFOLIO'
-                  ? 'bg-white font-semibold text-black shadow-sm'
-                  : 'text-[#888888] hover:text-white'
+                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
               }`}
             >
               GitHub Importer
@@ -140,13 +141,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleNavClick('CRM')}
               className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
                 activeTab === 'CRM'
-                  ? 'bg-white font-semibold text-black shadow-sm'
-                  : 'text-[#888888] hover:text-white'
+                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
               }`}
             >
               <span>Tracker</span>
               {applicationsCount > 0 && (
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
+                <span className={`flex h-4 min-w-4 px-1 items-center justify-center rounded-full text-[10px] font-bold ${
+                  activeTab === 'CRM' ? 'bg-[#09090B] text-white shadow-inner' : 'bg-white text-black'
+                }`}>
                   {applicationsCount}
                 </span>
               )}
@@ -154,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={handleFaqClick}
-              className="rounded-full px-3 py-1.5 text-[#888888] transition-all hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+              className="rounded-full px-3 py-1.5 text-[#888888] transition-all hover:text-white hover:bg-white/5 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
             >
               FAQ
             </button>
@@ -165,10 +168,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Candidate Profile Button */}
             <button
               onClick={onOpenProfile}
-              className="flex items-center gap-2 rounded-full border border-[#222222] bg-[#0A0A0A] py-1.5 pl-2 pr-3 text-xs transition-all hover:bg-[#141414] hover:border-[#333333] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white shadow-sm"
+              className="skeuo-btn flex items-center gap-2 rounded-full py-1.5 pl-2 pr-3 text-xs transition-all active:translate-y-[2px] active:shadow-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
               title="Open profile vault"
             >
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black shadow-sm">
                 {candidateName ? candidateName.charAt(0).toUpperCase() : 'C'}
               </div>
               <div className="hidden sm:block text-left font-medium text-[#D4D4D4]">
@@ -180,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-[#222222] bg-[#0A0A0A] text-[#A1A1A1] transition-colors hover:bg-[#141414] hover:text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+              className="md:hidden skeuo-btn flex h-9 w-9 items-center justify-center rounded-lg text-[#A1A1A1] transition-colors hover:text-white active:translate-y-[2px] active:shadow-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               aria-expanded={mobileMenuOpen}
             >

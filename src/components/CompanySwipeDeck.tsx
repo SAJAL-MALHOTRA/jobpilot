@@ -196,35 +196,35 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         </div>
 
         {/* Filter Pills */}
-        <div className="flex items-center gap-1 text-[11px] font-mono">
+        <div className="flex items-center gap-1 text-[11px] font-mono skeuo-well p-1 rounded-lg">
           <button
             onClick={() => { setClusterFilter('ALL'); setCurrentIndex(0); }}
-            className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'ALL' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+              clusterFilter === 'ALL' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
             All
           </button>
           <button
             onClick={() => { setClusterFilter('BLR'); setCurrentIndex(0); }}
-            className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'BLR' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+              clusterFilter === 'BLR' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
             Bangalore
           </button>
           <button
             onClick={() => { setClusterFilter('YC'); setCurrentIndex(0); }}
-            className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'YC' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+              clusterFilter === 'YC' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
             YC
           </button>
           <button
             onClick={() => { setClusterFilter('NOTICE'); setCurrentIndex(0); }}
-            className={`px-2 py-0.5 rounded transition-colors ${
-              clusterFilter === 'NOTICE' ? 'bg-white text-black font-bold' : 'bg-[#141414] text-[#A1A1A1] hover:text-white border border-[#222222]'
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+              clusterFilter === 'NOTICE' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
             Buyout
@@ -233,9 +233,9 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-[#141414] h-1 rounded-full overflow-hidden border border-[#1F1F1F]">
+      <div className="w-full skeuo-well h-1.5 rounded-full overflow-hidden">
         <div
-          className="bg-white h-full transition-all duration-300"
+          className="bg-white h-full transition-all duration-300 shadow-[0_0_8px_rgba(255,255,255,0.8)]"
           style={{ width: `${Math.min(100, (currentIndex / Math.max(filteredDeck.length, 1)) * 100)}%` }}
         />
       </div>
@@ -247,10 +247,9 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
             {/* Third Card in Stack (Bottom) */}
             {thirdJob && (
               <div
-                className="absolute inset-0 rounded-2xl bg-[#070707] border border-[#181818] pointer-events-none transition-transform duration-300"
+                className="absolute inset-0 rounded-2xl skeuo-surface pointer-events-none transition-transform duration-300 opacity-40"
                 style={{
                   transform: 'scale(0.90) translateY(24px)',
-                  opacity: 0.5,
                   zIndex: 1,
                 }}
               />
@@ -259,15 +258,15 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
             {/* Second Card in Stack (Middle) */}
             {nextJob && (
               <div
-                className="absolute inset-0 rounded-2xl bg-[#0A0A0A] border border-[#1E1E1E] pointer-events-none transition-transform duration-300 p-6 flex flex-col justify-between"
+                className="absolute inset-0 rounded-2xl skeuo-card pointer-events-none transition-transform duration-300 p-6 flex flex-col justify-between"
                 style={{
                   transform: 'scale(0.95) translateY(12px)',
-                  opacity: 0.8,
+                  opacity: 0.75,
                   zIndex: 2,
                 }}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl ${nextJob.logoColor} text-white font-bold flex items-center justify-center font-mono opacity-60`}>
+                  <div className={`w-10 h-10 rounded-xl ${nextJob.logoColor} text-white font-bold flex items-center justify-center font-mono opacity-60 shadow-inner`}>
                     {nextJob.company.charAt(0)}
                   </div>
                   <div>
@@ -285,7 +284,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
               onPointerCancel={handlePointerCancel}
-              className={`absolute inset-0 rounded-2xl bg-[#0A0A0A] border border-[#262626] shadow-2xl p-6 flex flex-col justify-between cursor-grab active:cursor-grabbing transition-transform ${
+              className={`absolute inset-0 rounded-2xl skeuo-card p-6 flex flex-col justify-between cursor-grab active:cursor-grabbing transition-transform ${
                 isDragging ? 'duration-0' : 'duration-300 ease-out'
               }`}
               style={{
@@ -298,10 +297,10 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                 touchAction: 'none',
               }}
             >
-              {/* Dynamic Stamp Overlay when Swiping */}
+              {/* Dynamic Rubber Ink Stamp Overlay when Swiping */}
               {isRightVote && (
                 <div 
-                  className="absolute top-6 left-6 px-4 py-1.5 rounded-lg border-2 border-emerald-400 text-emerald-400 font-black text-sm tracking-widest uppercase rotate-[-12deg] pointer-events-none z-20 bg-emerald-950/40"
+                  className="absolute top-6 left-6 px-4 py-1.5 skeuo-stamp-save font-black text-sm tracking-widest uppercase rotate-[-12deg] pointer-events-none z-20"
                   style={{ opacity: Math.min(1, Math.abs(dragOffset.x) / 80) }}
                 >
                   SAVE TO PIPELINE
@@ -309,7 +308,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
               )}
               {isLeftVote && (
                 <div 
-                  className="absolute top-6 right-6 px-4 py-1.5 rounded-lg border-2 border-neutral-400 text-neutral-400 font-black text-sm tracking-widest uppercase rotate-[12deg] pointer-events-none z-20 bg-neutral-900/60"
+                  className="absolute top-6 right-6 px-4 py-1.5 skeuo-stamp-pass font-black text-sm tracking-widest uppercase rotate-[12deg] pointer-events-none z-20"
                   style={{ opacity: Math.min(1, Math.abs(dragOffset.x) / 80) }}
                 >
                   PASS
@@ -320,7 +319,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
               <div className="space-y-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className={`w-11 h-11 rounded-xl ${activeJob.logoColor} text-white font-bold text-base flex items-center justify-center font-mono shadow-md`}>
+                    <div className={`w-11 h-11 rounded-xl ${activeJob.logoColor} text-white font-bold text-base flex items-center justify-center font-mono shadow-md border border-white/10`}>
                       {activeJob.company.charAt(0)}
                     </div>
                     <div>
@@ -354,15 +353,16 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
 
                   {/* Match Score Badge */}
                   <div
-                    className="rounded-full border border-[#262626] bg-[#141414] px-2.5 py-1 text-xs font-mono font-bold text-white"
+                    className="rounded-full skeuo-badge px-2.5 py-1 text-xs font-mono font-bold text-white flex items-center gap-1.5"
                     title="Percentage of required skills found in your profile"
                   >
-                    {calculateQuickMatchScore(candidate, activeJob)}% skills
+                    <span className="skeuo-led-green" />
+                    <span>{calculateQuickMatchScore(candidate, activeJob)}% skills</span>
                   </div>
                 </div>
 
                 {/* Role Title & Compensation Bar */}
-                <div className="space-y-2 pt-2 border-t border-[#1A1A1A]">
+                <div className="space-y-2 pt-2 border-t border-[#202028]">
                   <h2 className="text-xl font-black text-white tracking-tight leading-snug">
                     {activeJob.title}
                   </h2>
@@ -387,7 +387,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                   {activeJob.requiredSkills.map((skill) => (
                     <span
                       key={skill}
-                      className="px-2.5 py-1 rounded-lg bg-[#141414] border border-[#222222] text-[#D4D4D4] text-[11px] font-mono"
+                      className="px-2.5 py-1 rounded-lg skeuo-badge text-[#D4D4D4] text-[11px] font-mono"
                     >
                       {skill}
                     </span>
@@ -396,9 +396,9 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
               </div>
 
               {/* Card Bottom: Contact Details */}
-              <div className="pt-3 border-t border-[#1A1A1A] flex items-center justify-between text-xs font-mono text-[#A1A1A1]">
+              <div className="pt-3 border-t border-[#202028] flex items-center justify-between text-xs font-mono text-[#A1A1A1]">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="skeuo-led-green" />
                   <span className="text-white font-medium">{activeJob.founderName}</span>
                   <span className="text-[10px] text-[#A1A1A1]">({activeJob.founderRole})</span>
                 </div>
@@ -414,7 +414,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
             </div>
           </div>
         ) : filteredDeck.length === 0 ? (
-          <div className="max-w-sm space-y-3 rounded-2xl border border-dashed border-[#262626] p-8 text-center font-mono">
+          <div className="max-w-sm space-y-3 rounded-2xl skeuo-well p-8 text-center font-mono">
             <Search className="mx-auto h-5 w-5 text-[#737373]" />
             <h3 className="text-base font-bold text-white">No roles match these filters.</h3>
             <p className="text-xs text-[#A1A1A1]">
@@ -427,13 +427,13 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                 setHistory([]);
                 onClearFilters();
               }}
-              className="rounded-lg bg-white px-4 py-2 text-xs font-bold text-black transition-colors hover:bg-neutral-200"
+              className="skeuo-btn-primary rounded-lg px-4 py-2 text-xs font-bold active:translate-y-[2px] active:shadow-none"
             >
               Clear filters
             </button>
           </div>
         ) : (
-          <div className="text-center p-8 border border-dashed border-[#262626] rounded-2xl max-w-sm space-y-3 font-mono">
+          <div className="text-center p-8 skeuo-well rounded-2xl max-w-sm space-y-3 font-mono">
             <span className="text-3xl">🎉</span>
             <h3 className="font-bold text-white text-base">You've reached the end of the deck!</h3>
             <p className="text-xs text-[#A1A1A1]">
@@ -444,7 +444,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
                 setCurrentIndex(0);
                 setHistory([]);
               }}
-              className="px-4 py-2 bg-white text-black text-xs font-bold rounded-lg hover:bg-neutral-200 transition-colors"
+              className="skeuo-btn-primary px-4 py-2 text-xs font-bold rounded-lg active:translate-y-[2px] active:shadow-none"
             >
               Reset Deck
             </button>
@@ -458,7 +458,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <button
           onClick={() => handleSwipe('LEFT')}
           disabled={!activeJob}
-          className="w-12 h-12 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#A1A1A1] hover:text-red-400 flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40"
+          className="w-12 h-12 rounded-full skeuo-keycap text-[#A1A1A1] hover:text-red-400 flex items-center justify-center active:translate-y-[2px] active:shadow-none disabled:opacity-40"
           title="Pass (Left Arrow or H)"
           aria-label="Pass card"
         >
@@ -469,7 +469,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <button
           onClick={handleUndo}
           disabled={history.length === 0}
-          className="w-10 h-10 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#A1A1A1] hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-30"
+          className="w-10 h-10 rounded-full skeuo-keycap text-[#A1A1A1] hover:text-white flex items-center justify-center active:translate-y-[2px] active:shadow-none disabled:opacity-30"
           title="Undo Last Swipe & Reverse (Z)"
           aria-label="Undo last action"
         >
@@ -480,7 +480,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <button
           onClick={() => activeJob && onTailorAts(activeJob)}
           disabled={!activeJob}
-          className="w-10 h-10 rounded-full bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#A1A1A1] hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40"
+          className="w-10 h-10 rounded-full skeuo-keycap text-[#A1A1A1] hover:text-white flex items-center justify-center active:translate-y-[2px] active:shadow-none disabled:opacity-40"
           title="Tailor ATS Resume"
           aria-label="Tailor ATS resume"
         >
@@ -491,10 +491,10 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <button
           onClick={() => handleSwipe('RIGHT')}
           disabled={!activeJob || appliedJobIds.has(activeJob.id)}
-          className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-md active:scale-95 disabled:opacity-40 border ${
+          className={`w-11 h-11 rounded-full flex items-center justify-center active:translate-y-[2px] active:shadow-none disabled:opacity-40 ${
             activeJob && appliedJobIds.has(activeJob.id)
-              ? 'bg-[#141414] text-emerald-400 border-emerald-500/30'
-              : 'bg-[#111111] hover:bg-[#1A1A1A] text-[#A1A1A1] hover:text-emerald-400 border-[#262626]'
+              ? 'skeuo-keycap text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+              : 'skeuo-keycap text-[#A1A1A1] hover:text-emerald-400'
           }`}
           title="Save to Pipeline (Right Arrow or L)"
           aria-label="Save role to pipeline"
@@ -509,7 +509,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
             onPitch(activeJob);
           }}
           disabled={!activeJob}
-          className="w-12 h-12 rounded-full bg-white hover:bg-neutral-200 text-black flex items-center justify-center transition-all shadow-lg active:scale-95 disabled:opacity-40"
+          className="w-12 h-12 rounded-full skeuo-keycap-primary flex items-center justify-center active:translate-y-[2px] active:shadow-none disabled:opacity-40"
           title="Compose Founder Pitch (Space or Enter)"
           aria-label="Compose founder pitch"
         >

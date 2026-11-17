@@ -13,7 +13,7 @@ import { AutopilotTracker } from './components/AutopilotTracker';
 import { PortfolioStudio } from './components/PortfolioStudio';
 import { PreFooterCTA } from './components/PreFooterCTA';
 import { Footer } from './components/Footer';
-import { ArrowDown, Mail, Code2 } from 'lucide-react';
+import { ArrowRight, Mail, Code2, MapPin, Briefcase, ArrowUpRight } from 'lucide-react';
 
 const INITIAL_CARDS: ApplicationCard[] = [];
 
@@ -231,53 +231,99 @@ export function App() {
       )}
 
       {/* Main Container */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-16">
-        {/* 2. Hero Section: Minimalist, Pure Black Engineering Aesthetic */}
-        <section className="text-center max-w-3xl mx-auto space-y-6 pt-8 pb-4">
-          {/* Eyebrow Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0A0A0A] border border-[#222222] text-xs font-mono text-[#888888]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>Example startup listings · Bangalore & YC</span>
-            <span className="text-[#333333]">•</span>
-            <span className="text-white">Sample data</span>
-          </div>
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-16">
+        {/* Product-first hero */}
+        <section className="overflow-hidden rounded-[28px] border border-[#27272A] skeuo-surface">
+          <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:p-12">
+            <div className="flex flex-col items-start justify-center gap-6 py-2 sm:py-4">
+              <div className="inline-flex items-center gap-2 rounded-full skeuo-well px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#A1A1A1]">
+                <span className="skeuo-led-green" />
+                <span>JobPilot workspace</span>
+                <span className="text-[#4A4A4A]">/</span>
+                <span className="text-[#4CC9F0]">Example catalog</span>
+              </div>
 
-          {/* Headline */}
-          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.1]">
-            Find your next role. <br />
-            <span className="text-[#888888]">Make your next move.</span>
-          </h1>
+              <div className="space-y-4">
+                <h1 className="max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
+                  A clearer path through the <span className="text-[#4CC9F0]">startup job search.</span>
+                </h1>
+                <p className="max-w-xl text-sm leading-6 text-[#A1A1A1] sm:text-base sm:leading-7">
+                  Explore sample roles, prepare a focused pitch, and keep your applications organized in one browser workspace.
+                </p>
+              </div>
 
-          {/* Subtitle */}
-          <p className="text-sm sm:text-base text-[#888888] max-w-xl mx-auto font-sans leading-relaxed">
-            Explore example startup listings, compare required skills, draft founder outreach, and keep your application pipeline in one browser-based workspace.
-          </p>
+              <div className="flex w-full flex-wrap items-center gap-3">
+                <button
+                  onClick={scrollToDashboard}
+                  className="skeuo-btn-cyan inline-flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-semibold active:translate-y-[2px] active:shadow-none focus-visible:outline-offset-4"
+                >
+                  Browse {jobs.length} sample roles
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => setActiveModal('OUTREACH')}
+                  className="skeuo-btn inline-flex min-h-11 items-center gap-2 rounded-lg px-5 text-sm font-medium text-white active:translate-y-[2px] active:shadow-none"
+                >
+                  <Mail className="h-4 w-4 text-[#A1A1A1]" />
+                  Draft a pitch
+                </button>
+              </div>
 
-          {/* Action Buttons */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-            <button
-              onClick={scrollToDashboard}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black font-semibold text-xs transition-colors shadow-sm"
-            >
-              <span>Browse {jobs.length} Sample Roles</span>
-              <ArrowDown className="w-3.5 h-3.5" />
-            </button>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-[#1F1F1F] pt-4 font-mono text-[10px] uppercase tracking-wide text-[#737373]">
+                <span>01 <span className="text-[#D4D4D4]">Browse</span></span>
+                <span className="text-[#3A3A3A]">/</span>
+                <span>02 <span className="text-[#D4D4D4]">Prepare</span></span>
+                <span className="text-[#3A3A3A]">/</span>
+                <span>03 <span className="text-[#D4D4D4]">Track</span></span>
+              </div>
+            </div>
 
-            <button
-              onClick={() => setActiveModal('OUTREACH')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-white font-medium text-xs transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5 text-[#888888]" />
-              <span>Open Pitch Composer</span>
-            </button>
+            <div className="rounded-2xl skeuo-well p-3 sm:p-4">
+              <div className="flex items-center justify-between gap-3 border-b border-[#1F1F1F] px-1 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1.5" aria-hidden="true">
+                    <span className="skeuo-screw" />
+                    <span className="skeuo-screw" />
+                    <span className="skeuo-screw" />
+                  </div>
+                  <span className="ml-1 font-mono text-[10px] uppercase tracking-wide text-[#A1A1A1]">Role preview</span>
+                </div>
+                <span className="rounded-full skeuo-badge px-2 py-1 font-mono text-[9px] uppercase tracking-wide text-[#888888]">Sample data</span>
+              </div>
 
-            <button
-              onClick={() => setActiveModal('PORTFOLIO')}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#111111] hover:bg-[#1A1A1A] border border-[#262626] text-[#AAAAAA] hover:text-white font-medium text-xs transition-colors"
-            >
-              <Code2 className="w-3.5 h-3.5" />
-              <span>Import GitHub Profile</span>
-            </button>
+              <div className="space-y-2 py-3">
+                {jobs.slice(0, 3).map((job, index) => (
+                  <div key={job.id} className="flex items-center gap-3 rounded-xl skeuo-card p-3 sm:p-3.5">
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${job.logoColor} font-mono text-sm font-bold text-white shadow-inner`}>
+                      {job.company.charAt(0)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-xs font-semibold text-white sm:text-sm">{job.title}</span>
+                        <span className="shrink-0 font-mono text-[9px] text-[#5F5F5F]">0{index + 1}</span>
+                      </div>
+                      <div className="mt-1 flex min-w-0 items-center gap-1.5 text-[10px] text-[#888888] sm:text-[11px]">
+                        <span className="truncate">{job.company}</span>
+                        <span className="text-[#444444]">·</span>
+                        <MapPin className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{job.location}</span>
+                      </div>
+                    </div>
+                    <div className="hidden shrink-0 text-right sm:block">
+                      <span className="block font-mono text-[10px] text-[#D4D4D4]">{job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa}L`}</span>
+                      <span className="mt-1 block text-[9px] text-[#737373]">Example listing</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#1F1F1F] px-1 pt-3 text-[10px] text-[#737373]">
+                <span className="flex items-center gap-1.5"><Briefcase className="h-3 w-3" /> Check each source for current availability</span>
+                <button onClick={scrollToDashboard} className="inline-flex items-center gap-1 font-medium text-[#4CC9F0] transition-colors hover:text-[#9AE6FA] active:translate-y-[1px]">
+                  Open directory <ArrowUpRight className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -374,13 +420,13 @@ export function App() {
             <div className="flex items-center justify-between pb-3 border-b border-[#1F1F1F]">
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-sm text-white">Application Pipeline Tracker</h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#141414] text-[#888888] border border-[#262626]">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded skeuo-badge text-[#888888]">
                   {cards.length} Tracked
                 </span>
               </div>
               <button
                 onClick={() => setActiveModal('NONE')}
-                className="px-3 py-1 bg-[#141414] hover:bg-[#1F1F1F] rounded-md text-xs text-[#888888] hover:text-white font-mono border border-[#262626]"
+                className="skeuo-btn px-3 py-1 rounded-md text-xs text-[#888888] hover:text-white font-mono active:translate-y-[1px]"
               >
                 Close
               </button>
@@ -411,7 +457,7 @@ export function App() {
               </div>
               <button
                 onClick={() => setActiveModal('NONE')}
-                className="px-3 py-1 bg-[#141414] hover:bg-[#1F1F1F] rounded-md text-xs text-[#888888] hover:text-white font-mono border border-[#262626]"
+                className="skeuo-btn px-3 py-1 rounded-md text-xs text-[#888888] hover:text-white font-mono active:translate-y-[1px]"
               >
                 Close
               </button>

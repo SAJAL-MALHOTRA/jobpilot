@@ -37,44 +37,44 @@ const COLUMNS: {
   { 
     id: 'DISCOVERED', 
     label: '1. Wishlist / Sourced', 
-    countColor: 'text-neutral-400 bg-neutral-900 border-neutral-800', 
+    countColor: 'text-neutral-300 bg-neutral-900 border-neutral-700', 
     borderColor: 'border-neutral-800', 
-    dotColor: 'bg-neutral-500' 
+    dotColor: 'skeuo-led-amber' 
   },
   { 
     id: 'TAILORED', 
     label: '2. Resume tailored',
     countColor: 'text-indigo-400 bg-indigo-950/40 border-indigo-900/50', 
     borderColor: 'border-indigo-950/40', 
-    dotColor: 'bg-indigo-400' 
+    dotColor: 'skeuo-led-blue' 
   },
   { 
     id: 'OUTREACH_SENT', 
     label: '3. Pitch Dispatched', 
     countColor: 'text-amber-400 bg-amber-950/40 border-amber-900/50', 
     borderColor: 'border-amber-950/40', 
-    dotColor: 'bg-amber-400' 
+    dotColor: 'skeuo-led-amber' 
   },
   { 
     id: 'INTERVIEW_SCHEDULED', 
     label: '4. Interview Booked', 
     countColor: 'text-blue-400 bg-blue-950/40 border-blue-900/50', 
     borderColor: 'border-blue-950/40', 
-    dotColor: 'bg-blue-400' 
+    dotColor: 'skeuo-led-blue' 
   },
   { 
     id: 'OFFER', 
     label: '5. Offer Secured', 
     countColor: 'text-emerald-400 bg-emerald-950/40 border-emerald-900/50', 
     borderColor: 'border-emerald-950/40', 
-    dotColor: 'bg-emerald-400' 
+    dotColor: 'skeuo-led-green' 
   },
   { 
     id: 'REJECTED', 
     label: '6. Archived / Passed', 
     countColor: 'text-rose-400 bg-rose-950/40 border-rose-900/50', 
     borderColor: 'border-rose-950/40', 
-    dotColor: 'bg-rose-500' 
+    dotColor: 'skeuo-led-red' 
   },
 ];
 
@@ -396,14 +396,14 @@ Arjun Mehta`;
     <div className="space-y-6 text-[#EDEDED] font-sans">
       {/* 1. Metrics Banner */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-[#0D0D11] p-4 sm:p-5 rounded-xl border border-[#1F1F24]">
+        <div className="skeuo-surface p-4 sm:p-5 rounded-xl">
           <span className="text-[11px] font-mono font-medium text-neutral-400 uppercase tracking-wider block">
             Total In Pipeline
           </span>
           <div className="text-2xl sm:text-3xl font-black font-mono text-white mt-1">{cards.length}</div>
         </div>
 
-        <div className="bg-[#0D0D11] p-4 sm:p-5 rounded-xl border border-[#1F1F24]">
+        <div className="skeuo-surface p-4 sm:p-5 rounded-xl">
           <span className="text-[11px] font-mono font-medium text-neutral-400 uppercase tracking-wider block">
             Pitches Dispatched
           </span>
@@ -412,7 +412,7 @@ Arjun Mehta`;
           </div>
         </div>
 
-        <div className="bg-[#0D0D11] p-4 sm:p-5 rounded-xl border border-[#1F1F24]">
+        <div className="skeuo-surface p-4 sm:p-5 rounded-xl">
           <span className="text-[11px] font-mono font-medium text-neutral-400 uppercase tracking-wider block">
             Interviews Booked
           </span>
@@ -421,7 +421,7 @@ Arjun Mehta`;
           </div>
         </div>
 
-        <div className="bg-[#0D0D11] p-4 sm:p-5 rounded-xl border border-[#1F1F24]">
+        <div className="skeuo-surface p-4 sm:p-5 rounded-xl">
           <span className="text-[11px] font-mono font-medium text-neutral-400 uppercase tracking-wider block">
             Offers Secured
           </span>
@@ -435,13 +435,13 @@ Arjun Mehta`;
       <div className="bg-[#0A0A0A] p-3.5 sm:p-4 rounded-xl border border-[#1F1F1F] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
         {/* Search & Filter */}
         <div className="flex-1 relative max-w-md">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 z-10" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search company, title, skill tag, or notes..."
-            className="w-full bg-[#141416] border border-[#26262B] focus:border-white/40 rounded-lg pl-8 pr-8 py-2 text-xs text-white placeholder-neutral-500 outline-none transition-all font-mono"
+            className="w-full skeuo-well pl-8 pr-8 py-2 text-xs text-white placeholder-neutral-500 rounded-lg outline-none transition-all font-mono focus:border-[#3F3F46]"
           />
           {searchQuery && (
             <button
@@ -457,7 +457,7 @@ Arjun Mehta`;
         <div className="flex items-center gap-2.5 self-end md:self-auto shrink-0">
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="px-3.5 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black font-medium transition-colors flex items-center gap-1.5 text-xs shadow-sm font-sans"
+            className="skeuo-btn-primary px-3.5 py-2 rounded-lg text-black font-semibold flex items-center gap-1.5 text-xs active:translate-y-[2px] active:shadow-none font-sans"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Custom Job</span>
@@ -465,7 +465,7 @@ Arjun Mehta`;
 
           <button
             onClick={handleExportCsv}
-            className="px-3.5 py-2 rounded-lg bg-[#141416] hover:bg-[#1E1E22] text-neutral-300 hover:text-white font-medium border border-[#26262B] transition-colors flex items-center gap-1.5 text-xs font-mono"
+            className="skeuo-btn px-3.5 py-2 rounded-lg text-neutral-300 hover:text-white font-medium flex items-center gap-1.5 text-xs font-mono active:translate-y-[2px] active:shadow-none"
             title="Download full pipeline as CSV"
           >
             <Download className="w-3.5 h-3.5 text-neutral-400" />
@@ -486,21 +486,21 @@ Arjun Mehta`;
               onDragOver={(e) => handleDragOverColumn(e, col.id)}
               onDragLeave={handleDragLeaveColumn}
               onDrop={(e) => handleDropOnColumn(e, col.id)}
-              className={`min-w-[270px] w-[270px] shrink-0 rounded-xl border transition-all duration-150 flex flex-col ${
+              className={`min-w-[275px] w-[275px] shrink-0 rounded-xl skeuo-slot transition-all duration-150 flex flex-col ${
                 isOverThisCol 
-                  ? 'bg-[#15151B] border-white/60 ring-2 ring-white/20' 
-                  : 'bg-[#0D0D11] border-[#1F1F24]'
+                  ? 'ring-2 ring-white/30 border-white/50' 
+                  : ''
               }`}
             >
               {/* Column Header */}
-              <div className="p-3.5 border-b border-[#1F1F24] flex items-center justify-between">
+              <div className="p-3.5 border-b border-[#202028] bg-gradient-to-b from-[#18181D] to-[#101014] flex items-center justify-between rounded-t-xl">
                 <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${col.dotColor}`} />
+                  <span className={col.dotColor} />
                   <span className="text-xs font-mono font-bold text-neutral-200">
                     {col.label}
                   </span>
                 </div>
-                <span className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-bold border ${col.countColor}`}>
+                <span className="skeuo-badge px-2 py-0.5 rounded-md text-[11px] font-mono font-bold text-neutral-200">
                   {columnCards.length}
                 </span>
               </div>
@@ -508,7 +508,7 @@ Arjun Mehta`;
               {/* Column Body / Drop Zone */}
               <div className="p-2.5 space-y-2.5 min-h-[420px] max-h-[620px] overflow-y-auto">
                 {columnCards.length === 0 ? (
-                  <div className="h-44 flex flex-col items-center justify-center border border-dashed border-[#222228] rounded-lg text-center p-4">
+                  <div className="h-44 flex flex-col items-center justify-center border border-dashed border-[#272732] rounded-lg text-center p-4 skeuo-well opacity-50">
                     <span className="text-[11px] font-mono text-neutral-500 italic">
                       Drag jobs here
                     </span>
@@ -528,16 +528,16 @@ Arjun Mehta`;
                         draggable
                         onDragStart={(e) => handleDragStart(e, card.id)}
                         onDragEnd={handleDragEnd}
-                        className={`bg-[#141418] hover:bg-[#18181E] border border-[#24242A] hover:border-[#383842] rounded-xl p-3.5 space-y-2.5 transition-all shadow-sm group cursor-grab active:cursor-grabbing ${
+                        className={`skeuo-index-card rounded-xl p-3.5 space-y-2.5 transition-all group cursor-grab active:cursor-grabbing ${
                           isDragging ? 'opacity-30 border-dashed border-white/50 scale-95' : ''
                         }`}
                       >
                         {/* Top: Grip Handle, Position & Top Controls */}
                         <div className="flex items-start justify-between gap-1.5">
                           <div className="flex items-start gap-1.5 flex-1 min-w-0">
-                            <GripVertical className="w-3.5 h-3.5 text-neutral-600 group-hover:text-neutral-400 mt-0.5 shrink-0" />
+                            <GripVertical className="w-3.5 h-3.5 text-neutral-500 group-hover:text-neutral-200 mt-0.5 shrink-0" />
                             <div className="min-w-0">
-                              <h4 className="font-bold text-white text-xs leading-snug truncate group-hover:text-indigo-200 transition-colors">
+                              <h4 className="font-bold text-white text-xs leading-snug truncate group-hover:text-white transition-colors">
                                 {card.job.title}
                               </h4>
                               <p className="text-[11px] text-neutral-400 font-mono mt-0.5 truncate">
@@ -553,7 +553,7 @@ Arjun Mehta`;
                                 href={jobLink}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="p-1 hover:text-white text-neutral-400 transition-colors rounded"
+                                className="skeuo-btn p-1 hover:text-white text-neutral-400 transition-colors rounded active:translate-y-[1px]"
                                 title="Open Job Posting URL"
                               >
                                 <ExternalLink className="w-3 h-3" />
@@ -561,14 +561,14 @@ Arjun Mehta`;
                             )}
                             <button
                               onClick={() => handleOpenEditModal(card)}
-                              className="p-1 hover:text-white text-neutral-400 transition-colors rounded"
+                              className="skeuo-btn p-1 hover:text-white text-neutral-400 transition-colors rounded active:translate-y-[1px]"
                               title="Edit application details"
                             >
                               <Pencil className="w-3 h-3" />
                             </button>
                             <button
                               onClick={() => onRemoveCard(card.id)}
-                              className="p-1 hover:text-rose-400 text-neutral-400 transition-colors rounded"
+                              className="skeuo-btn p-1 hover:text-rose-400 text-neutral-400 transition-colors rounded active:translate-y-[1px]"
                               title="Delete from board"
                             >
                               <Trash2 className="w-3 h-3" />
@@ -579,31 +579,31 @@ Arjun Mehta`;
                         {/* Metadata Pills: Salary & Location */}
                         <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono text-neutral-300">
                           {displaySalary && (
-                            <span className="bg-[#1C1C22] px-2 py-0.5 rounded border border-[#2B2B33] text-emerald-400 font-medium">
+                            <span className="skeuo-tag px-2 py-0.5 rounded text-emerald-400 font-medium">
                               {displaySalary}
                             </span>
                           )}
                           {card.job.location && (
-                            <span className="bg-[#1C1C22] px-2 py-0.5 rounded border border-[#2B2B33] text-neutral-400 flex items-center gap-0.5">
-                              <MapPin className="w-2.5 h-2.5" />
+                            <span className="skeuo-tag px-2 py-0.5 rounded text-neutral-300 flex items-center gap-0.5">
+                              <MapPin className="w-2.5 h-2.5 text-neutral-400" />
                               <span className="truncate max-w-[110px]">{card.job.location}</span>
                             </span>
                           )}
                         </div>
 
-                        {/* Tag Pills */}
+                        {/* Physical Tag Badges */}
                         {tags.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {tags.slice(0, 3).map((tag, idx) => (
                               <span
                                 key={idx}
-                                className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#101014] text-neutral-400 border border-[#222228]"
+                                className="text-[9px] font-mono px-2 py-0.5 rounded skeuo-tag text-neutral-300"
                               >
                                 #{tag}
                               </span>
                             ))}
                             {tags.length > 3 && (
-                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#101014] text-neutral-500">
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded skeuo-badge text-neutral-400">
                                 +{tags.length - 3}
                               </span>
                             )}
@@ -612,22 +612,23 @@ Arjun Mehta`;
 
                         {/* Notes snippet */}
                         {card.notes && (
-                          <p className="text-[10px] text-neutral-400 italic line-clamp-2 bg-[#0E0E12] p-1.5 rounded border border-[#1C1C22] font-mono">
+                          <p className="text-[10px] text-neutral-400 italic line-clamp-2 skeuo-well p-1.5 rounded font-mono">
                             "{card.notes}"
                           </p>
                         )}
 
                         {/* Quick 3-Day Follow-Up Script for Outreach Sent */}
                         {card.status === 'OUTREACH_SENT' && (
-                          <div className="p-2 bg-[#0C0C10] border border-amber-500/20 rounded-lg space-y-1">
+                          <div className="p-2.5 skeuo-surface border border-amber-500/30 rounded-lg space-y-1.5">
                             <div className="flex items-center justify-between text-[9px] font-mono text-amber-400">
-                              <span className="flex items-center gap-1">
+                              <span className="flex items-center gap-1.5">
+                                <span className="skeuo-led-amber" />
                                 <Clock className="w-2.5 h-2.5" /> 3-Day Follow-Up Template
                               </span>
                             </div>
                             <button
                               onClick={() => handleCopyFollowUp(card)}
-                              className="w-full py-1 text-[10px] font-mono font-bold bg-[#1C1C22] hover:bg-[#25252E] text-neutral-200 rounded transition-all"
+                              className="skeuo-btn w-full py-1 text-[10px] font-mono font-bold text-neutral-200 rounded transition-all active:translate-y-[1px]"
                             >
                               {followUpCopiedId === card.id ? 'Copied Follow-up Script!' : 'Copy 3-Day Follow-Up'}
                             </button>
@@ -638,18 +639,18 @@ Arjun Mehta`;
                         {(card.status === 'TAILORED' || (card.job.founderEmail && card.status === 'DISCOVERED')) && (
                           <button
                             onClick={() => onOpenOutreachForCard(card.job)}
-                            className="w-full py-1.5 text-[10px] font-mono font-bold bg-white hover:bg-neutral-200 text-black rounded flex items-center justify-center gap-1 transition-all"
+                            className="skeuo-btn-primary w-full py-1.5 text-[10px] font-mono font-bold text-black rounded flex items-center justify-center gap-1 transition-all active:translate-y-[2px] active:shadow-none"
                           >
                             <Send className="w-2.5 h-2.5" /> Launch Founder Pitch
                           </button>
                         )}
 
                         {/* Stage Progression Arrows (Tactile click alternative to drag-and-drop) */}
-                        <div className="flex items-center justify-between pt-1.5 border-t border-[#1F1F24] text-[10px] font-mono">
+                        <div className="flex items-center justify-between pt-1.5 border-t border-[#23232C] text-[10px] font-mono">
                           {prevStatus ? (
                             <button
                               onClick={() => onUpdateCardStatus(card.id, prevStatus)}
-                              className="text-neutral-500 hover:text-white flex items-center gap-0.5 py-0.5"
+                              className="skeuo-btn px-2 py-0.5 text-neutral-400 hover:text-white flex items-center gap-0.5 active:translate-y-[1px] rounded"
                               title={`Move back to ${prevStatus}`}
                             >
                               <ChevronLeft className="w-3 h-3" /> Back
@@ -661,7 +662,7 @@ Arjun Mehta`;
                           {nextStatus && (
                             <button
                               onClick={() => onUpdateCardStatus(card.id, nextStatus)}
-                              className="text-neutral-300 hover:text-white font-bold flex items-center gap-0.5 ml-auto py-0.5"
+                              className="skeuo-btn px-2 py-0.5 text-neutral-200 hover:text-white font-bold flex items-center gap-0.5 ml-auto active:translate-y-[1px] rounded"
                               title={`Advance to ${nextStatus}`}
                             >
                               Advance <ChevronRight className="w-3 h-3" />
@@ -820,13 +821,13 @@ Arjun Mehta`;
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-[#141418] hover:bg-[#1E1E22] text-neutral-400 hover:text-white border border-[#26262B] transition-colors"
+                  className="skeuo-btn px-4 py-2 rounded-lg text-neutral-400 hover:text-white transition-all active:translate-y-[1px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black font-semibold transition-colors flex items-center gap-1.5"
+                  className="skeuo-btn-primary px-4 py-2 rounded-lg text-black font-semibold transition-all flex items-center gap-1.5 active:translate-y-[2px] active:shadow-none"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Add to Pipeline</span>
@@ -971,13 +972,13 @@ Arjun Mehta`;
                 <button
                   type="button"
                   onClick={() => setEditingCard(null)}
-                  className="px-4 py-2 rounded-lg bg-[#141418] hover:bg-[#1E1E22] text-neutral-400 hover:text-white border border-[#26262B] transition-colors"
+                  className="skeuo-btn px-4 py-2 rounded-lg text-neutral-400 hover:text-white transition-all active:translate-y-[1px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black font-semibold transition-colors flex items-center gap-1.5"
+                  className="skeuo-btn-primary px-4 py-2 rounded-lg text-black font-semibold transition-all flex items-center gap-1.5 active:translate-y-[2px] active:shadow-none"
                 >
                   <Check className="w-3.5 h-3.5" />
                   <span>Save Changes</span>
