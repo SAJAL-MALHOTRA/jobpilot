@@ -21,7 +21,6 @@ import {
   ExternalLink, 
   Mail, 
   CheckCircle2, 
-  Sparkles, 
   ShieldCheck, 
   BookmarkPlus,
   Building2,
@@ -496,8 +495,8 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
                         )}
                       </button>
                     </div>
-                    <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-[#969BA6] font-medium">
-                      <Sparkles className="w-3 h-3 text-blue-600 dark:text-[#6366F1]" />
+                    <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-[#969BA6]">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300 font-mono">Rationale:</span>
                       <span>{bullet.reasoning}</span>
                     </div>
                   </div>

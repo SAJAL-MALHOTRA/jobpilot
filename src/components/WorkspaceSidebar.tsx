@@ -1,7 +1,7 @@
 import React from 'react';
 import type { CandidateProfile } from '../types';
 import { 
-  Sparkles, 
+  Command, 
   Kanban, 
   FileText, 
   Send, 
@@ -87,7 +87,7 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
           title="Open Command Palette (⌘K)"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-[#818CF8] shrink-0" />
+            <Command className="w-3.5 h-3.5 text-slate-500 dark:text-[#A1A8B8] shrink-0" />
             {!isCollapsed && <span className="font-semibold text-slate-700 dark:text-[#A1A8B8] group-hover:text-slate-900 dark:group-hover:text-[#F3F4F6] truncate">Command Menu</span>}
           </div>
           {!isCollapsed && (

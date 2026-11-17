@@ -126,14 +126,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div 
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-neutral-900/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+      onClick={onClose}
+    >
       <div 
-        className="w-full max-w-2xl bg-[#14151B] border border-[#262833] rounded-xl shadow-2xl overflow-hidden flex flex-col text-[#EDEDED]"
+        className="w-full max-w-2xl bg-white dark:bg-[#121316] border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-2xl overflow-hidden flex flex-col text-neutral-900 dark:text-neutral-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="flex items-center px-4 py-3.5 border-b border-[#232530] bg-[#171821]">
-          <Search className="w-4 h-4 text-[#7C7E8C] mr-3 shrink-0" />
+        <div className="flex items-center px-4 py-3.5 border-b border-neutral-200/80 dark:border-neutral-800 bg-neutral-50 dark:bg-[#15171e]">
+          <Search className="w-4 h-4 text-neutral-400 mr-3 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -144,9 +147,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             }}
             onKeyDown={handleInputKeyDown}
             placeholder="Type a command or search roles, skills, startups..."
-            className="flex-1 bg-transparent text-sm text-[#EDEDED] placeholder-[#7C7E8C] outline-none font-sans"
+            className="flex-1 bg-transparent text-sm text-neutral-900 dark:text-white placeholder-neutral-400 outline-none font-sans"
           />
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#7C7E8C] bg-[#1E202B] px-2 py-0.5 rounded border border-[#2B2D3C]">
+          <div className="flex items-center gap-1.5 text-[11px] font-mono text-neutral-500 bg-white dark:bg-neutral-800 px-2 py-0.5 rounded border border-neutral-200 dark:border-neutral-700">
             <kbd className="font-sans">ESC</kbd>
             <span>to close</span>
           </div>
@@ -155,7 +158,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         {/* Command & Job List */}
         <div ref={listRef} className="max-h-[60vh] overflow-y-auto p-2 space-y-4 text-xs font-sans">
           {allItems.length === 0 ? (
-            <div className="py-12 text-center text-[#7C7E8C] text-sm">
+            <div className="py-12 text-center text-neutral-400 text-sm">
               No matching commands or jobs found for "{query}"
             </div>
           ) : (
@@ -163,7 +166,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               {/* Navigation Section */}
               {matchingNavs.length > 0 && (
                 <div>
-                  <div className="px-2 py-1 text-[11px] font-medium uppercase tracking-wider text-[#6C6E7E]">
+                  <div className="px-2 py-1 text-[11px] font-mono font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                     Actions & Views
                   </div>
                   <div className="space-y-0.5 mt-1">
@@ -177,16 +180,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           onMouseEnter={() => setSelectedIndex(itemIdx)}
                           onClick={() => handleSelect(itemIdx)}
                           className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors ${
-                            isSelected ? 'bg-[#5E6AD2] text-white' : 'text-[#D0D1D8] hover:bg-[#1C1E28]'
+                            isSelected 
+                              ? 'bg-neutral-900 text-white dark:bg-neutral-800 dark:text-white font-medium shadow-xs' 
+                              : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/60'
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
-                            <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-[#8E90A0]'}`} />
-                            <span className="font-medium">{cmd.title}</span>
+                            <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-neutral-400'}`} />
+                            <span>{cmd.title}</span>
                           </div>
                           {cmd.shortcut && (
                             <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                              isSelected ? 'bg-white/20 text-white' : 'bg-[#1E202B] text-[#7C7E8C]'
+                              isSelected ? 'bg-white/20 text-white' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 border border-neutral-200 dark:border-neutral-700'
                             }`}>
                               {cmd.shortcut}
                             </span>
@@ -201,7 +206,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               {/* Jobs Section */}
               {matchingJobs.length > 0 && (
                 <div>
-                  <div className="px-2 py-1 text-[11px] font-medium uppercase tracking-wider text-[#6C6E7E]">
+                  <div className="px-2 py-1 text-[11px] font-mono font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
                     Startup Roles ({matchingJobs.length})
                   </div>
                   <div className="space-y-0.5 mt-1">
@@ -214,25 +219,27 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           onMouseEnter={() => setSelectedIndex(itemIdx)}
                           onClick={() => handleSelect(itemIdx)}
                           className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors ${
-                            isSelected ? 'bg-[#5E6AD2] text-white' : 'text-[#D0D1D8] hover:bg-[#1C1E28]'
+                            isSelected 
+                              ? 'bg-neutral-900 text-white dark:bg-neutral-800 dark:text-white font-medium shadow-xs' 
+                              : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/60'
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-6 h-6 rounded bg-[#1C1E2A] border border-[#2B2E40] flex items-center justify-center text-xs font-bold shrink-0 text-[#EDEDED]">
+                            <div className="w-6 h-6 rounded bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-xs font-bold shrink-0 font-mono">
                               {job.company.charAt(0)}
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium truncate">{job.title}</span>
-                                <span className={`text-[11px] ${isSelected ? 'text-white/80' : 'text-[#8E90A0]'}`}>
+                                <span className="font-semibold truncate">{job.title}</span>
+                                <span className={`text-[11px] ${isSelected ? 'text-white/80' : 'text-neutral-500'}`}>
                                   {job.company}
                                 </span>
                               </div>
-                              <div className={`flex items-center gap-2 text-[10px] truncate ${
-                                isSelected ? 'text-white/70' : 'text-[#6C6E7E]'
+                              <div className={`flex items-center gap-2 text-[10px] font-mono truncate ${
+                                isSelected ? 'text-white/70' : 'text-neutral-400'
                               }`}>
                                 <span>{job.location}</span>
-                                <span>·</span>
+                                <span>•</span>
                                 <span>{job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa}L`}</span>
                               </div>
                             </div>
@@ -240,13 +247,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
                           <div className="flex items-center gap-1.5 shrink-0 ml-3">
                             {job.atsMatchScore && (
-                              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                                isSelected ? 'bg-white/20 text-white' : 'bg-[#1E202B] text-emerald-400'
+                              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded tabular-nums ${
+                                isSelected 
+                                  ? 'bg-white/20 text-white' 
+                                  : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60'
                               }`}>
                                 {job.atsMatchScore}% match
                               </span>
                             )}
-                            <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-[#5E6070]'}`} />
+                            <ArrowRight className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-neutral-400'}`} />
                           </div>
                         </div>
                       );
@@ -259,19 +268,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Footer shortcuts */}
-        <div className="px-4 py-2 bg-[#121318] border-t border-[#232530] flex items-center justify-between text-[11px] text-[#7C7E8C]">
+        <div className="px-4 py-2 bg-neutral-50 dark:bg-[#15171e] border-t border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between text-[11px] text-neutral-500 font-mono">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded bg-[#1C1E27] border border-[#2B2D3C] text-[10px] font-mono">↑</kbd>
-              <kbd className="px-1 py-0.5 rounded bg-[#1C1E27] border border-[#2B2D3C] text-[10px] font-mono">↓</kbd>
+              <kbd className="px-1 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-[10px]">↑</kbd>
+              <kbd className="px-1 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-[10px]">↓</kbd>
               <span>navigate</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded bg-[#1C1E27] border border-[#2B2D3C] text-[10px] font-mono">↵</kbd>
+              <kbd className="px-1 py-0.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-[10px]">↵</kbd>
               <span>select</span>
             </span>
           </div>
-          <span className="text-[10px] text-[#5E6070]">Raycast-speed keyboard navigation</span>
+          <span className="text-[10px] text-neutral-400">Keyboard quick navigation</span>
         </div>
       </div>
     </div>
