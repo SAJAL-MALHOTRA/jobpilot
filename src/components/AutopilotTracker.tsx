@@ -226,8 +226,10 @@ Arjun Mehta`;
     }
   };
 
-  const handleDragLeaveColumn = () => {
-    setDragOverCol(null);
+  const handleDragLeaveColumn = (e: React.DragEvent) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragOverCol(null);
+    }
   };
 
   const handleDropOnColumn = (e: React.DragEvent, colId: KanbanStatus) => {
@@ -256,7 +258,7 @@ Arjun Mehta`;
       id: `custom-job-${Date.now()}`,
       company,
       title,
-      logoColor: '#3B82F6',
+      logoColor: 'bg-blue-600',
       location: newJobForm.location.trim() || 'Bangalore, India',
       isRemote: newJobForm.location.toLowerCase().includes('remote'),
       source: 'LinkedIn',
@@ -553,7 +555,7 @@ Arjun Mehta`;
                                 href={jobLink}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="skeuo-btn p-1 hover:text-white text-neutral-400 transition-colors rounded active:translate-y-[1px]"
+                                className="skeuo-btn p-1 hover:text-white text-neutral-400 transition-colors rounded active:translate-y-[2px] active:shadow-none"
                                 title="Open Job Posting URL"
                               >
                                 <ExternalLink className="w-3 h-3" />
@@ -561,14 +563,14 @@ Arjun Mehta`;
                             )}
                             <button
                               onClick={() => handleOpenEditModal(card)}
-                              className="skeuo-btn p-1 hover:text-white text-neutral-400 transition-colors rounded active:translate-y-[1px]"
+                              className="skeuo-btn p-1 hover:text-white text-neutral-400 transition-colors rounded active:translate-y-[2px] active:shadow-none"
                               title="Edit application details"
                             >
                               <Pencil className="w-3 h-3" />
                             </button>
                             <button
                               onClick={() => onRemoveCard(card.id)}
-                              className="skeuo-btn p-1 hover:text-rose-400 text-neutral-400 transition-colors rounded active:translate-y-[1px]"
+                              className="skeuo-btn p-1 hover:text-rose-400 text-neutral-400 transition-colors rounded active:translate-y-[2px] active:shadow-none"
                               title="Delete from board"
                             >
                               <Trash2 className="w-3 h-3" />
@@ -628,7 +630,7 @@ Arjun Mehta`;
                             </div>
                             <button
                               onClick={() => handleCopyFollowUp(card)}
-                              className="skeuo-btn w-full py-1 text-[10px] font-mono font-bold text-neutral-200 rounded transition-all active:translate-y-[1px]"
+                              className="skeuo-btn w-full py-1 text-[10px] font-mono font-bold text-neutral-200 rounded transition-all active:translate-y-[2px] active:shadow-none"
                             >
                               {followUpCopiedId === card.id ? 'Copied Follow-up Script!' : 'Copy 3-Day Follow-Up'}
                             </button>
@@ -650,7 +652,7 @@ Arjun Mehta`;
                           {prevStatus ? (
                             <button
                               onClick={() => onUpdateCardStatus(card.id, prevStatus)}
-                              className="skeuo-btn px-2 py-0.5 text-neutral-400 hover:text-white flex items-center gap-0.5 active:translate-y-[1px] rounded"
+                              className="skeuo-btn px-2 py-0.5 text-neutral-400 hover:text-white flex items-center gap-0.5 active:translate-y-[2px] active:shadow-none rounded"
                               title={`Move back to ${prevStatus}`}
                             >
                               <ChevronLeft className="w-3 h-3" /> Back
@@ -662,7 +664,7 @@ Arjun Mehta`;
                           {nextStatus && (
                             <button
                               onClick={() => onUpdateCardStatus(card.id, nextStatus)}
-                              className="skeuo-btn px-2 py-0.5 text-neutral-200 hover:text-white font-bold flex items-center gap-0.5 ml-auto active:translate-y-[1px] rounded"
+                              className="skeuo-btn px-2 py-0.5 text-neutral-200 hover:text-white font-bold flex items-center gap-0.5 ml-auto active:translate-y-[2px] active:shadow-none rounded"
                               title={`Advance to ${nextStatus}`}
                             >
                               Advance <ChevronRight className="w-3 h-3" />
@@ -821,7 +823,7 @@ Arjun Mehta`;
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="skeuo-btn px-4 py-2 rounded-lg text-neutral-400 hover:text-white transition-all active:translate-y-[1px]"
+                  className="skeuo-btn px-4 py-2 rounded-lg text-neutral-400 hover:text-white transition-all active:translate-y-[2px] active:shadow-none"
                 >
                   Cancel
                 </button>
@@ -972,7 +974,7 @@ Arjun Mehta`;
                 <button
                   type="button"
                   onClick={() => setEditingCard(null)}
-                  className="skeuo-btn px-4 py-2 rounded-lg text-neutral-400 hover:text-white transition-all active:translate-y-[1px]"
+                  className="skeuo-btn px-4 py-2 rounded-lg text-neutral-400 hover:text-white transition-all active:translate-y-[2px] active:shadow-none"
                 >
                   Cancel
                 </button>

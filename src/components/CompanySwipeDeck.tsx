@@ -144,9 +144,10 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
 
   // Pointer drag event handlers
   const handlePointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('a, button')) return;
     setIsDragging(true);
     dragStartRef.current = { x: e.clientX, y: e.clientY };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -156,9 +157,12 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
     setDragOffset({ x: dx, y: dy * 0.4 });
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
     if (!isDragging) return;
     setIsDragging(false);
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch { /* ignore */ }
 
     const threshold = 110;
     if (dragOffset.x > threshold) {
@@ -171,8 +175,11 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
   };
 
   // Safe cancel gesture: resets card position without committing a swipe
-  const handlePointerCancel = () => {
+  const handlePointerCancel = (e: React.PointerEvent) => {
     setIsDragging(false);
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch { /* ignore */ }
     setDragOffset({ x: 0, y: 0 });
   };
 
@@ -199,7 +206,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <div className="flex items-center gap-1 text-[11px] font-mono skeuo-well p-1 rounded-lg">
           <button
             onClick={() => { setClusterFilter('ALL'); setCurrentIndex(0); }}
-            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[2px] active:shadow-none ${
               clusterFilter === 'ALL' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
@@ -207,7 +214,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
           </button>
           <button
             onClick={() => { setClusterFilter('BLR'); setCurrentIndex(0); }}
-            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[2px] active:shadow-none ${
               clusterFilter === 'BLR' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
@@ -215,7 +222,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
           </button>
           <button
             onClick={() => { setClusterFilter('YC'); setCurrentIndex(0); }}
-            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[2px] active:shadow-none ${
               clusterFilter === 'YC' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
@@ -223,7 +230,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
           </button>
           <button
             onClick={() => { setClusterFilter('NOTICE'); setCurrentIndex(0); }}
-            className={`px-2.5 py-1 rounded transition-all active:translate-y-[1px] ${
+            className={`px-2.5 py-1 rounded transition-all active:translate-y-[2px] active:shadow-none ${
               clusterFilter === 'NOTICE' ? 'skeuo-btn-primary font-bold' : 'text-[#A1A1A1] hover:text-white'
             }`}
           >
@@ -298,18 +305,18 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
               }}
             >
               {/* Dynamic Rubber Ink Stamp Overlay when Swiping */}
-              {isRightVote && (
+              {(isRightVote || swipeDirection === 'RIGHT') && (
                 <div 
                   className="absolute top-6 left-6 px-4 py-1.5 skeuo-stamp-save font-black text-sm tracking-widest uppercase rotate-[-12deg] pointer-events-none z-20"
-                  style={{ opacity: Math.min(1, Math.abs(dragOffset.x) / 80) }}
+                  style={{ opacity: swipeDirection === 'RIGHT' ? 1 : Math.min(1, Math.abs(dragOffset.x) / 80) }}
                 >
                   SAVE TO PIPELINE
                 </div>
               )}
-              {isLeftVote && (
+              {(isLeftVote || swipeDirection === 'LEFT') && (
                 <div 
                   className="absolute top-6 right-6 px-4 py-1.5 skeuo-stamp-pass font-black text-sm tracking-widest uppercase rotate-[12deg] pointer-events-none z-20"
-                  style={{ opacity: Math.min(1, Math.abs(dragOffset.x) / 80) }}
+                  style={{ opacity: swipeDirection === 'LEFT' ? 1 : Math.min(1, Math.abs(dragOffset.x) / 80) }}
                 >
                   PASS
                 </div>
@@ -491,7 +498,7 @@ export const CompanySwipeDeck: React.FC<CompanySwipeDeckProps> = ({
         <button
           onClick={() => handleSwipe('RIGHT')}
           disabled={!activeJob || appliedJobIds.has(activeJob.id)}
-          className={`w-11 h-11 rounded-full flex items-center justify-center active:translate-y-[2px] active:shadow-none disabled:opacity-40 ${
+          className={`w-12 h-12 rounded-full flex items-center justify-center active:translate-y-[2px] active:shadow-none disabled:opacity-40 ${
             activeJob && appliedJobIds.has(activeJob.id)
               ? 'skeuo-keycap text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
               : 'skeuo-keycap text-[#A1A1A1] hover:text-emerald-400'

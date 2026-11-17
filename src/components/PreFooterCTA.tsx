@@ -16,11 +16,11 @@ export const PreFooterCTA: React.FC<PreFooterCTAProps> = ({
 }) => {
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-[#1F1F1F] bg-[#0A0A0A] p-8 sm:p-12 text-center shadow-xl">
+    <section className="relative overflow-hidden rounded-2xl border border-[#27272A] skeuo-surface p-8 sm:p-12 text-center shadow-xl">
       <div className="relative z-10 max-w-3xl mx-auto space-y-6">
         {/* Eyebrow Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111111] border border-[#262626] text-xs font-mono text-[#888888] shadow-sm">
-          <span>◈</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full skeuo-well text-xs font-mono text-[#888888]">
+          <span className="skeuo-led-green" />
           <span>Example role directory</span>
           <span className="text-[#333333]">•</span>
           <span className="text-white font-medium">{roleCount} sample {roleCount === 1 ? 'role' : 'roles'}</span>
@@ -41,7 +41,7 @@ export const PreFooterCTA: React.FC<PreFooterCTAProps> = ({
         <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
           <button
             onClick={onLaunchRadar}
-            className="px-5 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black font-bold text-xs transition-colors shadow-sm flex items-center gap-2"
+            className="skeuo-btn-primary px-5 py-2.5 rounded-lg text-black font-bold text-xs flex items-center gap-2 active:translate-y-[2px] active:shadow-none"
           >
             <span>Browse {roleCount} Sample {roleCount === 1 ? 'Role' : 'Roles'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -49,7 +49,7 @@ export const PreFooterCTA: React.FC<PreFooterCTAProps> = ({
 
           <button
             onClick={onOpenOutreach}
-            className="px-5 py-2.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] border border-[#262626] text-white font-medium text-xs transition-colors flex items-center gap-2"
+            className="skeuo-btn px-5 py-2.5 rounded-lg text-white font-medium text-xs flex items-center gap-2 active:translate-y-[2px] active:shadow-none"
           >
             <Mail className="w-3.5 h-3.5 text-[#888888]" />
             <span>Open Pitch Composer</span>
@@ -57,7 +57,7 @@ export const PreFooterCTA: React.FC<PreFooterCTAProps> = ({
 
           <button
             onClick={onOpenPortfolio}
-            className="px-5 py-2.5 rounded-lg bg-[#141414] hover:bg-[#1F1F1F] border border-[#262626] text-[#A1A1A1] hover:text-white font-medium text-xs transition-colors flex items-center gap-2"
+            className="skeuo-btn px-5 py-2.5 rounded-lg text-[#A1A1A1] hover:text-white font-medium text-xs flex items-center gap-2 active:translate-y-[2px] active:shadow-none"
           >
             <span>Import GitHub Profile</span>
           </button>

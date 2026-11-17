@@ -138,7 +138,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     setSidebarTab('JOBS');
                     setViewMode('SWIPE');
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all active:translate-y-[1px] ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all active:translate-y-[2px] active:shadow-none ${
                     sidebarTab === 'JOBS' && viewMode === 'SWIPE'
                       ? 'skeuo-btn text-white font-semibold'
                       : 'text-[#888888] hover:bg-[#141414] hover:text-white'
@@ -158,7 +158,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     setSidebarTab('JOBS');
                     setViewMode('TABLE');
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all active:translate-y-[1px] ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all active:translate-y-[2px] active:shadow-none ${
                     sidebarTab === 'JOBS' && viewMode === 'TABLE'
                       ? 'skeuo-btn text-white font-semibold'
                       : 'text-[#888888] hover:bg-[#141414] hover:text-white'
@@ -178,7 +178,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     setSidebarTab('APPLICATIONS');
                     onOpenApplications();
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all active:translate-y-[1px] ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs transition-all active:translate-y-[2px] active:shadow-none ${
                     sidebarTab === 'APPLICATIONS' ? 'skeuo-btn text-white font-semibold' : 'text-[#888888] hover:bg-[#141414] hover:text-white'
                   }`}
                 >
@@ -203,7 +203,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     setSidebarTab('PORTFOLIO');
                     onOpenPortfolio();
                   }}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all active:translate-y-[1px] ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all active:translate-y-[2px] active:shadow-none ${
                     sidebarTab === 'PORTFOLIO' ? 'skeuo-btn text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
                   }`}
                 >
@@ -216,7 +216,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                     setSidebarTab('ATS');
                     onOpenAtsLab();
                   }}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all active:translate-y-[1px] ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all active:translate-y-[2px] active:shadow-none ${
                     sidebarTab === 'ATS' ? 'skeuo-btn text-white font-semibold' : 'text-[#8C93A8] hover:bg-[#151824] hover:text-white'
                   }`}
                 >
@@ -258,7 +258,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                       className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 active:translate-y-[2px] active:shadow-none ${
                         viewMode === 'SWIPE'
                           ? 'skeuo-btn-primary font-bold text-black'
-                          : 'text-[#888888] hover:text-white active:translate-y-[1px]'
+                          : 'text-[#888888] hover:text-white'
                       }`}
                     >
                       <span>⚡ Swipe Deck</span>
@@ -269,7 +269,7 @@ export const JobRadar: React.FC<JobRadarProps> = ({
                       className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 active:translate-y-[2px] active:shadow-none ${
                         viewMode === 'TABLE'
                           ? 'skeuo-btn-primary font-bold text-black'
-                          : 'text-[#888888] hover:text-white active:translate-y-[1px]'
+                          : 'text-[#888888] hover:text-white'
                       }`}
                     >
                       <Layers className="w-3 h-3" />

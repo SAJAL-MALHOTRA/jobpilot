@@ -68,10 +68,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={() => handleNavClick('RADAR')}
-              className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white rounded-lg active:translate-y-[1px]"
+              className="flex items-center gap-2.5 text-left group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white rounded-lg active:translate-y-[2px] active:shadow-none"
               aria-label="JobPilot Home"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg skeuo-btn-primary text-xs font-black text-black transition-transform group-hover:scale-105 active:translate-y-[2px] active:shadow-none">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg skeuo-keycap-primary text-xs font-black text-black transition-transform group-hover:scale-105">
                 JP
               </div>
               <div>
@@ -95,10 +95,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <button
               onClick={() => handleNavClick('RADAR')}
-              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
+              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white active:translate-y-[2px] active:shadow-none ${
                 activeTab === 'RADAR'
-                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
+                  ? 'skeuo-btn-primary font-bold text-black'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5'
               }`}
             >
               Sample Roles
@@ -106,10 +106,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => handleNavClick('OUTREACH')}
-              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
+              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white active:translate-y-[2px] active:shadow-none ${
                 activeTab === 'OUTREACH'
-                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
+                  ? 'skeuo-btn-primary font-bold text-black'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5'
               }`}
             >
               Founder Pitches
@@ -117,10 +117,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => handleNavClick('ATS_LAB')}
-              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
+              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white active:translate-y-[2px] active:shadow-none ${
                 activeTab === 'ATS_LAB'
-                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
+                  ? 'skeuo-btn-primary font-bold text-black'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5'
               }`}
             >
               ATS Resume
@@ -128,10 +128,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => handleNavClick('PORTFOLIO')}
-              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
+              className={`rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white active:translate-y-[2px] active:shadow-none ${
                 activeTab === 'PORTFOLIO'
-                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
+                  ? 'skeuo-btn-primary font-bold text-black'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5'
               }`}
             >
               GitHub Importer
@@ -139,10 +139,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={() => handleNavClick('CRM')}
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white ${
+              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white active:translate-y-[2px] active:shadow-none ${
                 activeTab === 'CRM'
-                  ? 'skeuo-btn-primary font-bold text-black active:translate-y-[2px] active:shadow-none'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5 active:translate-y-[1px]'
+                  ? 'skeuo-btn-primary font-bold text-black'
+                  : 'text-[#888888] hover:text-white hover:bg-white/5'
               }`}
             >
               <span>Tracker</span>
@@ -157,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={handleFaqClick}
-              className="rounded-full px-3 py-1.5 text-[#888888] transition-all hover:text-white hover:bg-white/5 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+              className="rounded-full px-3 py-1.5 text-[#888888] transition-all hover:text-white hover:bg-white/5 active:translate-y-[2px] active:shadow-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
             >
               FAQ
             </button>

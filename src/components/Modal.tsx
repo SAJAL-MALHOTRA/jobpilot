@@ -114,13 +114,13 @@ export const Modal: React.FC<ModalProps> = ({
         aria-describedby={descId}
         aria-label={ariaLabel || title}
         tabIndex={-1}
-        className={`bg-[#0A0A0A] border border-[#222222] rounded-2xl ${maxWidth} w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-7 space-y-5 text-[#EDEDED] font-sans focus:outline-none`}
+        className={`skeuo-surface border border-[#27272E] rounded-2xl ${maxWidth} w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-7 space-y-5 text-[#EDEDED] font-sans focus:outline-none`}
       >
         {/* Header */}
         <div className="flex items-start justify-between border-b border-[#1F1F1F] pb-4">
           <div className="flex items-center gap-3">
             {icon && (
-              <div className="w-9 h-9 rounded-xl bg-[#141414] border border-[#262626] flex items-center justify-center text-white shrink-0">
+              <div className="w-9 h-9 rounded-xl skeuo-well flex items-center justify-center text-white shrink-0">
                 {icon}
               </div>
             )}
@@ -139,7 +139,7 @@ export const Modal: React.FC<ModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1.5 rounded-lg text-[#A1A1A1] hover:text-white hover:bg-[#1A1A1A] border border-transparent hover:border-[#262626] transition-colors"
+            className="skeuo-btn p-1.5 rounded-lg text-[#A1A1A1] hover:text-white transition-all active:translate-y-[2px] active:shadow-none"
           >
             <X className="w-4 h-4" />
           </button>

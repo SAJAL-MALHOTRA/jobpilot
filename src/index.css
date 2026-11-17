@@ -2,438 +2,324 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --font-mono: 'Geist Mono', 'Fragment Mono', monospace;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --font-mono: 'Geist Mono', 'JetBrains Mono', 'SF Mono', monospace;
 
-    /* Semantic Unified Surface Tokens */
-    --surface-bg: #000000;
-    --surface-card: #0A0A0A;
-    --surface-elevated: #111111;
-    --surface-input: #141414;
-    --border-subtle: #1F1F1F;
-    --border-strong: #2E2E2E;
+    /* Dark Charcoal Workstation Palette (Linear / Raycast inspired) */
+    --canvas-bg: #0D0E12;
+    --surface-sidebar: #121318;
+    --surface-panel: #16171F;
+    --surface-row: #181922;
+    --surface-hover: #1E202B;
+    --surface-active: #232534;
+    --surface-card: #15161D;
 
-    /* Semantic High-Contrast Text Tokens (WCAG AAA/AA compliant) */
+    /* Subtle Architectural Borders */
+    --border-subtle: #21232D;
+    --border-muted: #282A37;
+    --border-highlight: #36394A;
+
+    /* Restrained Brand Accent: Linear Indigo */
+    --accent-indigo: #5E6AD2;
+    --accent-indigo-hover: #6E7BEA;
+    --accent-indigo-subtle: rgba(94, 106, 210, 0.12);
+
+    /* Text Hierarchy */
     --text-primary: #EDEDED;
-    --text-secondary: #D4D4D4;
-    --text-muted: #A1A1A1;
-    --text-faint: #737373;
+    --text-secondary: #9B9CA7;
+    --text-muted: #676977;
+    --text-faint: #4B4C57;
   }
 
   html, body {
-    background-color: #000000;
-    color: #EDEDED;
+    background-color: var(--canvas-bg);
+    color: var(--text-primary);
     font-family: var(--font-sans);
+    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   /* Accessible Focus Ring */
   :focus-visible {
-    outline: 2px solid #FFFFFF !important;
+    outline: 2px solid var(--accent-indigo) !important;
     outline-offset: 2px !important;
   }
 }
 
-/* Minimalist scrollbar */
+/* Linear-grade slim scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #262626;
+  background: #262835;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3A3A3A;
+  background: #3B3E52;
 }
 
-/* Clean unified panel styling */
-.dark-panel {
-  background-color: #0A0A0A;
-  border: 1px solid #1F1F1F;
+/* Glassmorphism blur effects */
+.workspace-glass {
+  background-color: rgba(18, 19, 24, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-/* JobPilot Card primitive */
-.jp-card {
-  background-color: #0A0A0A;
-  border: 1px solid #1F1F1F;
-  border-radius: 1rem;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+.workspace-glass-subtle {
+  background-color: rgba(22, 23, 31, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.jp-card:hover {
-  border-color: #2E2E2E;
-  background-color: #0D0D0D;
+.workspace-panel {
+  background-color: #15161E;
+  border: 1px solid #232530;
 }
 
-/* Animations for Dialogs & Modals */
+/* Smooth Spring Momentum Transitions */
+.transition-spring {
+  transition-property: all;
+  transition-duration: 240ms;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transition-momentum {
+  transition: all 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Animations for Dialogs, Slide-Over & Modals */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { 
+    transform: translateX(100%); 
+    opacity: 0.5;
   }
-  to {
+  to { 
+    transform: translateX(0); 
     opacity: 1;
   }
 }
 
-@keyframes enter {
+@keyframes scaleUp {
   from {
+    transform: scale(0.97);
     opacity: 0;
-    transform: scale(0.97) translateY(4px);
   }
   to {
+    transform: scale(1);
     opacity: 1;
-    transform: scale(1) translateY(0);
   }
 }
 
-.animate-in {
-  animation: enter 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-fade-in {
+  animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.fade-in {
-  animation: fadeIn 0.15s ease-out forwards;
+.animate-slide-in-right {
+  animation: slideInRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Accessibility: Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+.animate-scale-up {
+  animation: scaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ==========================================================================
-   Tactile Dark Skeuomorphism System (Neo-Skeuomorphic Hardware Styling)
-   ========================================================================== */
+/* Linear/Raycast Button Styles */
+.btn-primary {
+  background-color: #5E6AD2;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-primary:hover {
+  background-color: #6E7BEA;
+  box-shadow: 0 2px 8px rgba(94, 106, 210, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+  background-color: #525DBE;
+}
 
-/* Physical extruded metallic/dark surface with top specular highlight */
+.btn-secondary {
+  background-color: #1C1E27;
+  color: #EDEDED;
+  border: 1px solid #2B2D3C;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-secondary:hover {
+  background-color: #242633;
+  border-color: #383A4E;
+  color: #FFFFFF;
+}
+.btn-secondary:active {
+  background-color: #181921;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: #9B9CA7;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-ghost:hover {
+  background-color: #1E202B;
+  color: #EDEDED;
+}
+
+/* Consistent Workstation Components */
 .skeuo-surface {
-  background: linear-gradient(180deg, #18181B 0%, #0C0C0E 100%);
-  border: 1px solid #27272A;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
-    0 10px 25px -5px rgba(0, 0, 0, 0.8),
-    0 2px 4px rgba(0, 0, 0, 0.5);
+  background-color: #15161E;
+  border: 1px solid #232532;
+  border-radius: 0.75rem;
 }
 
-/* Deep recessed chassis tray/well */
 .skeuo-well {
-  background: #08080A;
-  border: 1px solid #18181B;
-  box-shadow: 
-    inset 0 2px 5px 0 rgba(0, 0, 0, 0.85),
-    inset 0 1px 1px 0 rgba(0, 0, 0, 0.95),
-    0 1px 0 0 rgba(255, 255, 255, 0.05);
+  background-color: #101117;
+  border: 1px solid #1E202C;
+  border-radius: 0.5rem;
 }
 
-/* Mechanical dark push-button with 3D bevel and active click depth */
+.skeuo-card, .skeuo-index-card {
+  background-color: #171822;
+  border: 1px solid #242635;
+  border-radius: 0.75rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.skeuo-card:hover, .skeuo-index-card:hover {
+  background-color: #1C1E2A;
+  border-color: #36394D;
+}
+
 .skeuo-btn {
-  background: linear-gradient(180deg, #222226 0%, #121215 100%);
-  border: 1px solid #2E2E34;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
-    0 2px 0 0 #000000,
-    0 4px 8px rgba(0, 0, 0, 0.5);
-  transition: all 0.1s ease;
-  user-select: none;
+  background-color: #1C1E27;
+  border: 1px solid #2B2D3C;
+  color: #EDEDED;
+  border-radius: 0.5rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .skeuo-btn:hover {
-  background: linear-gradient(180deg, #28282E 0%, #161619 100%);
-  border-color: #3B3B42;
+  background-color: #242633;
+  border-color: #383A4E;
+  color: #FFFFFF;
 }
-
 .skeuo-btn:active {
-  transform: translateY(2px);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.7),
-    0 0 0 0 #000000;
+  transform: translateY(1px);
+  background-color: #181921;
 }
 
-/* Machined aluminum / pearl white primary tactile button */
 .skeuo-btn-primary {
-  background: linear-gradient(180deg, #FFFFFF 0%, #D4D4D8 100%);
-  color: #09090B;
-  border: 1px solid #E4E4E7;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
-    0 2px 0 0 #71717A,
-    0 5px 12px rgba(0, 0, 0, 0.6);
-  font-weight: 600;
-  transition: all 0.1s ease;
-  user-select: none;
+  background-color: #5E6AD2;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .skeuo-btn-primary:hover {
-  background: linear-gradient(180deg, #FFFFFF 0%, #E4E4E7 100%);
+  background-color: #6E7BEA;
+  box-shadow: 0 2px 8px rgba(94, 106, 210, 0.35);
 }
-
 .skeuo-btn-primary:active {
-  transform: translateY(2px);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.35),
-    0 0 0 0 #71717A;
+  transform: translateY(1px);
+  background-color: #525DBE;
 }
 
-/* Tactile executive smart card / physical deck card */
-.skeuo-card {
-  background: linear-gradient(165deg, #18181C 0%, #0D0D10 60%, #08080A 100%);
-  border: 1px solid #27272E;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
-    0 24px 48px -12px rgba(0, 0, 0, 0.9),
-    0 4px 12px rgba(0, 0, 0, 0.6);
-}
-
-/* Embossed tactile pill/badge */
-.skeuo-badge {
-  background: linear-gradient(180deg, #1C1C20 0%, #101013 100%);
-  border: 1px solid #28282F;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
-    0 1px 3px rgba(0, 0, 0, 0.5);
-}
-
-/* Physical convex glass jewel LED indicators */
-.skeuo-led-green {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: radial-gradient(circle at 35% 35%, #86EFAC 0%, #22C55E 45%, #15803D 100%);
-  box-shadow: 
-    0 0 8px 1px rgba(34, 197, 94, 0.7),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
-  flex-shrink: 0;
-  display: inline-block;
-}
-
-.skeuo-led-amber {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: radial-gradient(circle at 35% 35%, #FDE68A 0%, #F59E0B 45%, #B45309 100%);
-  box-shadow: 
-    0 0 8px 1px rgba(245, 158, 11, 0.7),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
-  flex-shrink: 0;
-  display: inline-block;
-}
-
-.skeuo-led-blue {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: radial-gradient(circle at 35% 35%, #93C5FD 0%, #3B82F6 45%, #1D4ED8 100%);
-  box-shadow: 
-    0 0 8px 1px rgba(59, 130, 246, 0.7),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
-  flex-shrink: 0;
-  display: inline-block;
-}
-
-.skeuo-led-red {
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background: radial-gradient(circle at 35% 35%, #FCA5A5 0%, #EF4444 45%, #B91C1C 100%);
-  box-shadow: 
-    0 0 8px 1px rgba(239, 68, 68, 0.7),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.6);
-  flex-shrink: 0;
-  display: inline-block;
-}
-
-/* Metallic cyan hardware primary push-button */
-.skeuo-btn-cyan {
-  background: linear-gradient(180deg, #5AD4F5 0%, #38B8E0 100%);
-  color: #031117;
-  border: 1px solid #75DCF8;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.8),
-    0 2px 0 0 #0284C7,
-    0 5px 12px rgba(0, 0, 0, 0.6);
-  font-weight: 600;
-  transition: all 0.1s ease;
-  user-select: none;
-}
-
-.skeuo-btn-cyan:hover {
-  background: linear-gradient(180deg, #6EE0FD 0%, #40C2EB 100%);
-}
-
-.skeuo-btn-cyan:active {
-  transform: translateY(2px);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.35),
-    0 0 0 0 #0284C7;
-}
-
-/* Mechanical hardware keycap action buttons */
 .skeuo-keycap {
-  background: linear-gradient(180deg, #24242A 0%, #121215 100%);
-  border: 1px solid #303038;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
-    0 2px 0 0 #000000,
-    0 4px 8px rgba(0, 0, 0, 0.6);
-  transition: all 0.1s ease;
-  user-select: none;
+  background-color: #191B24;
+  border: 1px solid #292C3C;
+  color: #EDEDED;
+  border-radius: 0.5rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 .skeuo-keycap:hover {
-  background: linear-gradient(180deg, #2C2C33 0%, #17171C 100%);
-  border-color: #3D3D48;
-}
-
-.skeuo-keycap:active {
-  transform: translateY(2px);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.75),
-    0 0 0 0 #000000;
+  background-color: #212330;
+  border-color: #3B3E52;
 }
 
 .skeuo-keycap-primary {
-  background: linear-gradient(180deg, #FFFFFF 0%, #E2E2E8 100%);
-  border: 1px solid #EFEFF3;
-  color: #09090B;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
-    0 2px 0 0 #52525B,
-    0 6px 14px rgba(0, 0, 0, 0.6);
-  transition: all 0.1s ease;
-  user-select: none;
+  background-color: #5E6AD2;
+  color: #FFFFFF;
+  border-radius: 0.5rem;
 }
 
-.skeuo-keycap-primary:hover {
-  background: linear-gradient(180deg, #FFFFFF 0%, #EDEDF2 100%);
+.skeuo-badge, .skeuo-tag {
+  background-color: #1B1D27;
+  border: 1px solid #262837;
+  color: #9B9CA7;
+  border-radius: 0.375rem;
 }
 
-.skeuo-keycap-primary:active {
-  transform: translateY(2px);
-  box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.4),
-    0 0 0 0 #52525B;
-}
-
-/* Recessed equipment slot for Kanban columns */
 .skeuo-slot {
-  background: linear-gradient(180deg, #0A0A0E 0%, #060608 100%);
-  border: 1px solid #1C1C22;
-  box-shadow: 
-    inset 0 2px 6px 0 rgba(0, 0, 0, 0.9),
-    inset 0 1px 1px 0 rgba(0, 0, 0, 0.95),
-    0 1px 0 0 rgba(255, 255, 255, 0.04);
+  background-color: #101117;
+  border: 1px dashed #232533;
+  border-radius: 0.75rem;
 }
 
-/* Tactile index cards */
-.skeuo-index-card {
-  background: linear-gradient(175deg, #18181D 0%, #111115 65%, #0E0E12 100%);
-  border: 1px solid #27272F;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
-    0 2px 0 0 #000000,
-    0 4px 10px rgba(0, 0, 0, 0.45);
-  transition: all 0.15s ease;
-}
-
-.skeuo-index-card:hover {
-  border-color: #383844;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.16),
-    0 3px 0 0 #000000,
-    0 6px 14px rgba(0, 0, 0, 0.6);
-}
-
-/* Physical tag badge */
-.skeuo-tag {
-  background: linear-gradient(180deg, #1E1E24 0%, #131317 100%);
-  border: 1px solid #2C2C35;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
-    0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Hardware countersunk screw detail */
-.skeuo-screw {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, #3F3F46 0%, #18181B 75%, #09090B 100%);
-  box-shadow: 
-    inset 0 1px 1.5px rgba(0, 0, 0, 0.95),
-    0 1px 0 rgba(255, 255, 255, 0.15);
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.skeuo-screw::before {
-  content: '';
-  position: absolute;
+.skeuo-led-green {
+  display: inline-block;
   width: 6px;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.85);
-  box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.15);
-}
-
-.skeuo-screw::after {
-  content: '';
-  position: absolute;
-  width: 1px;
   height: 6px;
-  background: rgba(0, 0, 0, 0.85);
-  box-shadow: 0.5px 0 0 rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  background-color: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
 }
 
-/* Physical rubber ink stamp look */
+.skeuo-led-amber {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #F59E0B;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.skeuo-led-red {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #EF4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+}
+
+.skeuo-led-blue {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #5E6AD2;
+  box-shadow: 0 0 6px rgba(94, 106, 210, 0.6);
+}
+
 .skeuo-stamp-save {
-  border: 3px solid #10B981;
+  border: 2px solid #10B981;
   color: #10B981;
-  background: rgba(16, 185, 129, 0.1);
-  box-shadow: 
-    0 0 16px rgba(16, 185, 129, 0.3),
-    inset 0 1px 2px rgba(255, 255, 255, 0.25),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.5);
-  text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 6px;
 }
 
 .skeuo-stamp-pass {
-  border: 3px solid #EF4444;
+  border: 2px solid #EF4444;
   color: #EF4444;
-  background: rgba(239, 68, 68, 0.1);
-  box-shadow: 
-    0 0 16px rgba(239, 68, 68, 0.3),
-    inset 0 2px 4px rgba(0, 0, 0, 0.7);
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
-  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.12);
+  border-radius: 6px;
 }
 
-/* Print stylesheet for ATS Resume printing */
-@media print {
-  body {
-    background-color: #FFFFFF !important;
-    color: #000000 !important;
-  }
-  .no-print {
-    display: none !important;
-  }
-  .print-only {
-    display: block !important;
-  }
+/* Snapping row styles */
+.snap-scroll-container {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+.snap-item {
+  scroll-snap-align: start;
 }
