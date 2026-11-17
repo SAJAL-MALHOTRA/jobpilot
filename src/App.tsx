@@ -3,7 +3,7 @@ import type { CandidateProfile, JobListing, ApplicationCard, KanbanStatus } from
 import { initialProfile } from './lib/defaultProfile';
 import { curatedJobs } from './lib/jobRadarEngine';
 import { WorkspaceSidebar, type CorridorFilter } from './components/WorkspaceSidebar';
-import { JobDirectory } from './components/JobDirectory';
+import { OpportunityDiscover } from './components/OpportunityDiscover';
 import { JobInspectorDrawer } from './components/JobInspectorDrawer';
 import { CommandPalette, type WorkspaceTab } from './components/CommandPalette';
 import { AutopilotTracker } from './components/AutopilotTracker';
@@ -249,9 +249,6 @@ export function App() {
             setActiveTab(tab);
             if (tab === 'PROFILE') setModalMode('PROFILE_MODAL');
           }}
-          activeFilter={corridorFilter}
-          onSelectFilter={setCorridorFilter}
-          roleCount={jobs.length}
           pipelineCount={cards.length}
           candidate={candidate}
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
@@ -353,7 +350,7 @@ export function App() {
         <div className="flex-1 flex overflow-hidden">
           {/* TAB: DIRECTORY */}
           {activeTab === 'DIRECTORY' && (
-            <JobDirectory
+            <OpportunityDiscover
               jobs={jobs}
               candidate={candidate}
               selectedJobId={selectedJob?.id || null}
@@ -361,6 +358,7 @@ export function App() {
               onAddToPipeline={handleAddToPipeline}
               onDirectApply={handleDirectApply}
               appliedJobIds={appliedJobIds}
+              cards={cards}
               corridorFilter={corridorFilter}
               onSelectCorridorFilter={setCorridorFilter}
               onOpenPitch={(job: JobListing) => {

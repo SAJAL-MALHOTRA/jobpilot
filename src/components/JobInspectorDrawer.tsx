@@ -412,6 +412,20 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
               </div>
             </div>
 
+            {/* Methodology & Transparency */}
+            <div className="p-3 rounded-xl bg-[#131520] border border-[#202334] text-[11px] text-[#8E92A8] space-y-1.5">
+              <span className="font-semibold text-[#D0D3E2] flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Fit Score Methodology</span>
+              </span>
+              <p className="leading-relaxed">
+                Evaluated deterministically by comparing {job.requiredSkills.length} required technical proficiencies against your verified profile skills ({candidate.primarySkills.slice(0, 4).join(', ')}).
+              </p>
+              <div className="pt-1 text-[10px] text-[#63677D] font-mono">
+                Source: {job.verificationSource || 'Verified Founder Direct Reach'}
+              </div>
+            </div>
+
             {/* Keyword Breakdown */}
             <div className="space-y-2">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-[#686A78] block">
@@ -492,6 +506,14 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
       {/* Drawer Bottom Action Bar */}
       <div className="p-3 border-t border-[#212330] bg-[#121319] flex items-center gap-2">
         <button
+          onClick={() => setActiveTab('PITCH')}
+          className="flex-1 py-2 px-3 rounded-lg bg-[#5E6AD2] hover:bg-[#6E7BEA] text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+        >
+          <Send className="w-3.5 h-3.5" />
+          <span>Contact Founder</span>
+        </button>
+
+        <button
           onClick={() => onAddToPipeline(job)}
           className={`flex-1 py-2 px-3 rounded-lg border text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
             isApplied
@@ -500,16 +522,15 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
           }`}
         >
           <BookmarkPlus className="w-3.5 h-3.5" />
-          <span>{isApplied ? `Tracked in Pipeline (${applicationCard?.status || 'DISCOVERED'})` : '+ Track in Pipeline'}</span>
+          <span>{isApplied ? `Tracked (${applicationCard?.status || 'SAVED'})` : '+ Save'}</span>
         </button>
 
         <button
           onClick={() => onDirectApply(job)}
-          className="py-2 px-3.5 rounded-lg bg-[#5E6AD2] hover:bg-[#6E7BEA] text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+          className="p-2 rounded-lg bg-[#1C1E29] hover:bg-[#242636] border border-[#2E3144] text-[#8E92A8] hover:text-white transition-colors"
           title="Open career page or Google search"
         >
-          <span>Apply</span>
-          <ExternalLink className="w-3.5 h-3.5" />
+          <ExternalLink className="w-4 h-4" />
         </button>
       </div>
     </div>
