@@ -124,6 +124,16 @@ export function App() {
     );
   };
 
+  const handleUpdateCard = (updatedCard: ApplicationCard) => {
+    setCards((prev) =>
+      prev.map((c) => (c.id === updatedCard.id ? updatedCard : c))
+    );
+  };
+
+  const handleAddCustomCard = (newCard: ApplicationCard) => {
+    setCards((prev) => [newCard, ...prev]);
+  };
+
   const handleRemoveCard = (cardId: string) => {
     setCards((prev) => prev.filter((c) => c.id !== cardId));
   };
@@ -308,8 +318,8 @@ export function App() {
 
       {/* Applications Kanban Modal */}
       {activeModal === 'APPLICATIONS' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md">
-          <div className="bg-[#0A0A0A] border border-[#222222] rounded-xl max-w-5xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 space-y-6 text-white font-sans">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md">
+          <div className="bg-[#0A0A0A] border border-[#222222] rounded-xl max-w-6xl w-full max-h-[94vh] overflow-y-auto shadow-2xl p-5 sm:p-6 space-y-6 text-white font-sans">
             <div className="flex items-center justify-between pb-3 border-b border-[#1F1F1F]">
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-sm text-white">Application Pipeline Tracker</h3>
@@ -327,6 +337,8 @@ export function App() {
             <AutopilotTracker
               cards={cards}
               onUpdateCardStatus={handleUpdateCardStatus}
+              onUpdateCard={handleUpdateCard}
+              onAddCustomCard={handleAddCustomCard}
               onRemoveCard={handleRemoveCard}
               onOpenOutreachForCard={(job) => {
                 setSelectedJob(job);

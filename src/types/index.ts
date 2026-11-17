@@ -53,6 +53,8 @@ export interface JobListing {
   fundingRound?: string;
   bangaloreCluster?: string;
   noticeBuyoutCovered?: boolean;
+  jobUrl?: string;
+  tags?: string[];
 }
 
 export interface ATSMatchResult {
@@ -100,7 +102,8 @@ export type KanbanStatus =
   | 'TAILORED'
   | 'OUTREACH_SENT'
   | 'INTERVIEW_SCHEDULED'
-  | 'OFFER';
+  | 'OFFER'
+  | 'REJECTED';
 
 export interface ApplicationCard {
   id: string;
@@ -112,6 +115,8 @@ export interface ApplicationCard {
   outreachSubject?: string;
   outreachBody?: string;
   notes: string;
+  tags?: string[];
+  jobUrl?: string;
 }
 
 export interface AgentActivityLog {
