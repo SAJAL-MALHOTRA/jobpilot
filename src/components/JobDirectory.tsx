@@ -129,7 +129,7 @@ export const JobDirectory: React.FC<JobDirectoryProps> = ({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'MATCH' | 'SALARY' | 'RECENT')}
-              className="px-2.5 py-1.5 rounded-lg bg-[#181922] border border-[#252734] text-xs text-[#9D9FA9] outline-none hover:text-white transition-colors"
+              className="px-2.5 py-1.5 rounded-lg bg-[#181922] border border-[#252734] text-xs text-[#9D9FA9] outline-none hover:text-white transition-colors cursor-pointer"
             >
               <option value="MATCH">Sort: Best Match</option>
               <option value="SALARY">Sort: Compensation</option>
@@ -190,10 +190,11 @@ export const JobDirectory: React.FC<JobDirectoryProps> = ({
       {/* Directory Status Bar */}
       <div className="px-4 sm:px-6 py-2 border-b border-[#1E202B] bg-[#101116] flex items-center justify-between text-[11px] text-[#787A88]">
         <div className="flex items-center gap-2">
-          <span>
-            Showing <strong className="text-[#EDEDED] font-mono">{filteredJobs.length}</strong> of{' '}
-            <strong className="text-[#EDEDED] font-mono">{jobs.length}</strong> startup roles
+          <span className="text-[#EDEDED] font-medium font-mono">
+            {filteredJobs.length} roles found
           </span>
+          <span className="text-[#555767]">·</span>
+          <span className="text-[#848695]">Bangalore Corridors & YC Startups</span>
           {corridorFilter !== 'ALL' && (
             <span className="px-1.5 py-0.5 rounded bg-[#181922] text-[#9D9FA9] border border-[#252734] font-mono text-[10px]">
               Filter: {corridorFilter}
@@ -234,15 +235,15 @@ export const JobDirectory: React.FC<JobDirectoryProps> = ({
                     <div
                       key={job.id}
                       onClick={() => onSelectJob(job)}
-                      className={`grid grid-cols-[minmax(220px,2fr)_minmax(140px,1.2fr)_minmax(180px,1.5fr)_minmax(120px,1fr)_90px_100px] items-center px-4 sm:px-6 py-3 cursor-pointer text-xs transition-colors duration-150 ${
+                      className={`grid grid-cols-[minmax(220px,2fr)_minmax(140px,1.2fr)_minmax(180px,1.5fr)_minmax(120px,1fr)_90px_100px] items-center px-4 sm:px-6 py-2.5 cursor-pointer text-xs transition-colors duration-150 ${
                         isSelected
-                          ? 'bg-[#1E202C] border-l-2 border-[#5E6AD2]'
-                          : 'hover:bg-[#161720]'
+                          ? 'bg-[#181A25] border-l-[3px] border-[#5E6AD2]'
+                          : 'hover:bg-[#14151E]'
                       }`}
                     >
                       {/* Role & Company */}
                       <div className="flex items-center gap-3 min-w-0 pr-3">
-                        <div className={`w-8 h-8 rounded-lg ${job.logoColor} flex items-center justify-center font-bold text-white text-xs shrink-0 shadow-sm`}>
+                        <div className="w-8 h-8 rounded-lg bg-[#1C1E2A] border border-[#2B2E40] flex items-center justify-center font-bold text-[#D0D2E0] text-xs shrink-0 shadow-sm">
                           {job.company.charAt(0)}
                         </div>
                         <div className="min-w-0">
@@ -272,17 +273,17 @@ export const JobDirectory: React.FC<JobDirectoryProps> = ({
                       </div>
 
                       {/* Skills */}
-                      <div className="flex flex-wrap gap-1 pr-2">
+                      <div className="flex flex-wrap items-center gap-1 pr-2">
                         {job.requiredSkills.slice(0, 3).map((s) => (
                           <span
                             key={s}
-                            className="px-1.5 py-0.5 rounded bg-[#1A1C26] border border-[#252735] text-[10px] text-[#9D9FA9]"
+                            className="px-1.5 py-0.5 rounded bg-[#181923] border border-[#252735] text-[10px] text-[#9D9FA9]"
                           >
                             {s}
                           </span>
                         ))}
                         {job.requiredSkills.length > 3 && (
-                          <span className="text-[10px] text-[#636573] font-mono">
+                          <span className="px-1.5 py-0.5 rounded bg-[#151620] border border-[#232534] text-[10px] text-[#636573] font-mono">
                             +{job.requiredSkills.length - 3}
                           </span>
                         )}
@@ -290,7 +291,7 @@ export const JobDirectory: React.FC<JobDirectoryProps> = ({
 
                       {/* Compensation */}
                       <div className="font-mono text-[11px] text-[#D0D1DC] pr-2">
-                        <span>{job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa}L`}</span>
+                        <span className="font-semibold">{job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa} LPA`}</span>
                         <span className="block text-[10px] text-[#636573] font-sans">{job.equityRange}</span>
                       </div>
 
@@ -348,13 +349,13 @@ export const JobDirectory: React.FC<JobDirectoryProps> = ({
                   key={job.id}
                   onClick={() => onSelectJob(job)}
                   className={`p-4 rounded-xl border bg-[#15161E] hover:border-[#383B4E] cursor-pointer transition-all duration-150 flex flex-col justify-between ${
-                    isSelected ? 'border-[#5E6AD2] bg-[#1B1D28]' : 'border-[#232532]'
+                    isSelected ? 'border-[#5E6AD2] bg-[#181A25]' : 'border-[#232532]'
                   }`}
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-8 h-8 rounded-lg ${job.logoColor} flex items-center justify-center font-bold text-white text-xs shrink-0`}>
+                        <div className="w-8 h-8 rounded-lg bg-[#1C1E2A] border border-[#2B2E40] flex items-center justify-center font-bold text-[#D0D2E0] text-xs shrink-0">
                           {job.company.charAt(0)}
                         </div>
                         <div className="min-w-0">
@@ -372,18 +373,23 @@ export const JobDirectory: React.FC<JobDirectoryProps> = ({
                       <span className="truncate">{job.bangaloreCluster || job.location}</span>
                     </div>
 
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap items-center gap-1">
                       {job.requiredSkills.slice(0, 3).map((s) => (
-                        <span key={s} className="px-1.5 py-0.5 rounded bg-[#1A1C26] border border-[#252735] text-[10px] text-[#9D9FA9]">
+                        <span key={s} className="px-1.5 py-0.5 rounded bg-[#181923] border border-[#252735] text-[10px] text-[#9D9FA9]">
                           {s}
                         </span>
                       ))}
+                      {job.requiredSkills.length > 3 && (
+                        <span className="px-1.5 py-0.5 rounded bg-[#151620] border border-[#232534] text-[10px] text-[#636573] font-mono">
+                          +{job.requiredSkills.length - 3}
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-[#20222D] flex items-center justify-between">
-                    <span className="font-mono text-xs text-[#EDEDED] font-medium">
-                      {job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa}L`}
+                    <span className="font-mono text-xs text-[#EDEDED] font-semibold">
+                      {job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa} LPA`}
                     </span>
                     <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                       <button

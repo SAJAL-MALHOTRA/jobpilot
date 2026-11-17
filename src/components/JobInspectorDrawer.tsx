@@ -109,7 +109,7 @@ export const JobInspectorDrawer: React.FC<JobInspectorDrawerProps> = ({
       {/* Drawer Top Header */}
       <div className="p-4 border-b border-[#212330] bg-[#171822] flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <div className={`w-9 h-9 rounded-lg ${job.logoColor} flex items-center justify-center font-bold text-white text-base shadow-sm shrink-0`}>
+          <div className="w-9 h-9 rounded-lg bg-[#1C1E2A] border border-[#2B2E40] flex items-center justify-center font-bold text-[#EDEDED] text-base shadow-sm shrink-0">
             {job.company.charAt(0)}
           </div>
           <div className="min-w-0">

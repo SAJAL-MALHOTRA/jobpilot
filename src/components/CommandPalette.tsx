@@ -218,7 +218,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold shrink-0 ${job.logoColor} text-white`}>
+                            <div className="w-6 h-6 rounded bg-[#1C1E2A] border border-[#2B2E40] flex items-center justify-center text-xs font-bold shrink-0 text-[#EDEDED]">
                               {job.company.charAt(0)}
                             </div>
                             <div className="min-w-0">

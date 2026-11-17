@@ -9,13 +9,13 @@ import {
   Code2, 
   User, 
   HelpCircle, 
-  Search, 
   MapPin, 
   ShieldCheck, 
   PanelLeftClose, 
   PanelLeft, 
   Globe, 
-  Flame 
+  Flame,
+  Sparkles
 } from 'lucide-react';
 import type { WorkspaceTab } from './CommandPalette';
 
@@ -86,21 +86,21 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         </button>
       </div>
 
-      {/* Global Search / Command Bar Trigger */}
+      {/* Global Command Bar Trigger */}
       <div className="p-3 border-b border-[#21232D]">
         <button
           onClick={onOpenCommandPalette}
-          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#181922] border border-[#252734] hover:border-[#383B4E] hover:bg-[#1E202B] text-xs text-[#787A88] transition-all group ${
+          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#161720] border border-[#232532] hover:border-[#5E6AD2]/50 hover:bg-[#1C1E2A] text-xs transition-all group ${
             isCollapsed ? 'justify-center px-1' : ''
           }`}
-          title="Search or commands (⌘K)"
+          title="Open Command Palette (⌘K)"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <Search className="w-3.5 h-3.5 text-[#787A88] group-hover:text-[#EDEDED] shrink-0" />
-            {!isCollapsed && <span className="truncate">Search or jump to...</span>}
+            <Sparkles className="w-3.5 h-3.5 text-[#5E6AD2] group-hover:text-[#8E99F5] shrink-0" />
+            {!isCollapsed && <span className="font-medium text-[#B5B7C6] group-hover:text-white truncate">Command Menu</span>}
           </div>
           {!isCollapsed && (
-            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#222432] text-[#9D9FA9] border border-[#2D3042]">
+            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1F212D] text-[#8C8E9D] border border-[#2D3042] group-hover:text-white">
               ⌘K
             </kbd>
           )}
