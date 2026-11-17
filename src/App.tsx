@@ -102,6 +102,28 @@ export function App() {
   // Standalone Modals
   const [modalMode, setModalMode] = useState<'NONE' | 'ATS_MODAL' | 'OUTREACH_MODAL' | 'PROFILE_MODAL'>('NONE');
 
+  // Apple Light / Dark Theme State (Light Mode default)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('jobpilot_theme');
+    return (saved === 'dark' || saved === 'light') ? saved : 'light';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('jobpilot_theme', theme);
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   // Persistence to localStorage
   useEffect(() => {
     try {
@@ -240,7 +262,7 @@ export function App() {
   }, [cards, selectedJob]);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#0F1117] text-[#F3F4F6] font-sans selection:bg-[#818CF8]/30 selection:text-white">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#F4F6F9] dark:bg-[#0F1117] text-slate-900 dark:text-[#F3F4F6] font-sans transition-colors duration-300 selection:bg-blue-500/20 selection:text-blue-900 dark:selection:bg-[#818CF8]/30 dark:selection:text-white">
       {/* 1. Left Workspace Sidebar (Desktop) */}
       <div className="hidden md:flex shrink-0">
         <WorkspaceSidebar
@@ -255,6 +277,8 @@ export function App() {
           onOpenProfile={() => setModalMode('PROFILE_MODAL')}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
         />
       </div>
 
@@ -369,22 +393,24 @@ export function App() {
                 setSelectedJob(job);
                 setIsDrawerOpen(true);
               }}
+              theme={theme}
+              onToggleTheme={handleToggleTheme}
             />
           )}
 
           {/* TAB: PIPELINE CRM */}
           {activeTab === 'PIPELINE' && (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0F1117]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#F4F6F9] dark:bg-[#0F1117] transition-colors">
               <div className="max-w-7xl mx-auto space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#21232D]">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-[#21232D]">
                   <div>
-                    <h2 className="text-base font-semibold text-white">Application Pipeline CRM</h2>
-                    <p className="text-xs text-[#8C8E9D]">
+                    <h2 className="text-base font-bold text-slate-900 dark:text-white">Application Pipeline CRM</h2>
+                    <p className="text-xs text-slate-500 dark:text-[#8C8E9D]">
                       Move cards across interview stages, record outreach, and export CSV logs.
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#181922] border border-[#252734] text-indigo-400">
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-[#181922] border border-blue-200 dark:border-[#252734] text-blue-600 dark:text-indigo-400">
                       {cards.length} Tracked
                     </span>
                   </div>
@@ -407,7 +433,7 @@ export function App() {
 
           {/* TAB: SWIPE TRIAGE */}
           {activeTab === 'SWIPE' && (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0D0E12] flex flex-col items-center justify-center">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#F4F6F9] dark:bg-[#0D0E12] flex flex-col items-center justify-center transition-colors">
               <div className="w-full max-w-xl">
                 <CompanySwipeDeck
                   jobs={jobs}
@@ -430,26 +456,26 @@ export function App() {
 
           {/* TAB: ATS KEYWORD LAB */}
           {activeTab === 'ATS_LAB' && (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0D0E12]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#F4F6F9] dark:bg-[#0D0E12] transition-colors">
               <div className="max-w-4xl mx-auto space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#21232D]">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-[#21232D]">
                   <div>
-                    <h2 className="text-base font-semibold text-white">ATS Keyword Lab & Matcher</h2>
-                    <p className="text-xs text-[#8C8E9D]">
-                      Active Job: <strong className="text-white">{selectedJob?.title || jobs[0]?.title}</strong> at{' '}
-                      <strong className="text-white">{selectedJob?.company || jobs[0]?.company}</strong>
+                    <h2 className="text-base font-bold text-slate-900 dark:text-white">ATS Keyword Lab & Matcher</h2>
+                    <p className="text-xs text-slate-500 dark:text-[#8C8E9D]">
+                      Active Job: <strong className="text-slate-800 dark:text-white">{selectedJob?.title || jobs[0]?.title}</strong> at{' '}
+                      <strong className="text-slate-800 dark:text-white">{selectedJob?.company || jobs[0]?.company}</strong>
                     </p>
                   </div>
                   <button
                     onClick={() => setModalMode('ATS_MODAL')}
-                    className="px-3 py-1.5 rounded-lg bg-[#5E6AD2] hover:bg-[#6E7BEA] text-white text-xs font-medium transition-colors"
+                    className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors"
                   >
                     Launch PDF / Print Mode
                   </button>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#14151D] border border-[#232532]">
-                  <p className="text-xs text-[#B5B7C4] leading-relaxed mb-4">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#14151D] border border-slate-200/80 dark:border-[#232532] shadow-xs">
+                  <p className="text-xs text-slate-600 dark:text-[#B5B7C4] leading-relaxed mb-4">
                     Audit resume keywords against job requirements, preview tailored action verbs, and generate printable PDF resumes.
                   </p>
                   <button
@@ -457,7 +483,7 @@ export function App() {
                       setSelectedJob(selectedJob || jobs[0]);
                       setModalMode('ATS_MODAL');
                     }}
-                    className="btn-primary px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center gap-2"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs inline-flex items-center gap-2 active:scale-95 transition-all"
                   >
                     <FileText className="w-4 h-4" />
                     <span>Open Interactive ATS Tailor Studio</span>
@@ -469,19 +495,19 @@ export function App() {
 
           {/* TAB: OUTREACH COMPOSER */}
           {activeTab === 'OUTREACH' && (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0D0E12]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#F4F6F9] dark:bg-[#0D0E12] transition-colors">
               <div className="max-w-4xl mx-auto space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#21232D]">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-[#21232D]">
                   <div>
-                    <h2 className="text-base font-semibold text-white">Founder Pitch Composer</h2>
-                    <p className="text-xs text-[#8C8E9D]">
+                    <h2 className="text-base font-bold text-slate-900 dark:text-white">Founder Pitch Composer</h2>
+                    <p className="text-xs text-slate-500 dark:text-[#8C8E9D]">
                       Cold email templates tailored for startup founders and engineering leads.
                     </p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#14151D] border border-[#232532] space-y-3">
-                  <p className="text-xs text-[#B5B7C4]">
+                <div className="p-5 rounded-2xl bg-white dark:bg-[#14151D] border border-slate-200/80 dark:border-[#232532] shadow-xs space-y-3">
+                  <p className="text-xs text-slate-600 dark:text-[#B5B7C4]">
                     Select any job in the Directory to open the dedicated pitch composer with verified contact emails and custom formulas.
                   </p>
                   <button
@@ -489,7 +515,7 @@ export function App() {
                       setSelectedJob(selectedJob || jobs[0]);
                       setModalMode('OUTREACH_MODAL');
                     }}
-                    className="btn-primary px-4 py-2 rounded-lg text-xs font-medium inline-flex items-center gap-2"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs inline-flex items-center gap-2 active:scale-95 transition-all"
                   >
                     <Send className="w-4 h-4" />
                     <span>Compose Pitch for {selectedJob?.company || jobs[0]?.company}</span>
@@ -501,11 +527,11 @@ export function App() {
 
           {/* TAB: GITHUB PROOF STUDIO */}
           {activeTab === 'PORTFOLIO' && (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0D0E12]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#F4F6F9] dark:bg-[#0D0E12] transition-colors">
               <div className="max-w-4xl mx-auto space-y-4">
-                <div className="pb-3 border-b border-[#21232D]">
-                  <h2 className="text-base font-semibold text-white">GitHub Proof-of-Work Fetcher</h2>
-                  <p className="text-xs text-[#8C8E9D]">
+                <div className="pb-3 border-b border-slate-200/80 dark:border-[#21232D]">
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">GitHub Proof-of-Work Fetcher</h2>
+                  <p className="text-xs text-slate-500 dark:text-[#8C8E9D]">
                     Inspect live public repositories, commit histories, and tech stacks via GitHub REST API.
                   </p>
                 </div>
@@ -522,7 +548,7 @@ export function App() {
 
           {/* TAB: FAQ & ARCHITECTURE */}
           {activeTab === 'FAQ' && (
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#0D0E12]">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#F4F6F9] dark:bg-[#0D0E12] transition-colors">
               <div className="max-w-3xl mx-auto">
                 <WorkflowFAQ />
               </div>

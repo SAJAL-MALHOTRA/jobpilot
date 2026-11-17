@@ -9,7 +9,9 @@ import {
   HelpCircle, 
   PanelLeftClose, 
   PanelLeft,
-  Compass
+  Compass,
+  Sun,
+  Moon
 } from 'lucide-react';
 import type { WorkspaceTab } from './CommandPalette';
 
@@ -24,6 +26,8 @@ interface WorkspaceSidebarProps {
   onOpenProfile: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
@@ -35,29 +39,31 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
   onOpenProfile,
   isCollapsed,
   onToggleCollapse,
+  theme = 'light',
+  onToggleTheme,
 }) => {
   return (
     <aside 
-      className={`h-screen flex flex-col bg-[#0F1117] border-r border-[#292E3B] text-[#F3F4F6] select-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-30 shrink-0 ${
+      className={`h-screen flex flex-col bg-white/95 dark:bg-[#0F1117] border-r border-slate-200/80 dark:border-[#292C33] text-slate-900 dark:text-[#F3F4F6] select-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] z-30 shrink-0 ${
         isCollapsed ? 'w-16' : 'w-60'
       }`}
     >
-      {/* 1. Brand Header */}
-      <div className="h-14 px-4 border-b border-[#292E3B] flex items-center justify-between">
+      {/* 1. Brand Header (Apple squircle app icon) */}
+      <div className="h-14 px-4 border-b border-slate-200/80 dark:border-[#292C33] flex items-center justify-between">
         {!isCollapsed && (
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-[#818CF8] flex items-center justify-center font-bold text-[#0F1117] shadow-sm shrink-0 text-xs">
+            <div className="w-8 h-8 rounded-[12px] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white shadow-md shadow-blue-500/25 shrink-0 text-xs">
               JP
             </div>
             <div className="min-w-0">
-              <span className="font-semibold text-sm tracking-tight text-[#F3F4F6] block truncate">JobPilot</span>
-              <span className="text-[10px] text-[#A1A8B8] block truncate">Opportunity Intelligence</span>
+              <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-[#F3F4F6] block truncate">JobPilot</span>
+              <span className="text-[10px] font-semibold text-slate-400 dark:text-[#737C90] block truncate">Opportunity Radar</span>
             </div>
           </div>
         )}
 
         {isCollapsed && (
-          <div className="mx-auto w-8 h-8 rounded-lg bg-[#818CF8] flex items-center justify-center font-bold text-[#0F1117] shadow-sm text-xs">
+          <div className="mx-auto w-8 h-8 rounded-[12px] bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white shadow-md text-xs">
             JP
           </div>
         )}
@@ -65,66 +71,70 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         <button
           onClick={onToggleCollapse}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="p-1 rounded text-[#737C90] hover:text-[#F3F4F6] hover:bg-[#171A23] transition-colors"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:text-[#737C90] dark:hover:text-[#F3F4F6] hover:bg-slate-100 dark:hover:bg-[#1D2230] transition-colors"
         >
           {isCollapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* 2. Linear-style Command Trigger */}
-      <div className="p-3 border-b border-[#292E3B]">
+      {/* 2. Apple / Linear-style Command Trigger */}
+      <div className="p-3 border-b border-slate-200/80 dark:border-[#292C33]">
         <button
           onClick={onOpenCommandPalette}
-          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-[#171A23] border border-[#292E3B] hover:border-[#818CF8]/50 hover:bg-[#1D2230] text-xs transition-all group ${
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-100/80 dark:bg-[#171A23] border border-slate-200/80 dark:border-[#292C33] hover:border-blue-400 dark:hover:border-[#818CF8]/50 hover:bg-slate-100 dark:hover:bg-[#1D2230] text-xs transition-all group shadow-xs active:scale-95 ${
             isCollapsed ? 'justify-center px-1' : ''
           }`}
           title="Open Command Palette (⌘K)"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <Sparkles className="w-3.5 h-3.5 text-[#818CF8] group-hover:text-[#9FA8FF] shrink-0" />
-            {!isCollapsed && <span className="font-medium text-[#A1A8B8] group-hover:text-[#F3F4F6] truncate">Command Menu</span>}
+            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-[#818CF8] shrink-0" />
+            {!isCollapsed && <span className="font-semibold text-slate-700 dark:text-[#A1A8B8] group-hover:text-slate-900 dark:group-hover:text-[#F3F4F6] truncate">Command Menu</span>}
           </div>
           {!isCollapsed && (
-            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1D2230] text-[#737C90] border border-[#292E3B] group-hover:text-[#F3F4F6]">
+            <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-white dark:bg-[#1D2230] text-slate-500 dark:text-[#737C90] border border-slate-200/80 dark:border-[#292C33] shadow-2xs">
               ⌘K
             </kbd>
           )}
         </button>
       </div>
 
-      {/* 3. Essential Navigation */}
+      {/* 3. Navigation with Apple iOS-style Squircle Badges */}
       <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 text-xs font-sans">
         <div className="space-y-1">
           {/* Discover Opportunities */}
           <button
             onClick={() => onSelectTab('DIRECTORY')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${
               activeTab === 'DIRECTORY'
-                ? 'bg-[#1D2230] text-[#F3F4F6] font-semibold shadow-sm border border-[#292E3B]'
-                : 'text-[#A1A8B8] hover:text-[#F3F4F6] hover:bg-[#171A23]'
+                ? 'bg-blue-50 dark:bg-[#1D2230] text-blue-700 dark:text-[#F3F4F6] font-bold shadow-xs border border-blue-200/80 dark:border-[#292C33]'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
             } ${isCollapsed ? 'justify-center px-1' : ''}`}
             title="Discover Opportunities"
           >
-            <Compass className={`w-4 h-4 shrink-0 ${activeTab === 'DIRECTORY' ? 'text-[#818CF8]' : 'text-[#737C90]'}`} />
+            <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-xs">
+              <Compass className="w-3.5 h-3.5" />
+            </div>
             {!isCollapsed && <span>Discover</span>}
           </button>
 
           {/* Applications Pipeline CRM */}
           <button
             onClick={() => onSelectTab('PIPELINE')}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all ${
               activeTab === 'PIPELINE'
-                ? 'bg-[#1D2230] text-[#F3F4F6] font-semibold shadow-sm border border-[#292E3B]'
-                : 'text-[#A1A8B8] hover:text-[#F3F4F6] hover:bg-[#171A23]'
+                ? 'bg-emerald-50 dark:bg-[#1D2230] text-emerald-800 dark:text-[#F3F4F6] font-bold shadow-xs border border-emerald-200/80 dark:border-[#292C33]'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
             } ${isCollapsed ? 'justify-center px-1' : ''}`}
             title="Applications Pipeline"
           >
             <div className="flex items-center gap-2.5">
-              <Kanban className={`w-4 h-4 shrink-0 ${activeTab === 'PIPELINE' ? 'text-[#818CF8]' : 'text-[#737C90]'}`} />
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-[#34D399] flex items-center justify-center shrink-0 shadow-xs">
+                <Kanban className="w-3.5 h-3.5" />
+              </div>
               {!isCollapsed && <span>Pipeline CRM</span>}
             </div>
             {!isCollapsed && pipelineCount > 0 && (
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[#818CF8]/10 text-[#818CF8] border border-[#818CF8]/30">
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-[#34D399] border border-emerald-200 dark:border-emerald-800/40">
                 {pipelineCount}
               </span>
             )}
@@ -133,82 +143,109 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
           {/* ATS Keyword Match Lab */}
           <button
             onClick={() => onSelectTab('ATS_LAB')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${
               activeTab === 'ATS_LAB'
-                ? 'bg-[#1D2230] text-[#F3F4F6] font-semibold shadow-sm border border-[#292E3B]'
-                : 'text-[#A1A8B8] hover:text-[#F3F4F6] hover:bg-[#171A23]'
+                ? 'bg-purple-50 dark:bg-[#1D2230] text-purple-700 dark:text-[#F3F4F6] font-bold shadow-xs border border-purple-200/80 dark:border-[#292C33]'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
             } ${isCollapsed ? 'justify-center px-1' : ''}`}
-            title="ATS Keyword Lab"
+            title="ATS Keyword Match Lab"
           >
-            <FileText className={`w-4 h-4 shrink-0 ${activeTab === 'ATS_LAB' ? 'text-[#818CF8]' : 'text-[#737C90]'}`} />
-            {!isCollapsed && <span>Match Lab</span>}
+            <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 shadow-xs">
+              <FileText className="w-3.5 h-3.5" />
+            </div>
+            {!isCollapsed && <span>ATS Lab</span>}
           </button>
 
-          {/* Founder Pitch Composer */}
+          {/* Founder Pitch Outreach */}
           <button
             onClick={() => onSelectTab('OUTREACH')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${
               activeTab === 'OUTREACH'
-                ? 'bg-[#1D2230] text-[#F3F4F6] font-semibold shadow-sm border border-[#292E3B]'
-                : 'text-[#A1A8B8] hover:text-[#F3F4F6] hover:bg-[#171A23]'
+                ? 'bg-amber-50 dark:bg-[#1D2230] text-amber-800 dark:text-[#F3F4F6] font-bold shadow-xs border border-amber-200/80 dark:border-[#292C33]'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
             } ${isCollapsed ? 'justify-center px-1' : ''}`}
             title="Founder Outreach Composer"
           >
-            <Send className={`w-4 h-4 shrink-0 ${activeTab === 'OUTREACH' ? 'text-[#818CF8]' : 'text-[#737C90]'}`} />
+            <div className="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-[#FBBF24] flex items-center justify-center shrink-0 shadow-xs">
+              <Send className="w-3.5 h-3.5" />
+            </div>
             {!isCollapsed && <span>Outreach</span>}
           </button>
 
           {/* GitHub Proof Studio */}
           <button
             onClick={() => onSelectTab('PORTFOLIO')}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${
               activeTab === 'PORTFOLIO'
-                ? 'bg-[#1D2230] text-[#F3F4F6] font-semibold shadow-sm border border-[#292E3B]'
-                : 'text-[#A1A8B8] hover:text-[#F3F4F6] hover:bg-[#171A23]'
+                ? 'bg-slate-100 dark:bg-[#1D2230] text-slate-900 dark:text-[#F3F4F6] font-bold shadow-xs border border-slate-200/80 dark:border-[#292C33]'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
             } ${isCollapsed ? 'justify-center px-1' : ''}`}
             title="GitHub Proof Studio"
           >
-            <Code2 className={`w-4 h-4 shrink-0 ${activeTab === 'PORTFOLIO' ? 'text-[#818CF8]' : 'text-[#737C90]'}`} />
+            <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#1D2230] text-slate-700 dark:text-[#F3F4F6] flex items-center justify-center shrink-0 shadow-xs">
+              <Code2 className="w-3.5 h-3.5" />
+            </div>
             {!isCollapsed && <span>GitHub Studio</span>}
           </button>
         </div>
 
-        {/* System Reference */}
-        <div className="pt-2 border-t border-[#292E3B]">
+        {/* Methodology & Theme Controls */}
+        <div className="pt-2 border-t border-slate-200/80 dark:border-[#292C33] space-y-1">
           <button
             onClick={() => onSelectTab('FAQ')}
             className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${
               activeTab === 'FAQ'
-                ? 'text-[#F3F4F6] font-semibold bg-[#1D2230]'
-                : 'text-[#A1A8B8] hover:text-[#F3F4F6] hover:bg-[#171A23]'
+                ? 'text-slate-900 dark:text-[#F3F4F6] font-bold bg-slate-100 dark:bg-[#1D2230]'
+                : 'text-slate-500 dark:text-[#737C90] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
             } ${isCollapsed ? 'justify-center px-1' : ''}`}
-            title="Architecture & Trust Methodology"
+            title="Architecture & Methodology"
           >
             <HelpCircle className="w-4 h-4 shrink-0" />
             {!isCollapsed && <span>Methodology & FAQ</span>}
           </button>
+
+          {/* Theme Switcher Button */}
+          {onToggleTheme && !isCollapsed && (
+            <button
+              onClick={onToggleTheme}
+              className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-600 dark:text-[#A1A8B8] hover:bg-slate-100 dark:hover:bg-[#1D2230] transition-colors"
+              title="Toggle Appearance"
+            >
+              <div className="flex items-center gap-2">
+                {theme === 'light' ? (
+                  <Sun className="w-4 h-4 text-amber-500 shrink-0" />
+                ) : (
+                  <Moon className="w-4 h-4 text-indigo-400 shrink-0" />
+                )}
+                <span>Appearance</span>
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-200/70 dark:bg-[#0F1117] text-slate-800 dark:text-slate-300">
+                {theme === 'light' ? 'Light' : 'Dark'}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* 4. Candidate Profile Footer */}
-      <div className="p-3 border-t border-[#292E3B] bg-[#0F1117]">
+      <div className="p-3 border-t border-slate-200/80 dark:border-[#292C33] bg-slate-50/50 dark:bg-[#0F1117]">
         <button
           onClick={onOpenProfile}
-          className={`w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#171A23] transition-colors text-left ${
+          className={`w-full flex items-center gap-2.5 p-2 rounded-xl hover:bg-white dark:hover:bg-[#171A23] transition-colors text-left shadow-2xs border border-transparent hover:border-slate-200/80 dark:hover:border-[#292C33] ${
             isCollapsed ? 'justify-center p-1' : ''
           }`}
           title="Edit candidate profile & target skills"
         >
-          <div className="w-8 h-8 rounded-lg bg-[#1D2230] border border-[#292E3B] flex items-center justify-center font-bold text-xs text-[#F3F4F6] shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-[#1D2230] border border-slate-300/50 dark:border-[#292C33] flex items-center justify-center font-bold text-xs text-slate-800 dark:text-[#F3F4F6] shrink-0">
             {candidate.fullName.split(' ').map((n) => n[0]).join('').slice(0, 2) || 'CA'}
           </div>
           {!isCollapsed && (
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-xs text-[#F3F4F6] truncate">{candidate.fullName}</span>
-                <span className="text-[11px] font-medium text-[#34D399]">{candidate.yearsOfExperience}y exp</span>
+                <span className="font-bold text-xs text-slate-900 dark:text-[#F3F4F6] truncate">{candidate.fullName}</span>
+                <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-[#34D399]">{candidate.yearsOfExperience}y</span>
               </div>
-              <p className="text-[10px] text-[#A1A8B8] truncate">{candidate.headline.split('(')[0]}</p>
+              <p className="text-[10px] text-slate-500 dark:text-[#737C90] truncate">{candidate.headline.split('(')[0]}</p>
             </div>
           )}
         </button>

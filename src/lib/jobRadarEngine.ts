@@ -375,16 +375,63 @@ export const curatedJobs: JobListing[] = [
   },
 ];
 
-// Distinct, restrained brand palettes (Linear/Ramp style)
-export function getCompanyBrandStyle(company: string): { bg: string; text: string; border: string } {
+// Distinct, vibrant iOS-inspired brand palettes
+export function getCompanyBrandStyle(company: string): { bg: string; text: string; border: string; gradient: string } {
   const c = company.toLowerCase();
-  if (c.includes('cognitive') || c.includes('prayog')) return { bg: 'bg-orange-950/30', text: 'text-orange-400', border: 'border-orange-800/40' };
-  if (c.includes('mosaic') || c.includes('kestrel')) return { bg: 'bg-indigo-950/30', text: 'text-indigo-400', border: 'border-indigo-800/40' };
-  if (c.includes('meridian') || c.includes('aarna')) return { bg: 'bg-rose-950/30', text: 'text-rose-400', border: 'border-rose-800/40' };
-  if (c.includes('vidyut')) return { bg: 'bg-amber-950/30', text: 'text-amber-400', border: 'border-amber-800/40' };
-  if (c.includes('willow') || c.includes('kavach')) return { bg: 'bg-emerald-950/30', text: 'text-emerald-400', border: 'border-emerald-800/40' };
-  if (c.includes('ironvale')) return { bg: 'bg-red-950/30', text: 'text-red-400', border: 'border-red-800/40' };
-  return { bg: 'bg-blue-950/30', text: 'text-blue-400', border: 'border-blue-800/40' };
+  if (c.includes('cognitive') || c.includes('prayog')) {
+    return {
+      bg: 'bg-orange-50 dark:bg-orange-950/30',
+      text: 'text-orange-600 dark:text-orange-400',
+      border: 'border-orange-200/80 dark:border-orange-800/40',
+      gradient: 'from-orange-500 to-amber-500 text-white shadow-orange-500/20',
+    };
+  }
+  if (c.includes('mosaic') || c.includes('kestrel')) {
+    return {
+      bg: 'bg-indigo-50 dark:bg-indigo-950/30',
+      text: 'text-indigo-600 dark:text-indigo-400',
+      border: 'border-indigo-200/80 dark:border-indigo-800/40',
+      gradient: 'from-indigo-600 to-blue-600 text-white shadow-indigo-500/20',
+    };
+  }
+  if (c.includes('meridian') || c.includes('aarna')) {
+    return {
+      bg: 'bg-rose-50 dark:bg-rose-950/30',
+      text: 'text-rose-600 dark:text-rose-400',
+      border: 'border-rose-200/80 dark:border-rose-800/40',
+      gradient: 'from-rose-500 to-pink-600 text-white shadow-rose-500/20',
+    };
+  }
+  if (c.includes('vidyut')) {
+    return {
+      bg: 'bg-amber-50 dark:bg-amber-950/30',
+      text: 'text-amber-600 dark:text-amber-400',
+      border: 'border-amber-200/80 dark:border-amber-800/40',
+      gradient: 'from-amber-500 to-yellow-500 text-white shadow-amber-500/20',
+    };
+  }
+  if (c.includes('willow') || c.includes('kavach')) {
+    return {
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+      text: 'text-emerald-600 dark:text-emerald-400',
+      border: 'border-emerald-200/80 dark:border-emerald-800/40',
+      gradient: 'from-emerald-500 to-teal-600 text-white shadow-emerald-500/20',
+    };
+  }
+  if (c.includes('ironvale')) {
+    return {
+      bg: 'bg-red-50 dark:bg-red-950/30',
+      text: 'text-red-600 dark:text-red-400',
+      border: 'border-red-200/80 dark:border-red-800/40',
+      gradient: 'from-red-500 to-rose-600 text-white shadow-red-500/20',
+    };
+  }
+  return {
+    bg: 'bg-blue-50 dark:bg-blue-950/30',
+    text: 'text-blue-600 dark:text-blue-400',
+    border: 'border-blue-200/80 dark:border-blue-800/40',
+    gradient: 'from-blue-600 to-cyan-600 text-white shadow-blue-500/20',
+  };
 }
 
 export function calculateQuickMatchScore(candidate: CandidateProfile, job: JobListing): number {
