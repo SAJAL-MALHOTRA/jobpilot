@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import type { JobListing, CandidateProfile, ApplicationCard } from '../types';
-import { OpportunityCard } from './OpportunityCard';
 import { getCompanyBrandStyle } from '../lib/jobRadarEngine';
 import { analyzeJobMatch } from '../lib/matchReasoning';
 import { 
@@ -23,7 +22,8 @@ import {
   ExternalLink,
   FileText,
   CheckCircle2,
-  Info
+  Info,
+  Sparkles
 } from 'lucide-react';
 import type { CorridorFilter } from './WorkspaceSidebar';
 
@@ -41,6 +41,8 @@ interface OpportunityDiscoverProps {
   onOpenPitch: (job: JobListing) => void;
   onOpenAts: (job: JobListing) => void;
   onOpenResumeScanner?: () => void;
+  onOpenQuickModal?: (job: JobListing) => void;
+  onOpenAgent?: (job: JobListing) => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
 }
@@ -69,6 +71,8 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
   onOpenPitch,
   onOpenAts,
   onOpenResumeScanner,
+  onOpenQuickModal,
+  onOpenAgent,
   theme = 'light',
   onToggleTheme,
 }) => {
@@ -939,23 +943,100 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
         )}
 
         {/* ========================================================
-            4. OPTIONAL CARDS VIEW (WHEN TOGGLED)
+            4. CAREERLIFT CLEAN CARDS VIEW (Exact Image 2 match)
         ======================================================== */}
         {viewMode === 'CARDS' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {filteredJobs.map((job) => (
-              <OpportunityCard
-                key={job.id}
-                job={job}
-                candidate={candidate}
-                isSelected={job.id === selectedJobId}
-                isTracked={appliedJobIds.has(job.id)}
-                onSelect={onSelectJob}
-                onAddToPipeline={onAddToPipeline}
-                onOpenPitch={onOpenPitch}
-                onDirectApply={onDirectApply}
-              />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredJobs.map((job) => {
+              const isSelected = job.id === selectedJobId;
+              const matchAnalysis = analyzeJobMatch(job, candidate);
+
+              return (
+                <div
+                  key={job.id}
+                  onClick={() => onSelectJob(job)}
+                  className={`rounded-2xl p-5 sm:p-6 bg-white dark:bg-[#151824] border transition-all cursor-pointer flex flex-col justify-between space-y-4 hover:border-blue-400 dark:hover:border-blue-500 shadow-xs group ${
+                    isSelected
+                      ? 'border-blue-500 ring-2 ring-blue-500/20'
+                      : 'border-slate-200/90 dark:border-[#242838]'
+                  }`}
+                >
+                  <div className="space-y-2.5">
+                    {/* Top Row: Company Name & Match Badge */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold text-slate-500 dark:text-neutral-400 tracking-wide">
+                        {job.company}
+                      </span>
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                        matchAnalysis.relevance === 'strong'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
+                      }`}>
+                        {matchAnalysis.matchScore}% Fit
+                      </span>
+                    </div>
+
+                    {/* Role Title */}
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors leading-snug">
+                      {job.title}
+                    </h3>
+
+                    {/* Location & Work Mode (Bengaluru · Hybrid) */}
+                    <div className="text-xs text-slate-500 dark:text-neutral-400 flex items-center gap-1 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span>{job.bangaloreCluster || job.location}</span>
+                      <span>·</span>
+                      <span>{job.isRemote ? 'Remote First' : 'Hybrid'}</span>
+                    </div>
+
+                    {/* Compensation (INR 20,000 / month or INR 32–48 LPA) */}
+                    <div className="text-xs font-extrabold text-slate-900 dark:text-white tabular-nums">
+                      {job.salaryDisplay || `INR ${job.minCtcLpa}–${job.maxCtcLpa} LPA`}
+                      {job.equityRange && !job.equityRange.toLowerCase().includes('none') && (
+                        <span className="text-slate-400 font-normal ml-1.5">
+                          ({job.equityRange})
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Inline Skills from Image 2 */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-slate-600 dark:text-neutral-300">
+                      {job.requiredSkills.map((s) => (
+                        <span key={s} className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-neutral-300 text-[11px] font-medium">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bottom Row Actions matching Image 2 & 3 */}
+                  <div className="pt-3 border-t border-slate-100 dark:border-[#222636] flex items-center justify-between">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onOpenAgent) onOpenAgent(job);
+                        else onSelectJob(job);
+                      }}
+                      className="text-xs font-bold text-slate-700 dark:text-neutral-300 hover:text-blue-600 flex items-center gap-1 transition-colors"
+                    >
+                      <Sparkles className="w-3 h-3 text-blue-500" />
+                      <span>Agent Apply</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onOpenQuickModal) onOpenQuickModal(job);
+                        else onSelectJob(job);
+                      }}
+                      className="text-xs font-bold text-[#2563EB] hover:text-blue-700 flex items-center gap-1 transition-colors"
+                    >
+                      <span>View job →</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 

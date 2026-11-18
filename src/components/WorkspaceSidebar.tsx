@@ -12,7 +12,9 @@ import {
   Compass,
   Layers,
   Sun,
-  Moon
+  Moon,
+  UploadCloud,
+  Sparkles
 } from 'lucide-react';
 import type { WorkspaceTab } from './CommandPalette';
 
@@ -136,6 +138,38 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
               <Compass className="w-3.5 h-3.5" />
             </div>
             {!isCollapsed && <span>Discover</span>}
+          </button>
+
+          {/* Resume Matching (CV in 5s) */}
+          <button
+            onClick={() => onSelectTab('MATCHING')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${
+              activeTab === 'MATCHING'
+                ? 'bg-blue-50 dark:bg-[#1D2230] text-blue-700 dark:text-[#F3F4F6] font-bold shadow-xs border border-blue-200/80 dark:border-[#292C33]'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
+            } ${isCollapsed ? 'justify-center px-1' : ''}`}
+            title="Resume Matching (Drop CV · Instant Fit in 5s)"
+          >
+            <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 shadow-xs">
+              <UploadCloud className="w-3.5 h-3.5" />
+            </div>
+            {!isCollapsed && <span>Matching</span>}
+          </button>
+
+          {/* JobPilot Application Agent */}
+          <button
+            onClick={() => onSelectTab('AGENT')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${
+              activeTab === 'AGENT'
+                ? 'bg-indigo-50 dark:bg-[#1D2230] text-indigo-700 dark:text-[#F3F4F6] font-bold shadow-xs border border-indigo-200/80 dark:border-[#292C33]'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
+            } ${isCollapsed ? 'justify-center px-1' : ''}`}
+            title="JobPilot Application Agent (Form Auto-Fill)"
+          >
+            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
+            {!isCollapsed && <span>Agent</span>}
           </button>
 
           {/* Applications Pipeline CRM */}

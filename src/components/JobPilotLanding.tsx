@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import type { JobListing, CandidateProfile } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
-import BackgroundPaths from './kokonutui/background-paths';
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -9,12 +8,14 @@ import {
   FileText, 
   Send, 
   Kanban, 
-  Code2, 
   Layers, 
   ExternalLink, 
-  ChevronRight,
   Cpu,
-  Check
+  Check,
+  Sun,
+  Moon,
+  UploadCloud,
+  Briefcase
 } from 'lucide-react';
 
 interface JobPilotLandingProps {
@@ -25,6 +26,11 @@ interface JobPilotLandingProps {
   onOpenOutreachForJob: (job: JobListing) => void;
   onOpenAtsForJob: (job: JobListing) => void;
   onOpenPortfolio: () => void;
+  onNavigateToMatching?: () => void;
+  onNavigateToAgent?: (job?: JobListing) => void;
+  onNavigateToPipeline?: () => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 type EngineStageId = 'INGESTION' | 'MATCH' | 'ATS' | 'OUTREACH' | 'PIPELINE';
@@ -127,6 +133,11 @@ export const JobPilotLanding: React.FC<JobPilotLandingProps> = ({
   onOpenOutreachForJob,
   onOpenAtsForJob,
   onOpenPortfolio,
+  onNavigateToMatching,
+  onNavigateToAgent,
+  onNavigateToPipeline,
+  theme = 'light',
+  onToggleTheme,
 }) => {
   const [activeStageId, setActiveStageId] = useState<EngineStageId>('INGESTION');
   const [selectedDemoJobId, setSelectedDemoJobId] = useState<string>(jobs[0]?.id || '');
@@ -137,120 +148,151 @@ export const JobPilotLanding: React.FC<JobPilotLandingProps> = ({
   return (
     <div className="min-h-screen bg-white dark:bg-[#090A0F] text-neutral-900 dark:text-neutral-100 font-sans selection:bg-blue-500/20 selection:text-blue-600 transition-colors">
       
-      {/* 1. TOP ANCHOR NAVBAR */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#090A0F]/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black text-white text-xs shadow-xs">
+      {/* 1. CAREERLIFT FLOATING PILL NAVBAR (Exact Image 1 match) */}
+      <div className="pt-4 px-4 flex justify-center sticky top-0 z-50 pointer-events-auto">
+        <header className="w-full max-w-5xl bg-white/90 dark:bg-[#111420]/90 backdrop-blur-md rounded-full border border-slate-200/90 dark:border-neutral-800/80 px-4 py-2 flex items-center justify-between shadow-lg shadow-black/5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-slate-900 dark:bg-white flex items-center justify-center font-black text-white dark:text-slate-900 text-xs shadow-xs">
               JP
             </div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-sm tracking-tight text-neutral-900 dark:text-white">JobPilot</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
-                v2.4 Core
-              </span>
-            </div>
+            <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">JobPilot</span>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-neutral-600 dark:text-neutral-400">
-            <a href="#process" className="hover:text-neutral-900 dark:hover:text-white transition-colors">
-              5-Stage Engine
-            </a>
-            <a href="#live-sandbox" className="hover:text-neutral-900 dark:hover:text-white transition-colors">
-              Live Demo
-            </a>
-            <a href="#comparison" className="hover:text-neutral-900 dark:hover:text-white transition-colors">
-              Why JobPilot
-            </a>
-            <button 
-              onClick={onOpenPortfolio}
-              className="hover:text-neutral-900 dark:hover:text-white transition-colors flex items-center gap-1 font-mono"
-            >
-              <Code2 className="w-3 h-3 text-indigo-500" />
-              <span>Proof Studio</span>
+          <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600 dark:text-neutral-300">
+            <button onClick={onLaunchConsole} className="hover:text-black dark:hover:text-white transition-colors">
+              Jobs
+            </button>
+            <button onClick={onNavigateToMatching} className="hover:text-black dark:hover:text-white transition-colors">
+              Matching
+            </button>
+            <button onClick={() => onNavigateToAgent?.()} className="hover:text-black dark:hover:text-white transition-colors">
+              Agent
+            </button>
+            <button onClick={onNavigateToPipeline} className="hover:text-black dark:hover:text-white transition-colors">
+              Pipeline
+            </button>
+            <button onClick={onOpenPortfolio} className="hover:text-black dark:hover:text-white transition-colors">
+              Proof Studio
             </button>
           </nav>
 
           <div className="flex items-center gap-2.5">
+            <span className="hidden sm:inline-block text-[11px] font-bold px-3 py-1 rounded-full bg-[#FEF3C7] dark:bg-amber-950/40 text-[#92400E] dark:text-amber-300 border border-[#FDE68A] dark:border-amber-800/40">
+              Premium
+            </span>
+            <button
+              onClick={onNavigateToMatching}
+              className="px-4 py-1.5 rounded-full bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold shadow-xs active:scale-95 transition-all"
+            >
+              Match my resume
+            </button>
+            {onToggleTheme && (
+              <button 
+                onClick={onToggleTheme} 
+                className="p-1.5 rounded-full text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+                title="Toggle light/dark mode"
+              >
+                {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
+              </button>
+            )}
+            <div className="w-7 h-7 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+              AM
+            </div>
+          </div>
+        </header>
+      </div>
+
+      {/* 2. CAREERLIFT SUNSET HERO SECTION (Exact Image 1 match) */}
+      <section className="relative overflow-hidden pt-10 pb-20 md:pt-14 md:pb-28 bg-gradient-to-b from-[#CCE5FA] via-[#FDE4D7] to-[#FFF3E8] dark:from-[#0B0F19] dark:via-[#131726] dark:to-[#0D101A] border-b border-slate-200/60 dark:border-neutral-800">
+        
+        {/* Subtle cloud mist overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-40 dark:opacity-20 mix-blend-overlay bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-7 relative z-10">
+          
+          {/* Explore badge pill matching Image 1 */}
+          <div className="inline-flex items-center gap-2 p-1 pr-3.5 rounded-full bg-white/95 dark:bg-[#161B29]/95 border border-slate-200/80 dark:border-neutral-700 shadow-sm backdrop-blur-xs">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#EFF6FF] dark:bg-blue-950/60 text-[#2563EB] dark:text-blue-400 font-extrabold text-[11px]">
+              Explore
+            </span>
+            <span className="text-xs font-semibold text-slate-700 dark:text-neutral-200">
+              4,850+ verified startup listings in India to explore
+            </span>
+          </div>
+
+          {/* Social Proof Avatars matching Image 1 */}
+          <div className="flex items-center justify-center gap-2.5 text-xs text-slate-600 dark:text-neutral-300 font-medium">
+            <div className="flex -space-x-2">
+              <span className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-800 bg-sky-500 text-white font-bold text-[9px] flex items-center justify-center shadow-xs">AI</span>
+              <span className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-800 bg-indigo-500 text-white font-bold text-[9px] flex items-center justify-center shadow-xs">TS</span>
+              <span className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-800 bg-emerald-500 text-white font-bold text-[9px] flex items-center justify-center shadow-xs">PY</span>
+              <span className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-800 bg-orange-500 text-white font-bold text-[9px] flex items-center justify-center shadow-xs">YC</span>
+            </div>
+            <span className="font-extrabold text-slate-900 dark:text-white">43K+</span>
+            <span>active website users from 10+ countries</span>
+          </div>
+
+          {/* Massive Headline matching Image 1 */}
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.08]">
+            Upload your CV. <br />
+            Find jobs that <span className="text-[#2563EB]">fit you in 5 sec.</span>
+          </h1>
+
+          {/* Subtitle matching Image 1 */}
+          <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-600 dark:text-neutral-300 leading-relaxed font-normal">
+            JobPilot compares jobs with your resume — skills, experience and eligibility — and brings your best fits to the top.
+          </p>
+
+          {/* 3 Action Buttons matching Image 1 */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <button
+              onClick={onNavigateToMatching}
+              className="px-6 py-3 rounded-full bg-[#2563EB] hover:bg-blue-700 text-white font-bold text-sm shadow-md active:scale-95 transition-all flex items-center gap-2"
+            >
+              <UploadCloud className="w-4 h-4" />
+              <span>Match my resume</span>
+            </button>
+
             <button
               onClick={onLaunchConsole}
-              className="px-3.5 py-1.5 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors"
+              className="px-5 py-3 rounded-full bg-white dark:bg-[#1A1F2E] hover:bg-slate-50 dark:hover:bg-[#22283A] text-slate-800 dark:text-neutral-200 border border-slate-200/90 dark:border-neutral-700 font-semibold text-sm shadow-xs transition-colors flex items-center gap-2"
             >
-              <span>Launch Console</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Briefcase className="w-4 h-4 text-slate-500" />
+              <span>Browse jobs</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#DCFCE7] dark:bg-emerald-950/60 text-[#166534] dark:text-emerald-300">
+                Free
+              </span>
             </button>
+
+            <a
+              href="#process"
+              className="px-5 py-3 rounded-full bg-white dark:bg-[#1A1F2E] hover:bg-slate-50 dark:hover:bg-[#22283A] text-slate-800 dark:text-neutral-200 border border-slate-200/90 dark:border-neutral-700 font-semibold text-sm shadow-xs transition-colors flex items-center gap-1.5"
+            >
+              <span>▷ See how it works</span>
+            </a>
           </div>
+
+          {/* Quick Metrics Bar */}
+          <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 max-w-3xl mx-auto text-left font-mono">
+            <div className="p-3 rounded-xl bg-white/80 dark:bg-[#121316]/80 border border-slate-200/80 dark:border-neutral-800 backdrop-blur-xs">
+              <span className="text-[10px] text-slate-400 dark:text-neutral-500 block uppercase">Verified Roles</span>
+              <span className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">{jobs.length} Live</span>
+            </div>
+            <div className="p-3 rounded-xl bg-white/80 dark:bg-[#121316]/80 border border-slate-200/80 dark:border-neutral-800 backdrop-blur-xs">
+              <span className="text-[10px] text-slate-400 dark:text-neutral-500 block uppercase">CTC Band</span>
+              <span className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">₹28L–₹48L</span>
+            </div>
+            <div className="p-3 rounded-xl bg-white/80 dark:bg-[#121316]/80 border border-slate-200/80 dark:border-neutral-800 backdrop-blur-xs">
+              <span className="text-[10px] text-slate-400 dark:text-neutral-500 block uppercase">Founder Reach</span>
+              <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">100% Direct</span>
+            </div>
+            <div className="p-3 rounded-xl bg-white/80 dark:bg-[#121316]/80 border border-slate-200/80 dark:border-neutral-800 backdrop-blur-xs">
+              <span className="text-[10px] text-slate-400 dark:text-neutral-500 block uppercase">Agent Auto-Fill</span>
+              <span className="text-lg font-bold text-blue-600 dark:text-blue-400 tabular-nums">1-Click</span>
+            </div>
+          </div>
+
         </div>
-      </header>
-
-      {/* 2. HERO SECTION WITH KOKONUT UI BACKGROUND PATHS */}
-      <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 border-b border-neutral-200/80 dark:border-neutral-800/80">
-        <BackgroundPaths
-          count={18}
-          spread={0.65}
-          speed={0.06}
-          angle={-4}
-          className="min-h-[460px] md:min-h-[520px] bg-transparent"
-        >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center space-y-6 relative z-10">
-            {/* Verified Corridor Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800 text-[11px] font-mono text-neutral-700 dark:text-neutral-300 shadow-2xs backdrop-blur-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>YC W25 & Peak XV Ingestion Active · 11 Verified Stealth Roles</span>
-            </div>
-
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-950 dark:text-white leading-[1.1]">
-              Direct Founder Reach. <br />
-              <span className="text-neutral-400 dark:text-neutral-500">Zero Recruiter Friction.</span>
-            </h1>
-
-            {/* Plain English Value Proposition */}
-            <p className="max-w-2xl mx-auto text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed font-normal">
-              JobPilot replaces the black hole of generic job board portals with deterministic match graphs, 
-              Google X-Y-Z quantifiable ATS resume tailoring, and proof-of-work founder outreach for senior software engineers.
-            </p>
-
-            {/* CTA Group */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <button
-                onClick={onLaunchConsole}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
-              >
-                <span>Open Radar Console (11 Roles)</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <a
-                href="#process"
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 hover:bg-neutral-200 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-xs font-medium text-neutral-800 dark:text-neutral-200 flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <span>Explore 5-Stage Engine</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            {/* Real Stats Strip */}
-            <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 max-w-3xl mx-auto text-left font-mono">
-              <div className="p-3 rounded-lg bg-white/70 dark:bg-[#121316]/70 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur-xs">
-                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 block uppercase">Curated Roles</span>
-                <span className="text-lg font-bold text-neutral-900 dark:text-white tabular-nums">11 Live</span>
-              </div>
-              <div className="p-3 rounded-lg bg-white/70 dark:bg-[#121316]/70 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur-xs">
-                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 block uppercase">CTC Band</span>
-                <span className="text-lg font-bold text-neutral-900 dark:text-white tabular-nums">₹25L–₹55L</span>
-              </div>
-              <div className="p-3 rounded-lg bg-white/70 dark:bg-[#121316]/70 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur-xs">
-                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 block uppercase">Founder Inboxes</span>
-                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">100% Direct</span>
-              </div>
-              <div className="p-3 rounded-lg bg-white/70 dark:bg-[#121316]/70 border border-neutral-200/80 dark:border-neutral-800 backdrop-blur-xs">
-                <span className="text-[10px] text-neutral-400 dark:text-neutral-500 block uppercase">ATS Format</span>
-                <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400 tabular-nums">Google X-Y-Z</span>
-              </div>
-            </div>
-          </div>
-        </BackgroundPaths>
       </section>
 
       {/* 3. THE 5-STAGE STRUCTURED PROCESS (Interactive Showcase) */}

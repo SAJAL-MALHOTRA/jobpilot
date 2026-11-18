@@ -15,6 +15,9 @@ import { WorkflowFAQ } from './components/WorkflowFAQ';
 import { CompanySwipeDeck } from './components/CompanySwipeDeck';
 import { JobPilotLanding } from './components/JobPilotLanding';
 import { ResumeScannerModal } from './components/ResumeScannerModal';
+import { ResumeMatchingView } from './components/ResumeMatchingView';
+import { JobAgentView } from './components/JobAgentView';
+import { JobQuickModal } from './components/JobQuickModal';
 import StatusIsland, { type IslandTask } from './components/kokonutui/status-island';
 import { 
   FileText, 
@@ -94,7 +97,7 @@ export function App() {
   // Navigation State (defaults to LANDING to present the structured process)
   const [activeTab, setActiveTab] = useState<WorkspaceTab>(() => {
     const saved = localStorage.getItem('jobpilot_active_tab');
-    return (saved && ['LANDING', 'DIRECTORY', 'PIPELINE', 'SWIPE', 'ATS_LAB', 'OUTREACH', 'PORTFOLIO', 'PROFILE', 'FAQ'].includes(saved))
+    return (saved && ['LANDING', 'DIRECTORY', 'MATCHING', 'AGENT', 'PIPELINE', 'SWIPE', 'ATS_LAB', 'OUTREACH', 'PORTFOLIO', 'PROFILE', 'FAQ'].includes(saved))
       ? (saved as WorkspaceTab)
       : 'LANDING';
   });
@@ -106,8 +109,9 @@ export function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Inspector & Command Palette State
+  // Inspector, Quick Modal & Command Palette State
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
+  const [quickModalJob, setQuickModalJob] = useState<JobListing | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isResumeScannerOpen, setIsResumeScannerOpen] = useState(false);
@@ -449,6 +453,14 @@ export function App() {
                   setModalMode('ATS_MODAL');
                 }}
                 onOpenPortfolio={() => setActiveTab('PORTFOLIO')}
+                onNavigateToMatching={() => setActiveTab('MATCHING')}
+                onNavigateToAgent={(job?: JobListing) => {
+                  if (job) setSelectedJob(job);
+                  setActiveTab('AGENT');
+                }}
+                onNavigateToPipeline={() => setActiveTab('PIPELINE')}
+                theme={theme}
+                onToggleTheme={handleToggleTheme}
               />
             </div>
           )}
@@ -475,8 +487,65 @@ export function App() {
                 setIsDrawerOpen(true);
               }}
               onOpenResumeScanner={() => setIsResumeScannerOpen(true)}
+              onOpenQuickModal={(job) => setQuickModalJob(job)}
+              onOpenAgent={(job) => {
+                setSelectedJob(job);
+                setActiveTab('AGENT');
+              }}
               theme={theme}
               onToggleTheme={handleToggleTheme}
+            />
+          )}
+
+          {/* TAB: RESUME MATCHING (Image 5) */}
+          {activeTab === 'MATCHING' && (
+            <ResumeMatchingView
+              candidate={candidate}
+              jobs={jobs}
+              onUpdateCandidate={(updated) => {
+                setCandidate(updated);
+                setIslandTasks((prev) => [
+                  {
+                    id: `match-update-${Date.now()}`,
+                    label: 'Resume Parsed & Matched',
+                    detail: `${updated.primarySkills.length} skills analyzed against ${jobs.length} startups`,
+                    status: 'done',
+                  },
+                  ...prev,
+                ]);
+              }}
+              onSelectJob={(job) => {
+                setSelectedJob(job);
+                setQuickModalJob(job);
+              }}
+              onNavigateToJobs={() => setActiveTab('DIRECTORY')}
+              onNavigateToAgent={(job) => {
+                setSelectedJob(job);
+                setActiveTab('AGENT');
+              }}
+            />
+          )}
+
+          {/* TAB: JOB APPLICATION AGENT (Image 4) */}
+          {activeTab === 'AGENT' && (
+            <JobAgentView
+              job={selectedJob || jobs[0]}
+              candidate={candidate}
+              jobs={jobs}
+              onSelectJob={(job) => setSelectedJob(job)}
+              onSubmitApplication={(job) => {
+                handleAddToPipeline(job);
+                setIslandTasks((prev) => [
+                  {
+                    id: `agent-submit-${Date.now()}`,
+                    label: 'Application Dispatched via Agent',
+                    detail: `${job.title} at ${job.company} added to CRM`,
+                    status: 'done',
+                  },
+                  ...prev,
+                ]);
+              }}
+              onNavigateToJobs={() => setActiveTab('DIRECTORY')}
             />
           )}
 
@@ -727,6 +796,17 @@ export function App() {
           }}
         />
       )}
+
+      {/* 7. Quick Job Detail Modal (Careerlift Image 3 Sample Listing) */}
+      <JobQuickModal
+        job={quickModalJob}
+        isOpen={!!quickModalJob}
+        onClose={() => setQuickModalJob(null)}
+        onApplyWithAgent={(job) => {
+          setSelectedJob(job);
+          setActiveTab('AGENT');
+        }}
+      />
 
       {/* Kokonut UI Dynamic Status Island */}
       <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
