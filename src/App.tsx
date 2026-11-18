@@ -13,6 +13,7 @@ import { ProfileVaultModal } from './components/ProfileVaultModal';
 import { PortfolioStudio } from './components/PortfolioStudio';
 import { WorkflowFAQ } from './components/WorkflowFAQ';
 import { CompanySwipeDeck } from './components/CompanySwipeDeck';
+import { JobPilotLanding } from './components/JobPilotLanding';
 import StatusIsland, { type IslandTask } from './components/kokonutui/status-island';
 import { 
   FileText, 
@@ -89,8 +90,17 @@ export function App() {
     return new Set(arr);
   });
 
-  // Navigation State
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('DIRECTORY');
+  // Navigation State (defaults to LANDING to present the structured process)
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(() => {
+    const saved = localStorage.getItem('jobpilot_active_tab');
+    return (saved && ['LANDING', 'DIRECTORY', 'PIPELINE', 'SWIPE', 'ATS_LAB', 'OUTREACH', 'PORTFOLIO', 'PROFILE', 'FAQ'].includes(saved))
+      ? (saved as WorkspaceTab)
+      : 'LANDING';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('jobpilot_active_tab', activeTab);
+  }, [activeTab]);
   const [corridorFilter, setCorridorFilter] = useState<CorridorFilter>('ALL');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -358,6 +368,12 @@ export function App() {
         {isMobileMenuOpen && (
           <div className="md:hidden p-3 border-b border-[#21232D] bg-[#151620] space-y-1 text-xs">
             <button
+              onClick={() => { setActiveTab('LANDING'); setIsMobileMenuOpen(false); }}
+              className={`w-full text-left px-3 py-2 rounded-lg ${activeTab === 'LANDING' ? 'bg-[#5E6AD2] text-white font-medium' : 'text-[#9D9FA9]'}`}
+            >
+              Engine & Process (Landing)
+            </button>
+            <button
               onClick={() => { setActiveTab('DIRECTORY'); setIsMobileMenuOpen(false); }}
               className={`w-full text-left px-3 py-2 rounded-lg ${activeTab === 'DIRECTORY' ? 'bg-[#5E6AD2] text-white font-medium' : 'text-[#9D9FA9]'}`}
             >
@@ -411,6 +427,30 @@ export function App() {
 
         {/* Dynamic Center Canvas View */}
         <div className="flex-1 flex overflow-hidden">
+          {/* TAB: LANDING PAGE & 5-STAGE PROCESS */}
+          {activeTab === 'LANDING' && (
+            <div className="flex-1 overflow-y-auto">
+              <JobPilotLanding
+                jobs={jobs}
+                candidate={candidate}
+                onLaunchConsole={() => setActiveTab('DIRECTORY')}
+                onSelectJobForInspector={(job: JobListing) => {
+                  setSelectedJob(job);
+                  setIsDrawerOpen(true);
+                }}
+                onOpenOutreachForJob={(job: JobListing) => {
+                  setSelectedJob(job);
+                  setModalMode('OUTREACH_MODAL');
+                }}
+                onOpenAtsForJob={(job: JobListing) => {
+                  setSelectedJob(job);
+                  setModalMode('ATS_MODAL');
+                }}
+                onOpenPortfolio={() => setActiveTab('PORTFOLIO')}
+              />
+            </div>
+          )}
+
           {/* TAB: DIRECTORY */}
           {activeTab === 'DIRECTORY' && (
             <OpportunityDiscover

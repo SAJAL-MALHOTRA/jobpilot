@@ -10,6 +10,7 @@ import {
   PanelLeftClose, 
   PanelLeft,
   Compass,
+  Layers,
   Sun,
   Moon
 } from 'lucide-react';
@@ -101,6 +102,26 @@ export const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
       {/* 3. Navigation with Apple iOS-style Squircle Badges */}
       <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 text-xs font-sans">
         <div className="space-y-1">
+          {/* Platform Landing & Structured Process */}
+          <button
+            onClick={() => onSelectTab('LANDING')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all ${
+              activeTab === 'LANDING'
+                ? 'bg-neutral-900 text-white dark:bg-white dark:text-black font-bold shadow-xs'
+                : 'text-slate-600 dark:text-[#A1A8B8] hover:text-slate-900 dark:hover:text-[#F3F4F6] hover:bg-slate-50 dark:hover:bg-[#171A23]'
+            } ${isCollapsed ? 'justify-center px-1' : ''}`}
+            title="Platform Overview & 5-Stage Process"
+          >
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-xs ${
+              activeTab === 'LANDING'
+                ? 'bg-white/20 text-white dark:bg-black/20 dark:text-black'
+                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300'
+            }`}>
+              <Layers className="w-3.5 h-3.5" />
+            </div>
+            {!isCollapsed && <span>Engine & Process</span>}
+          </button>
+
           {/* Discover Opportunities */}
           <button
             onClick={() => onSelectTab('DIRECTORY')}

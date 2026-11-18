@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 
 export type WorkspaceTab = 
+  | 'LANDING'
   | 'DIRECTORY' 
   | 'PIPELINE' 
   | 'SWIPE' 
@@ -69,7 +70,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   // Navigation commands
   const navCommands = [
-    { id: 'nav-dir', title: 'Go to Jobs Directory', category: 'Navigation', icon: Briefcase, action: () => onNavigateTab('DIRECTORY'), shortcut: '⌘1' },
+    { id: 'nav-landing', title: 'Platform Landing & 5-Stage Engine', category: 'Navigation', icon: Layers, action: () => onNavigateTab('LANDING'), shortcut: '⌘0' },
+    { id: 'nav-dir', title: 'Go to Opportunities Radar (Directory)', category: 'Navigation', icon: Briefcase, action: () => onNavigateTab('DIRECTORY'), shortcut: '⌘1' },
     { id: 'nav-pipeline', title: 'Go to Applications Pipeline (Kanban)', category: 'Navigation', icon: Kanban, action: () => onNavigateTab('PIPELINE'), shortcut: '⌘2' },
     { id: 'nav-swipe', title: 'Go to Swipe Triage Deck', category: 'Navigation', icon: Layers, action: () => onNavigateTab('SWIPE'), shortcut: '⌘3' },
     { id: 'nav-ats', title: 'Open ATS Keyword Lab', category: 'Tools', icon: FileText, action: () => onNavigateTab('ATS_LAB'), shortcut: '⌘4' },
