@@ -10,7 +10,8 @@ import {
   User, 
   HelpCircle, 
   Layers, 
-  ArrowRight
+  ArrowRight,
+  UploadCloud
 } from 'lucide-react';
 
 export type WorkspaceTab = 
@@ -30,6 +31,7 @@ interface CommandPaletteProps {
   jobs: JobListing[];
   onSelectJob: (job: JobListing) => void;
   onNavigateTab: (tab: WorkspaceTab) => void;
+  onOpenScanner?: () => void;
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
@@ -38,6 +40,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   jobs,
   onSelectJob,
   onNavigateTab,
+  onOpenScanner,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -77,6 +80,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     { id: 'nav-ats', title: 'Open ATS Keyword Lab', category: 'Tools', icon: FileText, action: () => onNavigateTab('ATS_LAB'), shortcut: '⌘4' },
     { id: 'nav-outreach', title: 'Open Founder Pitch Composer', category: 'Tools', icon: Send, action: () => onNavigateTab('OUTREACH'), shortcut: '⌘5' },
     { id: 'nav-github', title: 'Open GitHub Proof Studio', category: 'Tools', icon: Code2, action: () => onNavigateTab('PORTFOLIO'), shortcut: '⌘6' },
+    { id: 'cmd-scanner', title: 'Scan Resume & Auto-Detect Skills (Startup-Finder Engine)', category: 'Tools', icon: UploadCloud, action: () => { onClose(); onOpenScanner?.(); }, shortcut: '⌘U' },
     { id: 'nav-profile', title: 'Open Candidate Profile Vault', category: 'Profile', icon: User, action: () => onNavigateTab('PROFILE'), shortcut: '⌘P' },
     { id: 'nav-faq', title: 'View Workflow FAQ & Architecture', category: 'System', icon: HelpCircle, action: () => onNavigateTab('FAQ'), shortcut: '?' },
   ];

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import type { WorkspaceTab } from './CommandPalette';
 
-export type CorridorFilter = 'ALL' | 'BLR' | 'YC' | 'REMOTE' | 'NOTICE';
+export type CorridorFilter = 'ALL' | 'BLR' | 'PUNE' | 'YC' | 'REMOTE' | 'NOTICE';
 
 interface WorkspaceSidebarProps {
   activeTab: WorkspaceTab;

@@ -373,6 +373,68 @@ export const curatedJobs: JobListing[] = [
     verificationSource: 'LinkedIn Jobs',
     contactConfidence: 'Verified Founder Inbox',
   },
+  {
+    id: 'job-13',
+    title: 'Founding Full Stack Systems Engineer',
+    company: 'DeepScale Systems',
+    logoColor: 'bg-emerald-600',
+    location: 'Pune, India',
+    isRemote: true,
+    source: 'YC S24',
+    minCtcLpa: 28.0,
+    maxCtcLpa: 42.0,
+    experienceDisplay: '3–6 years',
+    salaryDisplay: '₹28–42 LPA',
+    equityRange: '0.8% - 1.5%',
+    requiredSkills: ['react', 'typescript', 'python', 'docker', 'fastapi'],
+    roleCategory: 'Full Stack Developer',
+    description: 'DeepScale Systems builds high-throughput telemetry compaction engines for edge IoT and serverless runtimes. Looking for a founding full-stack engineer to lead core web console and distributed pipeline ingest.',
+    postedDate: '3 hours ago',
+    founderName: 'Tanmay Kulkarni',
+    founderRole: 'Co-Founder & CTO',
+    founderEmail: 'tanmay@deepscale.tech',
+    hiringUrgency: 'Immediate',
+    emailDeliverabilityPct: 99.7,
+    fundingRound: 'Seed · $2.8M (Surge)',
+    bangaloreCluster: 'Baner Tech Corridor, Pune',
+    noticeBuyoutCovered: true,
+    atsMatchScore: 88,
+    jobUrl: 'https://www.deepscale.tech/careers',
+    lastVerified: '2025-02-16T11:00:00Z',
+    verificationSource: 'Peak XV Surge Directory',
+    contactConfidence: 'Verified Founder Inbox',
+  },
+  {
+    id: 'job-14',
+    title: 'Senior Backend Engineer (Distributed Systems)',
+    company: 'Synapse Analytics',
+    logoColor: 'bg-cyan-600',
+    location: 'Pune, India',
+    isRemote: false,
+    source: 'Wellfound',
+    minCtcLpa: 30.0,
+    maxCtcLpa: 45.0,
+    experienceDisplay: '4–7 years',
+    salaryDisplay: '₹30–45 LPA',
+    equityRange: '0.4% - 0.9%',
+    requiredSkills: ['python', 'fastapi', 'postgres', 'redis', 'kafka'],
+    roleCategory: 'Backend Engineer',
+    description: 'Synapse Analytics builds continuous machine learning pipelines for predictive logistics. Seeking a senior backend engineer to architect asynchronous event streaming and low-latency API gateways.',
+    postedDate: '5 hours ago',
+    founderName: 'Neha Deshmukh',
+    founderRole: 'Founder & CEO',
+    founderEmail: 'neha@synapsehq.io',
+    hiringUrgency: 'High',
+    emailDeliverabilityPct: 99.4,
+    fundingRound: 'Series A · $6.5M',
+    bangaloreCluster: 'Hinjewadi Phase 2, Pune',
+    noticeBuyoutCovered: true,
+    atsMatchScore: 85,
+    jobUrl: 'https://wellfound.com/company/synapse-analytics-pune',
+    lastVerified: '2025-02-16T10:30:00Z',
+    verificationSource: 'Wellfound Verified',
+    contactConfidence: 'Direct Founder',
+  },
 ];
 
 // Distinct, vibrant iOS-inspired brand palettes
@@ -424,6 +486,22 @@ export function getCompanyBrandStyle(company: string): { bg: string; text: strin
       text: 'text-red-600 dark:text-red-400',
       border: 'border-red-200/80 dark:border-red-800/40',
       gradient: 'from-red-500 to-rose-600 text-white shadow-red-500/20',
+    };
+  }
+  if (c.includes('deepscale')) {
+    return {
+      bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+      text: 'text-emerald-700 dark:text-emerald-300',
+      border: 'border-emerald-200/80 dark:border-emerald-800/40',
+      gradient: 'from-emerald-600 to-teal-700 text-white shadow-emerald-500/20',
+    };
+  }
+  if (c.includes('synapse')) {
+    return {
+      bg: 'bg-cyan-50 dark:bg-cyan-950/30',
+      text: 'text-cyan-700 dark:text-cyan-300',
+      border: 'border-cyan-200/80 dark:border-cyan-800/40',
+      gradient: 'from-cyan-600 to-blue-700 text-white shadow-cyan-500/20',
     };
   }
   return {
@@ -598,6 +676,34 @@ const companyDossiers: Record<string, CompanyDossier> = {
     ],
     foundedYear: 2023,
     glassdoorTrustRating: 'Fintech Security Seed',
+  },
+  'deepscale systems': {
+    problemSpace: 'High-throughput telemetry compaction and distributed streaming runtimes for edge IoT and serverless architectures.',
+    backers: ['Peak XV Surge', 'Y Combinator (S23)', 'Blume Ventures'],
+    stageRound: 'Seed · $2.8M (Surge)',
+    engineeringStack: ['React 19', 'TypeScript', 'Python', 'FastAPI', 'Docker', 'ClickHouse', 'Rust'],
+    teamSize: '9 core engineers in Pune (Baner)',
+    architectureHighlights: [
+      'Sub-millisecond binary compaction protocol handling 400k events/sec per node',
+      'Zero-copy WebAssembly edge plugins for dynamic customer telemetry filtering',
+      'Automated failover clustering across AWS Mumbai and local data centres',
+    ],
+    foundedYear: 2023,
+    glassdoorTrustRating: 'Surge S23 Verified',
+  },
+  'synapse analytics': {
+    problemSpace: 'Autonomous predictive routing and real-time fleet allocation models for cross-border logistics in South Asia.',
+    backers: ['Nexus Venture Partners', 'Kalaari Capital'],
+    stageRound: 'Series A · $6.5M',
+    engineeringStack: ['Python', 'FastAPI', 'PostgreSQL', 'Redis', 'Kafka', 'Docker', 'Kubernetes'],
+    teamSize: '18 engineers in Pune (Hinjewadi)',
+    architectureHighlights: [
+      'Kafka distributed event fabric ingesting 150M GPS coordinate points daily',
+      'PostGIS spatial index optimizations reducing geofencing latency by 82%',
+      'Active-active failover with Redis cluster cache and CQRS read projections',
+    ],
+    foundedYear: 2022,
+    glassdoorTrustRating: '4.8/5 · Series A Verified',
   },
 };
 

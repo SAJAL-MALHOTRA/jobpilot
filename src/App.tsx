@@ -14,6 +14,7 @@ import { PortfolioStudio } from './components/PortfolioStudio';
 import { WorkflowFAQ } from './components/WorkflowFAQ';
 import { CompanySwipeDeck } from './components/CompanySwipeDeck';
 import { JobPilotLanding } from './components/JobPilotLanding';
+import { ResumeScannerModal } from './components/ResumeScannerModal';
 import StatusIsland, { type IslandTask } from './components/kokonutui/status-island';
 import { 
   FileText, 
@@ -109,6 +110,7 @@ export function App() {
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isResumeScannerOpen, setIsResumeScannerOpen] = useState(false);
 
   // Standalone Modals
   const [modalMode, setModalMode] = useState<'NONE' | 'ATS_MODAL' | 'OUTREACH_MODAL' | 'PROFILE_MODAL'>('NONE');
@@ -124,7 +126,7 @@ export function App() {
     {
       id: 'init-sync',
       label: 'Opportunity Radar',
-      detail: '11 verified startup listings active',
+      detail: `${curatedJobs.length} verified startup listings active`,
       status: 'done',
     },
   ]);
@@ -472,6 +474,7 @@ export function App() {
                 setSelectedJob(job);
                 setIsDrawerOpen(true);
               }}
+              onOpenResumeScanner={() => setIsResumeScannerOpen(true)}
               theme={theme}
               onToggleTheme={handleToggleTheme}
             />
@@ -667,6 +670,7 @@ export function App() {
           setActiveTab(tab);
           if (tab === 'PROFILE') setModalMode('PROFILE_MODAL');
         }}
+        onOpenScanner={() => setIsResumeScannerOpen(true)}
       />
 
       {/* 5. Modals (when explicit full dialog is opened) */}
@@ -699,6 +703,28 @@ export function App() {
             setModalMode('NONE');
           }}
           onClose={() => setModalMode('NONE')}
+        />
+      )}
+
+      {/* 6. Client-Side Resume & Skill Scanner (Startup-Finder Auto-Detector) */}
+      {isResumeScannerOpen && (
+        <ResumeScannerModal
+          isOpen={isResumeScannerOpen}
+          onClose={() => setIsResumeScannerOpen(false)}
+          candidate={candidate}
+          onSaveProfile={(updated: CandidateProfile) => {
+            setCandidate(updated);
+            setIsResumeScannerOpen(false);
+            setIslandTasks((prev) => [
+              {
+                id: `profile-${Date.now()}`,
+                label: 'Candidate Profile Synchronized',
+                detail: `${updated.primarySkills.length} skills parsed · Startups re-scored`,
+                status: 'done',
+              },
+              ...prev,
+            ]);
+          }}
         />
       )}
 

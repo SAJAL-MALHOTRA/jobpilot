@@ -1,6 +1,7 @@
 import React from 'react';
 import type { JobListing, CandidateProfile } from '../types';
 import { getCompanyBrandStyle } from '../lib/jobRadarEngine';
+import { analyzeJobMatch } from '../lib/matchReasoning';
 import { 
   MapPin, 
   Send, 
@@ -8,7 +9,9 @@ import {
   BookmarkCheck,
   ArrowRight,
   ShieldCheck,
-  Check
+  Check,
+  CheckCircle2,
+  Info
 } from 'lucide-react';
 
 interface OpportunityCardProps {
@@ -31,7 +34,9 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
   onAddToPipeline,
   onOpenPitch,
 }) => {
-  // Deterministic matching against candidate profile
+  // Deterministic matching & Startup-Finder style reasoning
+  const matchAnalysis = analyzeJobMatch(job, candidate);
+
   const candidateSkillsSet = new Set(
     [...candidate.primarySkills, ...candidate.secondarySkills].map((s) => s.toLowerCase().trim())
   );
@@ -45,9 +50,6 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
   
   const displayMatched = matchedSkills.slice(0, 2);
   const displayMissing = missingSkills.slice(0, 2);
-
-  const matchRatio = job.requiredSkills.length > 0 ? matchedSkills.length / job.requiredSkills.length : 0;
-  const matchPercent = Math.round(matchRatio * 100);
 
   // Company Brand Color
   const brand = getCompanyBrandStyle(job.company);
@@ -121,13 +123,20 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
           </div>
         </div>
 
-        {/* 3. Explainable Candidate Fit & Skills */}
+        {/* 3. Explainable Candidate Fit & Skills (startup-finder format) */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs font-mono">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
-                {matchPercent}% fit
+              <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                matchAnalysis.relevance === 'strong'
+                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                  : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${matchAnalysis.relevance === 'strong' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                <span>{matchAnalysis.badgeLabel}</span>
+                <span className="tabular-nums font-bold">{matchAnalysis.matchScore}%</span>
               </span>
+
               <span className="text-[11px] text-neutral-400">
                 ({matchedSkills.length}/{job.requiredSkills.length} matched)
               </span>
@@ -166,6 +175,18 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
                 +{job.requiredSkills.length - 4} more
               </span>
             )}
+          </div>
+
+          {/* Transparent Match Reason Line */}
+          <div className={`text-[11px] font-mono leading-relaxed flex items-start gap-1.5 pt-0.5 ${
+            matchAnalysis.capReason ? 'text-amber-700 dark:text-amber-400' : 'text-neutral-600 dark:text-neutral-400'
+          }`}>
+            {matchAnalysis.capReason ? (
+              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0 opacity-80 text-amber-500" />
+            ) : (
+              <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0 opacity-80 text-emerald-500" />
+            )}
+            <span className="line-clamp-2">{matchAnalysis.summaryLine}</span>
           </div>
         </div>
 

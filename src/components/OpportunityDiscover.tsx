@@ -2,11 +2,13 @@ import React, { useState, useMemo } from 'react';
 import type { JobListing, CandidateProfile, ApplicationCard } from '../types';
 import { OpportunityCard } from './OpportunityCard';
 import { getCompanyBrandStyle } from '../lib/jobRadarEngine';
+import { analyzeJobMatch } from '../lib/matchReasoning';
 import { 
   Search, 
   MapPin, 
   Table as TableIcon, 
   LayoutGrid, 
+  Building2,
   Bookmark, 
   SlidersHorizontal, 
   Check, 
@@ -16,7 +18,12 @@ import {
   Copy,
   Sun,
   Moon,
-  ChevronDown
+  ChevronDown,
+  UploadCloud,
+  ExternalLink,
+  FileText,
+  CheckCircle2,
+  Info
 } from 'lucide-react';
 import type { CorridorFilter } from './WorkspaceSidebar';
 
@@ -33,6 +40,7 @@ interface OpportunityDiscoverProps {
   onSelectCorridorFilter: (filter: CorridorFilter) => void;
   onOpenPitch: (job: JobListing) => void;
   onOpenAts: (job: JobListing) => void;
+  onOpenResumeScanner?: () => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
 }
@@ -59,15 +67,18 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
   corridorFilter,
   onSelectCorridorFilter,
   onOpenPitch,
+  onOpenAts,
+  onOpenResumeScanner,
   theme = 'light',
   onToggleTheme,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDiscipline, setSelectedDiscipline] = useState('All Roles');
-  const [viewMode, setViewMode] = useState<'TABLE' | 'CARDS'>('TABLE');
+  const [viewMode, setViewMode] = useState<'STARTUPS' | 'TABLE' | 'CARDS'>('STARTUPS');
   const [sortBy, setSortBy] = useState<'MATCH' | 'SALARY' | 'RECENT'>('MATCH');
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
   const [hoveredFounderEmail, setHoveredFounderEmail] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
 
   // Filter and sort opportunities
@@ -94,6 +105,8 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
       let matchesCorridor = true;
       if (corridorFilter === 'BLR') {
         matchesCorridor = job.location.toLowerCase().includes('bangalore') || job.location.toLowerCase().includes('bengaluru');
+      } else if (corridorFilter === 'PUNE') {
+        matchesCorridor = job.location.toLowerCase().includes('pune') || Boolean(job.bangaloreCluster?.toLowerCase().includes('pune'));
       } else if (corridorFilter === 'YC') {
         matchesCorridor = job.source.includes('YC');
       } else if (corridorFilter === 'REMOTE') {
@@ -116,6 +129,39 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
   const highEquityCount = jobs.filter((j) => j.equityRange && (j.equityRange.includes('0.') || j.equityRange.includes('1.'))).length;
   const noticeCount = jobs.filter((j) => j.noticeBuyoutCovered).length;
   const blrCount = jobs.filter((j) => j.location.toLowerCase().includes('bangalore') || j.location.toLowerCase().includes('bengaluru')).length;
+  const puneCount = jobs.filter((j) => j.location.toLowerCase().includes('pune') || Boolean(j.bangaloreCluster?.toLowerCase().includes('pune'))).length;
+
+  // Grouped by Startup (Startup-Finder format)
+  const groupedByStartup = useMemo(() => {
+    const map = new Map<string, JobListing[]>();
+    for (const job of filteredJobs) {
+      const list = map.get(job.company) || [];
+      list.push(job);
+      map.set(job.company, list);
+    }
+    return Array.from(map.entries()).map(([company, openings]) => {
+      const sample = openings[0];
+      const bestAnalysis = openings.reduce((best, cur) => {
+        const a = analyzeJobMatch(cur, candidate);
+        return a.matchScore > best.matchScore ? a : best;
+      }, analyzeJobMatch(sample, candidate));
+
+      return {
+        company,
+        openings,
+        sample,
+        fundingRound: sample.fundingRound,
+        location: sample.bangaloreCluster || sample.location,
+        founderName: sample.founderName,
+        founderRole: sample.founderRole,
+        founderEmail: sample.founderEmail,
+        careersEmail: `careers@${company.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
+        bestMatchScore: bestAnalysis.matchScore,
+        bestBadge: bestAnalysis.badgeLabel,
+        bestRelevance: bestAnalysis.relevance,
+      };
+    }).sort((a, b) => b.bestMatchScore - a.bestMatchScore);
+  }, [filteredJobs, candidate]);
 
   // Toggle selection for batch actions
   const handleToggleSelectRow = (id: string, e: React.MouseEvent) => {
@@ -171,6 +217,13 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
     setTimeout(() => setCopiedEmail(false), 2000);
   };
 
+  const handleCopy = (text: string, key: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
   return (
     <div className="flex-1 flex flex-col h-full bg-[#FFFFFF] dark:bg-[#0F1117] text-slate-900 dark:text-[#F3F4F6] overflow-y-auto selection:bg-[#EBF946] selection:text-black">
       <div className="max-w-[1400px] w-full mx-auto px-6 py-6 sm:px-8 sm:py-8 space-y-6">
@@ -186,6 +239,20 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
 
             {/* Quick Actions & Integration Logos (Ramp style) */}
             <div className="flex items-center gap-3">
+              {onOpenResumeScanner && (
+                <button
+                  onClick={onOpenResumeScanner}
+                  className="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                  title="Upload resume or paste text to auto-detect skills and re-score startups"
+                >
+                  <UploadCloud className="w-3.5 h-3.5 text-blue-400 dark:text-blue-600" />
+                  <span>Scan Resume</span>
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-neutral-800 dark:bg-neutral-200 text-neutral-300 dark:text-neutral-700 font-mono">
+                    {candidate.primarySkills.length} skills
+                  </span>
+                </button>
+              )}
+
               <button
                 onClick={handleExportCsv}
                 className="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:text-[#969BA6] dark:hover:text-[#F3F4F6] hover:bg-slate-100 dark:hover:bg-[#1F2228] transition-colors flex items-center gap-1.5 text-xs font-semibold"
@@ -256,6 +323,17 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
             >
               <span>Bangalore Corridors</span>
               <span className="font-bold text-slate-900 dark:text-white ml-0.5">{blrCount}</span>
+              <span className="text-slate-400 ml-0.5">↗</span>
+            </button>
+
+            <button
+              onClick={() => onSelectCorridorFilter(corridorFilter === 'PUNE' ? 'ALL' : 'PUNE')}
+              className={`hover:text-black dark:hover:text-white transition-colors flex items-center gap-1 ${
+                corridorFilter === 'PUNE' ? 'text-teal-600 font-bold' : 'text-slate-600 dark:text-[#969BA6]'
+              }`}
+            >
+              <span>Pune Startups</span>
+              <span className="font-bold text-slate-900 dark:text-white ml-0.5">{puneCount}</span>
               <span className="text-slate-400 ml-0.5">↗</span>
             </button>
 
@@ -362,9 +440,19 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
             {/* View Switcher */}
             <div className="flex items-center p-0.5 rounded-lg border border-slate-200 dark:border-[#292C33]">
               <button
+                onClick={() => setViewMode('STARTUPS')}
+                className={`px-2.5 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                  viewMode === 'STARTUPS' ? 'bg-slate-100 dark:bg-[#1D2230] text-black dark:text-white shadow-xs' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+                title="Startups grouped view (Startup-Finder format)"
+              >
+                <Building2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">By Startups</span>
+              </button>
+              <button
                 onClick={() => setViewMode('TABLE')}
                 className={`p-1.5 rounded-md text-xs transition-colors ${
-                  viewMode === 'TABLE' ? 'bg-slate-100 dark:bg-[#1D2230] text-black dark:text-white' : 'text-slate-400'
+                  viewMode === 'TABLE' ? 'bg-slate-100 dark:bg-[#1D2230] text-black dark:text-white shadow-xs' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
                 title="Table view"
               >
@@ -373,7 +461,7 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
               <button
                 onClick={() => setViewMode('CARDS')}
                 className={`p-1.5 rounded-md text-xs transition-colors ${
-                  viewMode === 'CARDS' ? 'bg-slate-100 dark:bg-[#1D2230] text-black dark:text-white' : 'text-slate-400'
+                  viewMode === 'CARDS' ? 'bg-slate-100 dark:bg-[#1D2230] text-black dark:text-white shadow-xs' : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
                 title="Cards view"
               >
@@ -393,7 +481,260 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
         </div>
 
         {/* ========================================================
-            3. RAMP HIGH-DENSITY TABLE (PRIMARY WORKSPACE)
+            3. STARTUPS VIEW (Startup-Finder Grouped Format)
+        ======================================================== */}
+        {viewMode === 'STARTUPS' && (
+          <div className="space-y-6">
+            {groupedByStartup.map((group) => {
+              const brand = getCompanyBrandStyle(group.company);
+              const sample = group.sample;
+
+              return (
+                <div
+                  key={group.company}
+                  className="rounded-2xl bg-white dark:bg-[#15171E] border border-slate-200/90 dark:border-[#242833] shadow-xs overflow-hidden transition-all hover:border-slate-300 dark:hover:border-neutral-700"
+                >
+                  {/* Startup Header Banner */}
+                  <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-[#21242E] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 dark:bg-[#121419]">
+                    <div className="flex items-start sm:items-center gap-3.5">
+                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${brand.gradient} flex items-center justify-center font-black text-white text-base shrink-0 shadow-sm`}>
+                        {group.company.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-lg font-bold text-slate-900 dark:text-[#F3F4F6] tracking-tight">
+                            {group.company}
+                          </h2>
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 border border-slate-200 dark:border-neutral-700">
+                            {group.fundingRound}
+                          </span>
+                          {sample.source.includes('YC') && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                              YC Backed
+                            </span>
+                          )}
+                          {sample.source.includes('Surge') && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                              Peak XV Surge
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-500 dark:text-neutral-400">
+                          <span className="flex items-center gap-1 font-medium">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                            {group.location}
+                          </span>
+                          <span>·</span>
+                          <span className="font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                            {group.openings.length} Active {group.openings.length === 1 ? 'Opening' : 'Openings'}
+                          </span>
+                          <span>·</span>
+                          <span className="text-[11px] font-mono text-slate-400">
+                            Verified {sample.postedDate}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Direct Verified Contact Vectors */}
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      {/* Careers Vector */}
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#1A1D25] border border-slate-200/80 dark:border-[#292D38]">
+                        <span className="text-[11px] font-medium text-slate-500 dark:text-neutral-400">Careers:</span>
+                        <span className="font-mono text-[11px] text-slate-800 dark:text-neutral-200 truncate max-w-[150px]">
+                          {group.careersEmail}
+                        </span>
+                        <button
+                          onClick={(e) => handleCopy(group.careersEmail, `careers-${group.company}`, e)}
+                          className="p-1 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors"
+                          title="Copy careers inbox"
+                        >
+                          {copiedKey === `careers-${group.company}` ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Founder / Engineering Direct Reach */}
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#1A1D25] border border-slate-200/80 dark:border-[#292D38]">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        <span className="text-[11px] font-medium text-slate-800 dark:text-neutral-200">
+                          {group.founderName} ({group.founderRole})
+                        </span>
+                        <button
+                          onClick={(e) => handleCopy(group.founderEmail, `founder-${group.company}`, e)}
+                          className="p-1 text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors"
+                          title="Copy direct inbox"
+                        >
+                          {copiedKey === `founder-${group.company}` ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => onOpenPitch(sample)}
+                          className="px-2 py-0.5 rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold text-[10px] hover:bg-neutral-800 transition-colors ml-1"
+                        >
+                          Pitch
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Startup Nested Job Listings */}
+                  <div className="divide-y divide-slate-100 dark:divide-[#21242E]">
+                    {group.openings.map((job) => {
+                      const matchAnalysis = analyzeJobMatch(job, candidate);
+                      const isTracked = appliedJobIds.has(job.id);
+                      const isSelected = job.id === selectedJobId;
+
+                      return (
+                        <div
+                          key={job.id}
+                          onClick={() => onSelectJob(job)}
+                          className={`p-4 sm:p-5 transition-colors cursor-pointer ${
+                            isSelected
+                              ? 'bg-blue-50/40 dark:bg-[#181B24]'
+                              : 'hover:bg-slate-50/70 dark:hover:bg-[#14161D]'
+                          }`}
+                        >
+                          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            {/* Role Title, Category, Compensation */}
+                            <div className="space-y-1.5 min-w-0 max-w-2xl">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="text-sm font-bold text-slate-900 dark:text-[#F3F4F6] hover:text-blue-600 transition-colors">
+                                  {job.title}
+                                </h3>
+                                <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 font-medium">
+                                  {job.roleCategory}
+                                </span>
+                                {job.noticeBuyoutCovered && (
+                                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                    Notice Buyout Covered
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Prominent Compensation & Equity */}
+                              <div className="flex flex-wrap items-center gap-3 text-xs">
+                                <span className="font-extrabold text-slate-900 dark:text-white tabular-nums text-sm">
+                                  {job.salaryDisplay || `₹${job.minCtcLpa}–${job.maxCtcLpa} LPA`}
+                                </span>
+                                <span className="text-slate-300 dark:text-neutral-600">|</span>
+                                <span className="text-slate-600 dark:text-neutral-400 font-medium">
+                                  Equity: {job.equityRange && !job.equityRange.toLowerCase().includes('none') ? job.equityRange : 'Standard ESOP'}
+                                </span>
+                                <span className="text-slate-300 dark:text-neutral-600">|</span>
+                                <span className="text-slate-500 dark:text-neutral-400">
+                                  Exp: {job.experienceDisplay}
+                                </span>
+                              </div>
+
+                              {/* Transparent Match Reason Line */}
+                              <div className={`text-xs font-mono flex items-start gap-1.5 pt-1 ${
+                                matchAnalysis.capReason ? 'text-amber-700 dark:text-amber-400' : 'text-neutral-600 dark:text-neutral-400'
+                              }`}>
+                                {matchAnalysis.capReason ? (
+                                  <Info className="w-3.5 h-3.5 mt-0.5 shrink-0 text-amber-500" />
+                                ) : (
+                                  <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-500" />
+                                )}
+                                <span>{matchAnalysis.summaryLine}</span>
+                              </div>
+
+                              {/* Matched vs Missing Skills Chips */}
+                              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                                {matchAnalysis.matchedSkills.map((s) => (
+                                  <span
+                                    key={s}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-semibold border border-emerald-200 dark:border-emerald-800/40"
+                                  >
+                                    ✓ {s}
+                                  </span>
+                                ))}
+                                {matchAnalysis.missingSkills.map((s) => (
+                                  <span
+                                    key={s}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-50 dark:bg-neutral-800/50 text-slate-500 dark:text-neutral-400 text-[11px] border border-dashed border-slate-300 dark:border-neutral-700"
+                                    title="Missing requirement according to your profile"
+                                  >
+                                    + {s}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Right Action Stack */}
+                            <div className="flex flex-row lg:flex-col items-end justify-between lg:justify-center gap-2 shrink-0 pt-2 lg:pt-0" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center gap-2">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
+                                  matchAnalysis.relevance === 'strong'
+                                    ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                                    : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                                }`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${matchAnalysis.relevance === 'strong' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                  <span>{matchAnalysis.badgeLabel}</span>
+                                  <span className="tabular-nums font-black">{matchAnalysis.matchScore}%</span>
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => onOpenPitch(job)}
+                                  className="px-3 py-1.5 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-black font-semibold text-xs transition-colors flex items-center gap-1 shadow-xs"
+                                  title="Generate custom cold pitch for founder"
+                                >
+                                  <Send className="w-3 h-3" />
+                                  <span>Pitch</span>
+                                </button>
+
+                                <button
+                                  onClick={() => onOpenAts(job)}
+                                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 hover:border-slate-300 dark:hover:border-neutral-600 text-slate-700 dark:text-neutral-300 font-semibold text-xs transition-colors flex items-center gap-1"
+                                  title="Tailor Google X-Y-Z ATS resume"
+                                >
+                                  <FileText className="w-3 h-3 text-slate-400" />
+                                  <span>Tailor</span>
+                                </button>
+
+                                <button
+                                  onClick={() => onDirectApply(job)}
+                                  className="p-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
+                                  title="Open original posting"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </button>
+
+                                <button
+                                  onClick={() => onAddToPipeline(job)}
+                                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                                    isTracked
+                                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                                      : 'border border-slate-200 dark:border-neutral-700 text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-800'
+                                  }`}
+                                  title="Save to Applications CRM"
+                                >
+                                  <Bookmark className={`w-3.5 h-3.5 ${isTracked ? 'fill-current' : ''}`} />
+                                  <span>{isTracked ? 'Saved' : 'Save'}</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ========================================================
+            4. RAMP HIGH-DENSITY TABLE (SECONDARY WORKSPACE)
         ======================================================== */}
         {viewMode === 'TABLE' && (
           <div className="border-t border-b border-slate-200/80 dark:border-[#292C33] overflow-x-auto">
@@ -428,6 +769,7 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
                   const isChecked = selectedRowIds.has(job.id);
                   const isTracked = appliedJobIds.has(job.id);
                   const brand = getCompanyBrandStyle(job.company);
+                  const matchAnalysis = analyzeJobMatch(job, candidate);
 
                   return (
                     <div
@@ -492,28 +834,33 @@ export const OpportunityDiscover: React.FC<OpportunityDiscoverProps> = ({
                         </div>
                       </div>
 
-                      {/* Match & Skills (Ramp Category style: ⚡ Software:Subscriptions) */}
+                      {/* Match & Skills (Explainable Startup-Finder Format) */}
                       <div className="pr-3">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-amber-500 font-bold">⚡</span>
-                          <span className="font-bold text-slate-900 dark:text-white">
-                            {job.atsMatchScore || 80}% Fit
-                          </span>
-                          <span className="text-[11px] text-slate-400 font-normal">
-                            ({job.requiredSkills.slice(0, 2).join(', ')})
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            matchAnalysis.relevance === 'strong'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                              : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${matchAnalysis.relevance === 'strong' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                            <span>{matchAnalysis.badgeLabel}</span>
+                            <span className="tabular-nums font-extrabold">{matchAnalysis.matchScore}%</span>
                           </span>
                         </div>
                         <div className="flex flex-wrap items-center gap-1 mt-1">
-                          {job.requiredSkills.slice(0, 2).map((s) => (
+                          {matchAnalysis.matchedSkills.slice(0, 2).map((s) => (
                             <span key={s} className="px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-semibold border border-emerald-200 dark:border-emerald-800/40">
                               ✓ {s}
                             </span>
                           ))}
-                          {job.requiredSkills.length > 2 && (
-                            <span className="text-[10px] text-slate-400">
-                              +{job.requiredSkills.length - 2}
+                          {matchAnalysis.missingSkills.slice(0, 1).map((s) => (
+                            <span key={s} className="px-1.5 py-0.2 rounded bg-slate-50 dark:bg-neutral-800/50 text-slate-500 dark:text-neutral-400 text-[10px] border border-dashed border-slate-300 dark:border-neutral-700">
+                              + {s}
                             </span>
-                          )}
+                          ))}
+                        </div>
+                        <div className="text-[10px] font-mono text-neutral-500 truncate mt-0.5 max-w-[200px]" title={matchAnalysis.summaryLine}>
+                          {matchAnalysis.summaryLine}
                         </div>
                       </div>
 
